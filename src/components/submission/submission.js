@@ -1,14 +1,13 @@
-import React, {useState} from 'react';
-import '../App.css';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import Navbar from '../navbar';
+import TopNavbar from '../topnavbar';
+import Footer from '../footer';
+import '../../App.css';
+import { variables } from '../../variables';
 import * as XLSX from 'xlsx';
-import Navbar from './navbar';
-import TopNavbar from './topnavbar'; 
-import Footer from './footer';
-// import { useNavigate } from "react-router-dom";
-import { variables } from '../variables';
-// import UpdateEmployeeInfo from './components/update';
 
-const HRIAssist = () => {
+const Submissions = () => {
 
   const [file, setFile] = useState(null);
   const [excelData, setExcelData] = useState([]);
@@ -198,21 +197,6 @@ const HRIAssist = () => {
                                     <th>
                                         Requests
                                     </th> 
-                                    <th>
-                                        Requests
-                                    </th> 
-                                    <th>
-                                        Requests
-                                    </th> 
-                                    <th>
-                                        Requests
-                                    </th> 
-                                    <th>
-                                        Requests
-                                    </th> 
-                                    <th>
-                                        Requests
-                                    </th> 
                                     {/* <th>
                                         
                                     </th> */}
@@ -220,8 +204,8 @@ const HRIAssist = () => {
                             </thead>
                             <tbody>
                                 {/* {departments.map(dep=> */}
-                                    <tr className='request'>
-                                        {/* <td className='td-width'>
+                                    <tr>
+                                        <td className='td-width'>
                                             <div className='request'> 
                                                 <div className='sender'>
                                                     <label>Joachem S. Trinidad</label>
@@ -229,14 +213,8 @@ const HRIAssist = () => {
                                                 <div className='sender'>
                                                     <label>Pag-Ibig Loan: Landbank Card</label>
                                                 </div>
-                                                <div className='sender'>
-                                                    <label>4 days</label>
-                                                </div> 
-                                                <div className='sender'>
-                                                    <label>status</label>
-                                                </div> 
                                                 <div className='time'>
-                                                    <label>20/4/2024, 12:12 AM</label>
+                                                    <label>12:12 AM</label>
                                                 </div> 
                                                 <div className='view'>
                                                   <button type="button" 
@@ -245,30 +223,9 @@ const HRIAssist = () => {
                                                   </button>
                                                 </div> 
                                             </div>    
-                                        </td>   */}
-                                        <td className='td-width'>
-                                              <label>Joachem S. Trinidad</label>
-                                        </td>  
-                                        <td className='td-width'>
-                                              <label>Pag-Ibig Loan: Landbank Card</label> 
-                                        </td>  
-                                        <td className='td-width'>
-                                              <label>4 days</label> 
-                                        </td>  
-                                        <td className='td-width'>
-                                              <label>status</label> 
-                                        </td>  
-                                        <td className='td-width'>
-                                              <label>20/4/2024, 12:12 AM</label> 
-                                        </td>  
-                                        <td className='td-width'>
-                                              <button type="button" 
-                                              className="btn btn-primary m-2 float-end">
-                                                  View
-                                              </button>
                                         </td>  
                                     </tr>
-                                    {/* <tr>
+                                    <tr>
                                         <td className='td-width'>
                                             <div className='request'> 
                                                 <div className='sender'>
@@ -330,7 +287,7 @@ const HRIAssist = () => {
                                                 </div> 
                                             </div>    
                                         </td>  
-                                    </tr> */}
+                                    </tr>
                                     {/* )} */}
                             </tbody>
                         </table>
@@ -357,4 +314,4 @@ const HRIAssist = () => {
   );
 }
 
-export default HRIAssist;
+export default Submissions;

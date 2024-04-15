@@ -60,6 +60,14 @@ import { useState } from "react";
                 </Link>
                  {/* </a> */}
              </li>
+             <li className="nav-item">
+                 {/* <a className="nav-link" href="/newHireUpload"> */}
+                 <Link className="nav-link" to={{ pathname: "/submissions"}} state={data}>
+                  <i className="fas fa-fw fa-book"></i>
+                  <span>Submissions</span>
+                </Link>
+                 {/* </a> */}
+             </li>
              {/* Nav Item - New Hire Upload */}
              <li className="nav-item">
                  {/* <a className="nav-link" href="/newHireUpload"> */}
@@ -158,6 +166,13 @@ import { useState } from "react";
              <Link className="nav-link" to={{ pathname: "/reports"}} state={data} >
                 <i className="fas fa-fw fa-chart-bar"></i>
                 <span>Report</span>
+              </Link>
+             </li>
+             {/* Nav Item - Reports*/}
+             <li className="nav-item">
+             <Link className="nav-link" to={{ pathname: "/test"}} state={data} >
+                <i className="fas fa-fw fa-chart-bar"></i>
+                <span>Test</span>
               </Link>
              </li>
             

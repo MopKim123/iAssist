@@ -16,6 +16,9 @@ import PagIbigVirtualAccount from './components/loans/pagIbigVirtualAccount';
 import MaternityNotification from './components/loans/MaternityNotification';
 import MaternityBenefit from './components/loans/MaternityBenefit';
 import HRIAssist from './components/hrIAssist';
+import Submissions from './components/submission/submission';
+
+import Test from './components/test';
 
 
 function App() {
@@ -33,6 +36,9 @@ function App() {
           <Route path="/update" element={<UpdateEmployeeInfo />} />
           <Route path="/update/:employeeId" element={<UpdateEmployeeInfo />} />
 
+          
+          <Route path="/submissions" element={<Submissions />} />
+
           <Route path="/iassist" element={<IAssist />} />
             <Route path="/sssloan" element={<SSSLoan />} />
             <Route path="/landbankcard" element={<PagIbigLandbankCard />} />
@@ -41,6 +47,8 @@ function App() {
             <Route path="/notification" element={<MaternityNotification />} />
             <Route path="/benefit" element={<MaternityBenefit />} />
             <Route path="/hriassist" element={<HRIAssist />} />
+
+            <Route path="/test" element={<Test/>} />
 
         </Routes>
       </div>
