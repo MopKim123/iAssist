@@ -1,15 +1,17 @@
 import React, {useState} from 'react';
-import '../App.css';
+import '../../App.css';
 import * as XLSX from 'xlsx';
-import Navbar from './navbar';
-import TopNavbar from './topnavbar'; 
-import Footer from './footer';
+import Navbar from '../navbar';
+import TopNavbar from '../topnavbar'; 
+import Footer from '../footer';
 // import { useNavigate } from "react-router-dom";
-import { variables } from '../variables';
+import { variables } from '../../variables';
 // import UpdateEmployeeInfo from './components/update';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const HRIAssist = () => {
 
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [excelData, setExcelData] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
@@ -67,6 +69,10 @@ const HRIAssist = () => {
   //   setShowPreview(false); // Hide the preview
   //   setActiveTab('upload'); // Switch back to upload tab
   // };
+
+  const viewRequest = () => {
+    navigate('/request') 
+  };
 
   const readFile = (file) => {
     return new Promise((resolve, reject) => {
@@ -196,22 +202,22 @@ const HRIAssist = () => {
                             <thead>
                                 <tr>
                                     <th>
-                                        Requests
+                                        Name
                                     </th> 
                                     <th>
-                                        Requests
+                                        Transaction Type
                                     </th> 
                                     <th>
-                                        Requests
+                                        Turn-Around time
                                     </th> 
                                     <th>
-                                        Requests
+                                        Status
                                     </th> 
                                     <th>
-                                        Requests
+                                        Date Sent
                                     </th> 
                                     <th>
-                                        Requests
+                                        Action/s
                                     </th> 
                                     {/* <th>
                                         
@@ -220,7 +226,7 @@ const HRIAssist = () => {
                             </thead>
                             <tbody>
                                 {/* {departments.map(dep=> */}
-                                    <tr className='request'>
+                                    <tr  >
                                         {/* <td className='td-width'>
                                             <div className='request'> 
                                                 <div className='sender'>
@@ -246,24 +252,25 @@ const HRIAssist = () => {
                                                 </div> 
                                             </div>    
                                         </td>   */}
-                                        <td className='td-width'>
+                                        <td className='column'>
                                               <label>Joachem S. Trinidad</label>
                                         </td>  
-                                        <td className='td-width'>
+                                        <td className='column'>
                                               <label>Pag-Ibig Loan: Landbank Card</label> 
                                         </td>  
-                                        <td className='td-width'>
+                                        <td className='column'>
                                               <label>4 days</label> 
                                         </td>  
-                                        <td className='td-width'>
+                                        <td className='column'>
                                               <label>status</label> 
                                         </td>  
-                                        <td className='td-width'>
+                                        <td className='column'>
                                               <label>20/4/2024, 12:12 AM</label> 
                                         </td>  
-                                        <td className='td-width'>
+                                        <td className='column'>
                                               <button type="button" 
-                                              className="btn btn-primary m-2 float-end">
+                                              className="btn btn-primary m-2 float-end"
+                                              onClick={viewRequest}>
                                                   View
                                               </button>
                                         </td>  

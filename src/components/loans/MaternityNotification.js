@@ -46,17 +46,11 @@ import { variables } from '../../variables';
   
       fetchEmployeeData();
     }, [employeeId]);
-  
-    const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setEmployeeData({
-        ...employeeData,
-        [name]: value
-      });
-    };
+
   
     const handleFormSubmit = async (e) => {
       e.preventDefault();
+      console.log("HELLO WORLD");
       // try {
       //   const response = await fetch(variables.API_URL + 'UploadEmp/' + employeeId, {
       //     method: 'PUT',
@@ -84,72 +78,118 @@ import { variables } from '../../variables';
           <div id="content-wrapper" className="d-flex flex-column">
               <div id="content">
                 <TopNavbar />
-              <div className="container-fluid">
-          <div className="row justify-content-center">
-            <div className="col-xl-12 col-xl-9">
-              <div className="card shadow mb-4">
-              <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <ul className="nav nav-tabs nav-fill">
-                      <li className="nav-item">
-                          <a className="nav-link active " id="personalDetails-tab" data-toggle="tab" href="#personalDetails" role="tab" aria-controls="personalDetails" 
-                          aria-selected="false">Maternity Notification</a>
-                      </li> 
-                  </ul>
+                  <div className="container-fluid">
+                    <div className="row justify-content-center">
+                      <h4 className="m-0 font-weight-bold text-primary header-name">Maternity Notification</h4>
+                    </div>
                   </div>
-                 <br/>
-                  <div className="tab-content">
-                      <div className="tab-pane fade show active" id="personalDetails" role="tabpanel" aria-labelledby="personalDetails-tab">
-                          {/* Personal Details Form */}
-                        <div className="container">
-                            <form onSubmit={handleFormSubmit}>
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">SSS Maternity Notification Form</label>
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
+                  <form onSubmit={handleFormSubmit}>
+                    {/* page content begin here */}
+                    <div className="container-fluid">
+                      <div className="row justify-content-center">
+                        <div className="col-xl-8 col-lg-7">
+                          <div className="card shadow mb-4">
+                            {/* Card Header - New Hire Upload */}
+                            <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                              <h6 className="m-0 font-weight-bold text-primary">SSS Maternity Notification Form</h6>
+                            </div>
+                            {/* Card Body - New Hire Options */}
+                            <div className="card-body">
+                              <div className="tab-content">
+                                <div className="card-body">
+                                  <div className="d-flex justify-content-left">
+                                    <input type="file" className="input-file" aria-describedby="fileHelp"/>
+                                    <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                  </div>
                                 </div>
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">Screenshot of SSS Maternity Eligibility</label>
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
-                                </div>
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">SSS Allocation of Maternity Leave Credit Form</label> 
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
-                                </div> 
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">Medical Certificate or Ultrasound Report</label> 
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
-                                </div> 
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
-                            </form>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      <br/>
-                      </div> 
-                      {/* Add more tab content here */}
-                  </div>
-              </div>
-              </div>
-              </div>
-              </div>
-              </div>
+                      </div>
+                    </div>
+                    {/* Page content ends here */}
+
+                    {/* page content begin here */}
+                    <div className="container-fluid">
+                      <div className="row justify-content-center">
+                        <div className="col-xl-8 col-lg-7">
+                          <div className="card shadow mb-4">
+                            {/* Card Header - New Hire Upload */}
+                            <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                              <h6 className="m-0 font-weight-bold text-primary">Screenshot of SSS Maternity Eligibility</h6>
+                            </div>
+                            {/* Card Body - New Hire Options */}
+                            <div className="card-body">
+                              <div className="tab-content">
+                                <div className="card-body">
+                                  <div className="d-flex justify-content-left">
+                                    <input type="file" className="input-file" aria-describedby="fileHelp"/>
+                                    <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Page content ends here */}
+
+                    {/* page content begin here */}
+                    <div className="container-fluid">
+                      <div className="row justify-content-center">
+                        <div className="col-xl-8 col-lg-7">
+                          <div className="card shadow mb-4">
+                            {/* Card Header - New Hire Upload */}
+                            <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                              <h6 className="m-0 font-weight-bold text-primary">SSS Allocation of Maternity Leave Credit Form</h6>
+                            </div>
+                            {/* Card Body - New Hire Options */}
+                            <div className="card-body">
+                              <div className="tab-content">
+                                <div className="card-body">
+                                  <div className="d-flex justify-content-left">
+                                    <input type="file" className="input-file" aria-describedby="fileHelp"/>
+                                    <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Page content ends here */}
+
+                    {/* page content begin here */}
+                    <div className="container-fluid">
+                      <div className="row justify-content-center">
+                        <div className="col-xl-8 col-lg-7">
+                          <div className="card shadow mb-4">
+                            {/* Card Header - New Hire Upload */}
+                            <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                              <h6 className="m-0 font-weight-bold text-primary">Medical Certificate or Ultrasound Report</h6>
+                            </div>
+                            {/* Card Body - New Hire Options */}
+                            <div className="card-body">
+                              <div className="tab-content">
+                                <div className="card-body">
+                                  <div className="d-flex justify-content-left">
+                                    <input type="file" className="input-file" aria-describedby="fileHelp"/>
+                                    <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Page content ends here */}
+                    <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
+                  </form>
+                </div>
               <Footer />
           </div>
       </div>

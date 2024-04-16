@@ -258,18 +258,58 @@
 .sender { 
   /* padding: 5px;  */
   display: flex; 
-  align-items: start;
+  align-items: flex-start;
   width: 30vh; 
 }  
 
 .time { 
   display: flex;
   flex-direction: column;
-  align-items: end; 
+  align-items: flex-end; 
   width: 20vh; 
 
 }
 
-.view {    
-  width: 25vh; 
+.column {     
+  align-content: center;
 } 
+
+/*start*/
+/* .header-name {
+  padding-bottom: 20px;
+}
+.input-file{
+  width: 60%;
+}
+.card-tab{
+  display: grid;
+    grid-template-columns: 20vw 5px auto; 
+    grid-gap: 10px;
+}
+.vertical-line {
+  border-left: 1px solid #ccc;
+  height: 100%;
+}
+.no-selected{
+  padding: 50px;
+  margin: auto;
+}
+.content-holder{
+  display: flex;
+  flex-direction: column;
+}
+.loan-btn{
+  width: 64%;
+  margin-bottom: 30px;
+}
+
+.loan-row{
+  gap: 1rem;
+  display: grid;
+  grid-template-columns: 25vw 25vw;
+} */
+
+/* requestView */
+.btnClose{
+  margin-left: 15px;
+}

@@ -9,6 +9,7 @@ import { variables } from '../../variables';
  function MaternityBenefit() {
    
     const { employeeId } = useParams();
+    const [selected, setSelected] = useState("0")
     const [employeeData, setEmployeeData] = useState({
       LastName: '',
       FirstName: '',
@@ -26,7 +27,8 @@ import { variables } from '../../variables';
       TIN: '',
       HRANID: '',
       ContactNumber: '',
-      EmailAddress: ''
+      EmailAddress: '',
+      deliveryType: ''
     });
   
     useEffect(() => {
@@ -48,12 +50,15 @@ import { variables } from '../../variables';
     }, [employeeId]);
   
     const handleInputChange = (e) => {
+      console.log(e.target.value);
+      setSelected(e.target.value);
+
       const { name, value } = e.target;
       setEmployeeData({
         ...employeeData,
         [name]: value
       });
-    };
+    }; 
   
     const handleFormSubmit = async (e) => {
       e.preventDefault();
@@ -84,103 +89,123 @@ import { variables } from '../../variables';
           <div id="content-wrapper" className="d-flex flex-column">
               <div id="content">
                 <TopNavbar />
-              <div className="container-fluid">
-          <div className="row justify-content-center">
-            <div className="col-xl-12 col-xl-9">
-              <div className="card shadow mb-4">
-              <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <ul className="nav nav-tabs nav-fill">
-                      <li className="nav-item">
-                          <a className="nav-link active " id="personalDetails-tab" data-toggle="tab" href="#personalDetails" role="tab" aria-controls="personalDetails" 
-                          aria-selected="false">Maternity Benefit</a>
-                      </li> 
-                  </ul>
-                  </div>
-                 <br/>
-                  <div className="tab-content">
-                      <div className="tab-pane fade show active" id="personalDetails" role="tabpanel" aria-labelledby="personalDetails-tab">
-                          {/* Personal Details Form */}
-                        <div className="container">
-                            <form onSubmit={handleFormSubmit}> 
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">SSS Maternity Reimbursement Application Form</label>
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
+                <div className="container-fluid">
+                    <div className="row justify-content-center">
+                      <h4 className="m-0 font-weight-bold text-primary header-name">Maternity Benefit</h4>
+                    </div>
+                    <form onSubmit={handleFormSubmit}>
+
+                      {/* page content begin here */}
+                      <div className="container-fluid">
+                        <div className="row justify-content-center">
+                          <div className="col-xl-8 col-lg-7">
+                            <div className="card shadow mb-4">
+                              {/* Card Header - New Hire Upload */}
+                              <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 className="m-0 font-weight-bold text-primary">SSS Maternity Reimbursement Application Form</h6>
+                              </div>
+                              {/* Card Body - New Hire Options */}
+                              <div className="card-body">
+                                <div className="tab-content">
+                                  <div className="card-body">
+                                    <div className="d-flex justify-content-left">
+                                      <input type="file" className="input-file" aria-describedby="fileHelp"/>
                                       <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                     </div>
-                                  </div> 
+                                  </div>
                                 </div>
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">Type of Delivery</label>
-                                      <input type="text" className="form-control" id="name" name="name" value={employeeData.Name} onChange={handleInputChange} />
-                                    </div>
-                                  </div> 
-                                </div>
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">If Live Birth</label>  
-                                    </div>
-                                  </div> 
-                                </div>  
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">Proof of Child's Birth (Live Birth Certificate)</label> 
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
-                                </div>  
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">Solo Parent ID or Certificate of Eligibility (If Solo Parent)</label> 
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
-                                </div>  
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">If Terminated</label>  
-                                    </div>
-                                  </div> 
-                                </div>  
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">Proof of Termination (If Still Birth/Fetal Death)</label> 
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
-                                </div>  
-                                <div className="row justify-content-center">
-                                  <div className="col-md-4">
-                                    <div className="form-group">
-                                      <label htmlFor="middleName">Fetal Certificate of Death</label> 
-                                      <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
-                                      <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
-                                    </div>
-                                  </div> 
-                                </div>  
-                                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
-                            </form>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      <br/>
-                      </div> 
-                      {/* Add more tab content here */}
+                      </div>
+                      {/* Page content ends here */}
+                      
+                      {/* page content begin here */}
+                      <div className="container-fluid">
+                        <div className="row justify-content-center">
+                          <div className="col-xl-8 col-lg-7">
+                            <div className="card shadow mb-4">
+                              {/* Card Header - New Hire Upload */}
+                              <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 className="m-0 font-weight-bold text-primary">Delivery</h6>
+                              </div>
+                              {/* Card Body - New Hire Options */}
+                              <div className="card-body">
+                                <div className="tab-content card-tab">
+                                  <div className="card-body">
+                                    <div className="d-flex justify-content-left">
+                                      <div className="form-group">
+                                        <label htmlFor="deliveryType">Type of Delivery</label>
+                                        <select className="form-control" id="deliveryType" name="deliveryType" value={employeeData.deliveryType} onChange={handleInputChange}>
+                                          <option value="0">Select Type</option>
+                                          <option value="1">Live Child Birth</option>
+                                          <option value="Miscarriage">Miscarriage</option>
+                                          <option value="Emergency Termination of Pregnancy">Emergency Termination of Pregnancy</option>
+                                          <option value="Ectopic Pregnancy">Ectopic Pregnancy</option>
+                                          <option value="Still Birth">Still Birth</option>
+                                          <option value="Fetal Death">Fetal Death</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {/* Vertical line */}
+                                  <div className="vertical-line"></div>
+                                    <div className="card-body">
+                                      <div className="d-flex justify-content-left ">
+                                        { selected === "0" && (
+                                          <div className="no-selected">
+                                            <label >Select a type of delivery</label>  
+                                          </div>
+                                        )}
+                                        { selected === "1" && selected !== "0" && (
+                                        <div className="row justify-content-left content-holder">
+                                          <div className="form-group">
+                                            <label htmlFor="middleName">Live Birth</label>  
+                                          </div>
+                                          <div className="form-group">
+                                            <label htmlFor="middleName">Proof of Child's Birth (Live Birth Certificate)</label> 
+                                            <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
+                                            <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                          </div>
+                                          <div className="form-group">
+                                            <label htmlFor="middleName">Solo Parent ID or Certificate of Eligibility (If Solo Parent)</label> 
+                                            <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
+                                            <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                          </div>
+                                        </div> 
+                                        )}
+                                         
+                                        { selected !== '1' && selected !== '0' && (
+                                        <div className="row justify-content-left content-holder">
+                                          <div className="form-group">
+                                            <label htmlFor="middleName">{employeeData.deliveryType}</label>  
+                                          </div>
+                                          <div className="form-group">
+                                            <label htmlFor="middleName">Proof of Termination (If Still Birth/Fetal Death)</label> 
+                                            <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
+                                            <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                          </div>
+                                          <div className="form-group">
+                                            <label htmlFor="middleName">Fetal Certificate of Death</label> 
+                                            <input type="file" className="form-control-file" aria-describedby="fileHelp"/>
+                                            <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
+                                          </div>
+                                        </div>  
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Page content ends here */}
+                        <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
+                    </form>
                   </div>
-              </div>
-              </div>
-              </div>
-              </div>
-              </div>
+                </div>
               <Footer />
           </div>
       </div>
