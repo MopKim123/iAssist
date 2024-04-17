@@ -8,26 +8,7 @@ import { variables } from '../../variables';
 
 function SSSLoan() {
 
-    const { employeeId } = useParams();
-    const [employeeData, setEmployeeData] = useState({
-        LastName: '',
-        FirstName: '',
-        MiddleName: '',
-        MaidenName: '',
-        Birthdate: '',
-        Age: '',
-        BirthMonth: '',
-        AgeBracket: '',
-        Aender: '',
-        MaritalStatus: '',
-        SSS: '',
-        PHIC: '',
-        HDMF: '',
-        TIN: '',
-        HRANID: '',
-        ContactNumber: '',
-        EmailAddress: ''
-    });
+    const { employeeId } = useParams(); 
 
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -72,7 +53,8 @@ function SSSLoan() {
       
         const formData = new FormData();
         formData.append('sssloanPDF', selectedFile); // Assuming selectedFile holds the PDF file
-      
+        
+        console.log(formData)
         try {
           const uploadResponse = await fetch('http://localhost:5000/upload', {
             method: 'POST',
@@ -94,10 +76,7 @@ function SSSLoan() {
     const handleFileSelect = (e) => {
         setSelectedFile(e.target.files[0]);
     };
-
-    if (!employeeData) {
-        return <div>Loading...</div>;
-    }
+ 
 
     const getCurrentDate = () => {
         const now = new Date();

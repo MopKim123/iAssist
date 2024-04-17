@@ -7,14 +7,13 @@ import '../../App.css';
 import { variables } from '../../variables';
 import { base64pdf } from '../../vblob';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-// import pdf1 from '../../dummy.pdf'
+import Button from 'react-bootstrap/Button'; 
 import "react-pdf/dist/esm/Page/TextLayer.css"; 
 
 import { Document, Page,pdfjs } from 'react-pdf'; 
 
 
- function RequestView() {
+ function SubmissionView() {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
 
     const { employeeId } = useParams();
@@ -140,8 +139,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                     <label>*Employee name</label>
                                     <label>*Date Submitted</label>
                                     <label>*Turn Around</label>
-                                    <label>*Status</label>
-                                    <Button>Confirm</Button>
+                                    <label>*Status</label> 
                                 </div>
                                 </div> 
                               </div> 
@@ -199,12 +197,13 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                 {/* Card Header - New Hire Upload */}
                                 <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 className="m-0 font-weight-bold text-primary">*Requirement name</h6> 
+                                    <h6 className="m-0 font-weight-bold">*Resubmit</h6> 
                                 </div>
                                 {/* Card Body - New Hire Options */}
                                 <div className="card-body">
                                     <div className="tab-content">
                                         <div className="card-body">
-                                            <div className="d-flex justify-content-between">
+                                            <div className="d-flex justify-content-between mb-2">
                                               <div> 
                                                 <button onClick={handleButtonClick}>
                                                   View PDF
@@ -212,26 +211,17 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                                 <button onClick={convertAndDownloadPDF} className='btnClose'>
                                                   Download
                                                 </button>
-                                                <label>*File Name</label>
                                               </div>
+                                              <label>*File Name</label>
                                               <label>*Upload Date</label>
-                                              <div> 
-                                                <label for="toggle" class="toggle-label mr-2">Resubmit</label>   
-                                                <input type="checkbox" id="toggle" class="toggle-input" />
-                                              </div>
                                             </div>
 
-                                            <div className="card-body">
+                                            {/* For Resubmission */}
+                                            <div className="d-flex justify-content-between">
                                                 <div className="d-flex justify-content-left">
-                                                  <div className="form-group">
-                                                      <label htmlFor="deliveryType">Reason For Resubmission</label>
-                                                      <select className="form-control" id="deliveryType" name="deliveryType">
-                                                        <option value="0">Select Type</option>
-                                                        <option value="1">Live Child Birth</option> 
-                                                        <option value="Fetal Death">Fetal Death</option>
-                                                      </select>
-                                                  </div>
-                                                </div>
+                                                    <input type="file" className="input-file" aria-describedby="fileHelp"/> 
+                                                </div> 
+                                                <label>Reason: Incomplete/blurry</label>
                                             </div>
                                         </div>
                                     </div>
@@ -242,36 +232,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                 </div>
                 {/* Page content ends here */}
 
-                
-                {/* page content begin here */}
-                <div className="container-fluid">
-                    <div className="row justify-content-center">
-                        <div className="col-xl-8 col-lg-7">
-                            <div className="card shadow mb-4">
-                                {/* Card Header - New Hire Upload */}
-                                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 className="m-0 font-weight-bold text-primary">Remark</h6>
-                                </div>
-                                {/* Card Body - New Hire Options */}
-                                <div className="card-body">
-                                    <div className="tab-content">
-                                        <div className="card-body loan-row"> 
-                                            <div className="form-group"> <textarea 
-                                              className="form-control" 
-                                              id="remark" 
-                                              name="remark"
-                                              rows="3" 
-                                              style={{ resize: "vertical" }}
-                                            />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {/* Page content ends here */}
+                 
                 <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
                 </form>
               </div>
@@ -320,5 +281,5 @@ import { Document, Page,pdfjs } from 'react-pdf';
   );
 }
 
-export default RequestView;
+export default SubmissionView;
 
