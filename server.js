@@ -30,4 +30,38 @@ app.post('/upload', upload.single('sssloanPDF'), async (req, res) => {
   // }
 });
 
+app.post('/hrsubmission', async (req, res) => {
+
+  try {
+
+    // if (!req.body) {
+    //   return res.status(400).json({ error: 'No Employee ID' });
+    // }
+  
+    const result = await dbOperation.getSubmissions();
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/submissionpdf',  upload.single('SubmissionID'), async (req, res) => {
+
+  try {
+
+    // if (!req.body) {
+    //   return res.status(400).json({ error: 'No Employee ID' });
+    // } 
+  
+    const result = await dbOperation.getPDF(req.body.SubmissionID);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

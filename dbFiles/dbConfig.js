@@ -2,7 +2,7 @@ const config = {
     user: 'root',
     password: '123',
     server: '10.160.54.14',
-    database: 'iAssist',
+    database: 'EmployeeManagementDB',
     options:{
         trustServerCertificate: true,
         trustedConnection: false,

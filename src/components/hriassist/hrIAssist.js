@@ -7,28 +7,57 @@ import Footer from '../footer';
 // import { useNavigate } from "react-router-dom";
 import { variables } from '../../variables'; 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const HRIAssist = () => {
 
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
-  const [excelData, setExcelData] = useState([]);
-  const [showPreview, setShowPreview] = useState(false);
-  const [activeTab, setActiveTab] = useState('upload'); // State to manage active tab
+  const [submissions, setSubmissions] = useState([]);
  
-
-  // const handleNavigateBack = () => {
-  //   setShowPreview(false); // Hide the preview
-  //   setActiveTab('upload'); // Switch back to upload tab
-  // };
-
-  const viewRequest = () => {
-    navigate('/request') 
+  const viewRequest = (data) => {
+    navigate('/request', { state: { data } }) 
   };
- 
-  
+
 
   
+  useEffect(() => {
+    handleFormSubmit()
+  }, []);
+  
+  const handleFormSubmit = async () => {
+    
+    const EmpId = '10023'
+
+    const formData = new FormData();
+    formData.append('EmpId', EmpId); 
+     
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/hrsubmission', {
+        method: 'POST',
+      }) 
+  
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
+
+      try {
+        const data = await uploadResponse.json(); // Wait for the JSON data to be parsed
+        // console.log(data.result);
+        setSubmissions(data.result) 
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
+
+      // console.log('PDF uploaded successfully');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+   
+  // console.log(submissions);
+
   return (
     
           <div>
@@ -54,6 +83,11 @@ const HRIAssist = () => {
                                   role="tabpanel"
                                   aria-labelledby="reports-tab"
                                 >
+                          <button type="button" 
+                          className="btn btn-primary m-2 float-end"
+                          onClick={handleFormSubmit}>
+                              View
+                          </button>
                           <div className="card-body">
                             <div className="table-responsive">
                                 <table className="table table-striped">
@@ -80,32 +114,33 @@ const HRIAssist = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {/* {departments.map(dep=> */}
-                                            <tr  > 
-                                                <td className='column'>
-                                                      <label>Joachem S. Trinidad</label>
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>Pag-Ibig Loan: Landbank Card</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>4 days</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>status</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>20/4/2024, 12:12 AM</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <button type="button" 
-                                                      className="btn btn-primary m-2 float-end"
-                                                      onClick={viewRequest}>
-                                                          View
-                                                      </button>
-                                                </td>  
-                                            </tr> 
-                                            {/* )} */}
+                                      {submissions.map((sub, index) =>
+                                        <tr key={index}>
+                                            <td className='column'>
+                                                  <label>{sub.Name}</label>
+                                            </td>  
+                                            <td className='column'>
+                                                  <label>{sub.TransactionType}</label> 
+                                            </td>  
+                                            <td className='column'>
+                                                  <label>{sub.TurnAround} Days</label> 
+                                            </td>  
+                                            <td className='column'>
+                                                  <label>{sub.Status}</label> 
+                                            </td>  
+                                            <td className='column'>
+                                              <label>{sub.DateTime}</label> 
+                                            </td> 
+                                            {/* <button onClick={() => handleButtonClick(sub)}>Go to Next Page</button>  */}
+                                            <td className='column'>
+                                              <button type="button" 
+                                              className="btn btn-primary m-2 float-end"
+                                              onClick={() => viewRequest(sub)}>
+                                                  View
+                                              </button>
+                                            </td>  
+                                        </tr> 
+                                      )}
                                     </tbody>
                                 </table>
                             <br />
