@@ -82,12 +82,7 @@ const HRIAssist = () => {
                                   id="newHireReports"
                                   role="tabpanel"
                                   aria-labelledby="reports-tab"
-                                >
-                          <button type="button" 
-                          className="btn btn-primary m-2 float-end"
-                          onClick={handleFormSubmit}>
-                              View
-                          </button>
+                                > 
                           <div className="card-body">
                             <div className="table-responsive">
                                 <table className="table table-striped">

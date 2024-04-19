@@ -1,25 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import Navbar from '../navbar';
-import TopNavbar from '../topnavbar';
-import Footer from '../footer';
+import React, {useState} from 'react';
 import '../../App.css';
-import { variables } from '../../variables';
 import * as XLSX from 'xlsx';
-import { useNavigate } from "react-router-dom";
+import Navbar from '../navbar';
+import TopNavbar from '../topnavbar'; 
+import Footer from '../footer';
+// import { useNavigate } from "react-router-dom";
+import { variables } from '../../variables'; 
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Submissions = () => {
 
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
-  const [excelData, setExcelData] = useState([]);
-  const [showPreview, setShowPreview] = useState(false);
-  const [activeTab, setActiveTab] = useState('upload'); // State to manage active tab
- 
-  const viewSubmission = () => {
-    navigate('/submissionview') 
-  };
+  const [submissions, setSubmissions] = useState([]);
   
+  const viewSubmission = (data) => {
+    navigate('/submissionview', { state: { data } }) 
+  };
+
+
+  
+  useEffect(() => {
+    handleFormSubmit()
+  }, []);
+  
+  const handleFormSubmit = async () => {
+    
+    const EmpId = '10023'
+
+    const formData = new FormData();
+    formData.append('EmpId', EmpId); 
+     
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/usersubmission', {
+        method: 'POST',
+        body: formData
+      }) 
+  
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
+
+      try {
+        const data = await uploadResponse.json(); // Wait for the JSON data to be parsed
+        // console.log(data.result);
+        setSubmissions(data.result) 
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
+
+      // console.log('PDF uploaded successfully');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+   
+  // console.log(submissions);
+
   return (
     
           <div>
@@ -32,6 +71,11 @@ const Submissions = () => {
         <div id="content">
          {/* Topbar */}
          <TopNavbar />
+            <div className="container-fluid mb-1">
+                <div className="row justify-content-center">
+                    <h4 className="m-0 font-weight-bold text-primary header-name">My Submissions</h4>
+                </div>
+            </div>
             {/* Start of Page Content */}
             <div className="container-fluid">
               <div className="row justify-content-center">
@@ -44,15 +88,15 @@ const Submissions = () => {
                                   id="newHireReports"
                                   role="tabpanel"
                                   aria-labelledby="reports-tab"
-                                >
+                                > 
                           <div className="card-body">
                             <div className="table-responsive">
                                 <table className="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>
+                                            {/* <th>
                                                 Name
-                                            </th> 
+                                            </th>  */}
                                             <th>
                                                 Transaction Type
                                             </th> 
@@ -71,32 +115,32 @@ const Submissions = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {/* {departments.map(dep=> */}
-                                            <tr  > 
-                                                <td className='column'>
-                                                      <label>Joachem S. Trinidad</label>
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>Pag-Ibig Loan: Landbank Card</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>4 days</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>status</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <label>20/4/2024, 12:12 AM</label> 
-                                                </td>  
-                                                <td className='column'>
-                                                      <button type="button" 
-                                                      className="btn btn-primary m-2 float-end" 
-                                                      onClick={viewSubmission}>
-                                                          View
-                                                      </button>
-                                                </td>  
-                                            </tr> 
-                                            {/* )} */}
+                                      {submissions.map((sub, index) =>
+                                        <tr key={index}>
+                                            {/* <td className='column'>
+                                                  <label>{sub.Name}</label>
+                                            </td>   */}
+                                            <td className='column'>
+                                                  <label>{sub.TransactionType}</label> 
+                                            </td>  
+                                            <td className='column'>
+                                                  <label>{sub.TurnAround} Days</label> 
+                                            </td>  
+                                            <td className='column'>
+                                                  <label>{sub.Status}</label> 
+                                            </td>  
+                                            <td className='column'>
+                                              <label>{sub.DateTime}</label> 
+                                            </td>  
+                                            <td className='column'>
+                                              <button type="button" 
+                                              className="btn btn-primary m-2 float-end"
+                                              onClick={() => viewSubmission(sub)}>
+                                                  View
+                                              </button>
+                                            </td>  
+                                        </tr> 
+                                      )}
                                     </tbody>
                                 </table>
                             <br />

@@ -64,6 +64,42 @@ const getSubmissions = async () => {
     }
 }
 
+const getUserSubmissions = async (id) => {
+    try {
+        let pool = await sql.connect(config);
+
+        // Query the database to get the PDF data based on the ID
+        let result = await pool.request() 
+            .input('id', sql.Int, id)
+            .query(`
+                SELECT 
+                    Employee.Name,
+                    Submission.SubmissionID,
+                    Submission.TransactionType,
+                    Submission.TurnAround,
+                    Submission.Status,
+                    Submission.DateTime,
+                    Submission.LoanAppDate,
+                    Submission.TransactionNum,
+                    Submission.TypeOfDelivery
+                FROM Submission
+                LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
+                Where Submission.EmpId = @id
+            `);
+
+        // If there's no result, return null
+        if (result.recordset.length === 0) {
+            return null;
+        } 
+    
+        return result.recordset;
+
+    } catch (error) {
+        console.error("Error retrieving PDF data:", error);
+        throw error;
+    }
+}
+
 const getPDF = async (id) => {
     try {
         let pool = await sql.connect(config);
@@ -93,5 +129,6 @@ const getPDF = async (id) => {
 module.exports = {
     insertPDF,
     getSubmissions,
+    getUserSubmissions,
     getPDF,
 };

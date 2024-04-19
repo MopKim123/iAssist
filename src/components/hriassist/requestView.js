@@ -259,7 +259,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                             <div className="d-flex justify-content-between align-items-center">
                                               <div> 
                                                 <button onClick={() => handleButtonClick(pdf.PdfData)}>
-                                                  View PDF {index}
+                                                  View PDF
                                                 </button>
                                                 <button onClick={() => convertAndDownloadPDF(pdf.PdfData,pdf.FileName)} className='btnClose'>
                                                   Download
