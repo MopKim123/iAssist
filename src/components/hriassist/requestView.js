@@ -86,13 +86,30 @@ import { Document, Page,pdfjs } from 'react-pdf';
           }
 
           try {
-            const data = await uploadResponse.json(); // Wait for the JSON data to be parsed
-            // console.log(data.result);
-            // data.forEach(element => {
-            //   console.log(element);
+            const responseData = await uploadResponse.json();
+            const sortedData = responseData.result.sort((a, b) => {
+                // First, sort by name
+                if (a.RequirementName !== b.RequirementName) {
+                    return a.RequirementName.localeCompare(b.RequirementName);
+                } else {
+                    // If names are the same, sort by the variable containing the number
+                    return b.Updated - a.Updated;
+                }
+            });
+
+            // const responseData = await uploadResponse.json();
+            // const sortedData = responseData.result.sort((a, b) => {
+            //     // Sort in descending order if Resubmit is true, otherwise keep order unchanged
+            //     console.log(a.Updated === b.Updated ? 0 : a.Updated ? 1 : -1);
+            //     return a.Updated === b.Updated ? 0 : a.Updated ? 1 : -1;
             // });
-            setPdfResubmit(data.result.map(({ PdfFileID, Resubmit, ResubmitReason}) => ({ PdfFileID, Resubmit, ResubmitReason})))
-            setPdf(data.result) 
+            // console.log(sortedData);
+            // // setPdfResubmit(sortedData.map(({ PdfFileID, Resubmit, ResubmitReason }) => ({ PdfFileID, Resubmit, ResubmitReason })));
+            setPdf(sortedData);
+
+            // const data = await uploadResponse.json();  
+            // setPdfResubmit(data.result.map(({ PdfFileID, Resubmit, ResubmitReason}) => ({ PdfFileID, Resubmit, ResubmitReason})))
+            // setPdf(data.result) 
           } catch (error) {
               console.error('Error parsing JSON response:', error);
           }
@@ -104,7 +121,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
   
 
     const handleFormSubmit = async (e) => {
-      e.preventDefault();
+      e.preventDefault(); 
       // try {
       //   const response = await fetch(variables.API_URL + 'UploadEmp/' + employeeId, {
       //     method: 'PUT',
@@ -122,7 +139,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
       //   console.error('Error updating employee:', error);
       // }
     }; 
-  
+    
     // Modal functions
     const handleButtonClick = (base64) => { 
       convertToPDF(base64);
@@ -133,21 +150,25 @@ import { Document, Page,pdfjs } from 'react-pdf';
     };
 
     // Checkbox 
-    const checkbox = (id, status) => {
-      console.log(pdfResubmit)
-      console.log(id, status.target.value)
-
-      const isChecked = status.target.checked;
-      setPdfResubmit(
-        pdfResubmit.map(pdfResubmit => { 
-          if (pdfResubmit.PdfFileID === id) { 
-            return { ...pdfResubmit, Resubmit: !pdfResubmit.PdfFileID };
-          } 
-          return pdfResubmit;
-        })
-      )
-    } 
+    const checkbox = (id, status) => { 
     
+      const isChecked = status.target.checked;
+      const index = pdf.findIndex(pdf => pdf.PdfFileID === id);
+      if (index !== -1) {
+        pdf[index].Resubmit = isChecked; 
+        setPdf([...pdf]); 
+      }
+    };
+    // Reason 
+    const resubmitReason = (id, reason) => {  
+      const reasonPDF = reason.target.value;
+      const index = pdf.findIndex(pdf => pdf.PdfFileID === id);
+      if (index !== -1) {
+        pdf[index].ResubmitReason = reasonPDF; 
+        setPdf([...pdf]); // Update the state with the modified array
+      }
+    };  
+
     return (
       <div id="wrapper">
           <Navbar />
@@ -256,37 +277,62 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                 <div className="card-body">
                                     <div className="tab-content">
                                         <div className="card-body">
-                                            <div className="d-flex justify-content-between align-items-center">
-                                              <div> 
-                                                <button onClick={() => handleButtonClick(pdf.PdfData)}>
-                                                  View PDF
-                                                </button>
-                                                <button onClick={() => convertAndDownloadPDF(pdf.PdfData,pdf.FileName)} className='btnClose'>
-                                                  Download
-                                                </button>
-                                                <label>{pdf.FileName}</label>
-                                              </div>
-                                              <label>{pdf.UploadDate}</label>
-                                              <div> 
-                                                <label for="toggle" class="toggle-label mr-2">Resubmit</label>   
-                                                <input type="checkbox" id="toggle" class="toggle-input"  onChange={(e)=>checkbox(pdf.PdfFileID, e)}
-                                                  checked={pdfResubmit && pdfResubmit.PdfFileID === pdf.PdfFileID}
-                                                />
-                                              </div>
+                                          <div className="d-flex justify-content-between align-items-center">
+                                            <div> 
+                                              <button onClick={() => handleButtonClick(pdf.PdfData)}>
+                                                View PDF
+                                              </button>
+                                              <button onClick={() => convertAndDownloadPDF(pdf.PdfData,pdf.FileName)} className='btnClose'>
+                                                Download
+                                              </button>
+                                              <label>{pdf.FileName}</label>
                                             </div>
-
-                                            <div className="card-body">
-                                                <div className="d-flex justify-content-left">
-                                                  <div className="form-group">
-                                                      <label htmlFor="deliveryType">Reason For Resubmission</label>
-                                                      <select className="form-control" id="deliveryType" name="deliveryType">
-                                                        <option value="0">Select Type</option>
-                                                        <option value="1">Live Child Birth</option> 
-                                                        <option value="Fetal Death">Fetal Death</option>
-                                                      </select>
-                                                  </div>
+                                            <label>{pdf.UploadDate}</label>
+                                            <div> 
+                                              <label for="toggle" class="toggle-label mr-2">{pdf.Updated ? 'Resubmission':'Resubmit'}</label>    
+                                              {pdf.Updated ? 
+                                              <label className="toggle-label mr-2">{pdf.EmpResubmitted ? '- Complete':'- Pending'}</label>
+                                              :
+                                              <input type="checkbox" id="toggle" class="toggle-input" onChange={(e)=>checkbox(pdf.PdfFileID, e)} 
+                                                checked={pdf.Resubmit}
+                                              />      
+                                              }
+                                            </div>
+                                          </div>
+                                          {pdf.Resubmit && !pdf.Updated ? 
+                                            <div>
+                                                {/* Card Header - New Hire Upload */}
+                                                <div className="py-3 align-items-center justify-content-between">
+                                                    <label className="mt-2 font-weight-bold text-primary">Reason</label>
+                                                    <label className="ml-1 font-weight-bold text-danger">*</label> 
+                                                </div> 
+                                                <div>
+                                                    <div className="">
+                                                        <div className=" loan-row"> 
+                                                            <div className="form-group"> <textarea 
+                                                              className="form-control" 
+                                                              id="remark" 
+                                                              name="remark"
+                                                              rows="3" 
+                                                              style={{ resize: "vertical" }}
+                                                              onChange={(e)=>resubmitReason(pdf.PdfFileID,e)}
+                                                              value={pdf.ResubmitReason}
+                                                            /> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </div>:''
+                                          }
+                                          {pdf.Updated ? 
+                                          <div>
+                                              {/* Card Header - New Hire Upload */}
+                                              <div className="py-3 align-items-center justify-content-between">
+                                                  <label className="mt-2 font-weight-bold text-danger">Reason:</label>
+                                                  <label className="ml-1">{pdf.ResubmitReason}</label> 
+                                              </div>  
+                                          </div>:''
+                                          }
                                         </div>
                                     </div>
                                 </div>
