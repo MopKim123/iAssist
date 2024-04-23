@@ -125,10 +125,61 @@ const getPDF = async (id) => {
     }
 }
 
+const updatePDF = async (id,reason,subId) => {
+    try {
+        let pool = await sql.connect(config);
+
+        console.log('this',id,reason,subId); 
+        let result = await pool.request()
+            .input('id', sql.Int, id)
+            .input('reason', sql.NVarChar(200), reason) // Assuming the reason is a string with a maximum length of 50 characters
+            .query(`
+                UPDATE PdfFile
+                SET ResubmitReason = @reason,
+                Resubmit = 1,
+                Updated = 1
+                WHERE PdfFileID = @id
+            `); 
+        let submission = await pool.request()
+            .input('id', sql.Int, subId) 
+            .query(`
+                UPDATE Submission
+                SET Status = 'Resubmit'
+                WHERE SubmissionID = @id
+            `);
+ 
+        return "Successfully updated the pdf";
+    } catch (error) {
+        console.error("Error updating PDF data:", error);
+        throw error;
+    }
+}
+
+const updateSubmission = async (id) => {
+    try {
+        let pool = await sql.connect(config);
+ 
+        let result = await pool.request()
+            .input('id', sql.Int, id) 
+            .query(`
+                UPDATE Submission
+                SET Status = 'Complete'
+                WHERE SubmissionID = @id
+            `);
+ 
+        return "Successfully updated the pdf";
+    } catch (error) {
+        console.error("Error updating PDF data:", error);
+        throw error;
+    }
+}
+
 
 module.exports = {
     insertPDF,
     getSubmissions,
     getUserSubmissions,
     getPDF,
+    updatePDF,
+    updateSubmission,
 };

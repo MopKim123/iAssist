@@ -261,12 +261,14 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                               <label>Date Submitted: {pdf.UploadDate}</label>  
                                             </div>
 
+                                            {console.log(pdf)}
                                             {/* For Resubmission */}
                                             {pdf.Resubmit === 1 &&
                                               <div className="d-flex justify-content-between">
+                                                  {pdf.EmpResubmitted === 0 &&
                                                   <div className="d-flex justify-content-left">
                                                       <input type="file" className="input-file" aria-describedby="fileHelp"/> 
-                                                  </div> 
+                                                  </div> }
                                                   <label>Reason: {pdf.ResubmitReason}</label>
                                               </div>
                                             }

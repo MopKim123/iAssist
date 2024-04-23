@@ -34,7 +34,6 @@ import { Document, Page,pdfjs } from 'react-pdf';
     
     // Converts base64 to pdf
     const convertToPDF = (base64) => {
-      console.log("here",base64)
       // const binaryString = atob(base64?base64:base64pdf.blobpdf2);
       const binaryString = atob(base64?base64:base64pdf.blobpdf2);
 
@@ -106,28 +105,69 @@ import { Document, Page,pdfjs } from 'react-pdf';
         } catch (error) {
           console.error('Error uploading PDF:', error);
         }
-      }; 
+    }; 
   
 
     const handleFormSubmit = async (e) => {
-      e.preventDefault(); 
-      // try {
-      //   const response = await fetch(variables.API_URL + 'UploadEmp/' + employeeId, {
-      //     method: 'PUT',
-      //     headers: {
-      //       'Content-Type': 'application/json'
-      //     },
-      //     body: JSON.stringify(employeeData)
-      //   });
-      //   if (!response.ok) {
-      //     throw new Error('Failed to update employee');
-      //   }
-      //   // Handle successful update
-      //   console.log('Employee updated successfully');
-      // } catch (error) {
-      //   console.error('Error updating employee:', error);
-      // }
+      e.preventDefault();  
+      pdf.forEach(pdf => {
+        if(pdf.Resubmit && pdf.ResubmitReason && !pdf.Updated){
+          // console.log("this - ",pdf)
+          updatePdf(pdf)
+        }
+      });
     }; 
+    
+    //update pdf for resubmission
+    const updatePdf = async (pdfSubmit) => {
+      
+      const formData = new FormData();
+      formData.append('id', pdfSubmit.PdfFileID); 
+      formData.append('reason', pdfSubmit.ResubmitReason); 
+      formData.append('SubmissionID', data.SubmissionID); 
+       
+       
+      try {
+        const uploadResponse = await fetch('http://localhost:5000/updatepdf', {
+          method: 'POST',
+          body: formData
+        }) 
+    
+        if (!uploadResponse.ok) {
+          console.error('Failed:', uploadResponse.statusText);
+          return;
+        } else {
+          alert('Submission updated successfully'); 
+          getSubmissionPDF()
+        } 
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    //update submission to 'complete'
+    const completeSubmission = async () => { 
+      const formData = new FormData();
+      formData.append('id', data.SubmissionID);  
+        
+      try {
+        const uploadResponse = await fetch('http://localhost:5000/updatesubmission', {
+          method: 'POST',
+          body: formData
+        }) 
+    
+        if (!uploadResponse.ok) {
+          console.error('Failed:', uploadResponse.statusText);
+          return;
+        } else { 
+          alert('Submission updated successfully'); 
+          window.history.back();
+        } 
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }; 
+    
     
     // Modal functions
     const handleButtonClick = (base64) => { 
@@ -156,7 +196,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
         pdf[index].ResubmitReason = reasonPDF; 
         setPdf([...pdf]); // Update the state with the modified array
       }
-    };  
+    };   
 
     return (
       <div id="wrapper">
@@ -194,7 +234,9 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                     <label>{data.DateTime}</label>
                                     <label>{data.TurnAround} Days</label>
                                     <label>{data.Status}</label>
-                                    <Button>Confirm</Button>
+                                    {(data.Status !== 'Complete' && data.Status !== 'Expired') &&
+                                      <Button onClick={completeSubmission}>Complete</Button>
+                                    }
                                 </div>
                                 </div> 
                               </div> 
@@ -277,14 +319,17 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                               <label>{pdf.FileName}</label>
                                             </div>
                                             <label>{pdf.UploadDate}</label>
-                                            <div> 
-                                              <label for="toggle" class="toggle-label mr-2">{pdf.Updated ? 'Resubmission':'Resubmit'}</label>    
+                                            <div>  
+                                              <label for="toggle" className="toggle-label mr-2">{pdf.Updated ? 'Resubmission': 
+                                              (data.Status !== 'Complete' && data.Status !== 'Expired') && 'Resubmit'}</label>
+
                                               {pdf.Updated ? 
                                               <label className="toggle-label mr-2">{pdf.EmpResubmitted ? '- Complete':'- Pending'}</label>
                                               :
-                                              <input type="checkbox" id="toggle" class="toggle-input" onChange={(e)=>checkbox(pdf.PdfFileID, e)} 
+                                              (data.Status !== 'Complete' && data.Status !== 'Expired') &&
+                                              <input type="checkbox" id="toggle" className="toggle-input" onChange={(e)=>checkbox(pdf.PdfFileID, e)} 
                                                 checked={pdf.Resubmit}
-                                              />      
+                                              />     
                                               }
                                             </div>
                                           </div>
@@ -334,15 +379,13 @@ import { Document, Page,pdfjs } from 'react-pdf';
 
                 
                 {/* page content begin here */}
-                <div className="container-fluid">
+                {/* <div className="container-fluid">
                     <div className="row justify-content-center">
                         <div className="col-xl-8 col-lg-7">
-                            <div className="card shadow mb-4">
-                                {/* Card Header - New Hire Upload */}
+                            <div className="card shadow mb-4"> 
                                 <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 className="m-0 font-weight-bold text-primary">Remark</h6>
-                                </div>
-                                {/* Card Body - New Hire Options */}
+                                </div> 
                                 <div className="card-body">
                                     <div className="tab-content">
                                         <div className="card-body loan-row"> 
@@ -360,9 +403,11 @@ import { Document, Page,pdfjs } from 'react-pdf';
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 {/* Page content ends here */}
-                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                {data.Status !== 'Complete' &&
+                  <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                }
                 </form>
               </div>
 

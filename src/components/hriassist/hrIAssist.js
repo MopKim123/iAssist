@@ -121,7 +121,10 @@ const HRIAssist = () => {
                                                   <label>{sub.TurnAround} Days</label> 
                                             </td>  
                                             <td className='column'>
-                                                  <label>{sub.Status}</label> 
+                                              {sub.Status === 'Complete' && <label style={{color: 'blue'}}>{sub.Status}</label>}
+                                              {sub.Status === 'Pending' && <label style={{color: 'green'}}>{sub.Status}</label>}
+                                              {sub.Status === 'Resubmit' && <label style={{color: 'orange'}}>{sub.Status}</label>}
+                                              {sub.Status === 'Expired' && <label style={{color: 'red'}}>{sub.Status}</label>}
                                             </td>  
                                             <td className='column'>
                                               <label>{sub.DateTime}</label> 
