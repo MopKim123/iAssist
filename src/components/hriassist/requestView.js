@@ -95,21 +95,10 @@ import { Document, Page,pdfjs } from 'react-pdf';
                     // If names are the same, sort by the variable containing the number
                     return b.Updated - a.Updated;
                 }
-            });
+            }); 
 
-            // const responseData = await uploadResponse.json();
-            // const sortedData = responseData.result.sort((a, b) => {
-            //     // Sort in descending order if Resubmit is true, otherwise keep order unchanged
-            //     console.log(a.Updated === b.Updated ? 0 : a.Updated ? 1 : -1);
-            //     return a.Updated === b.Updated ? 0 : a.Updated ? 1 : -1;
-            // });
-            // console.log(sortedData);
-            // // setPdfResubmit(sortedData.map(({ PdfFileID, Resubmit, ResubmitReason }) => ({ PdfFileID, Resubmit, ResubmitReason })));
             setPdf(sortedData);
-
-            // const data = await uploadResponse.json();  
-            // setPdfResubmit(data.result.map(({ PdfFileID, Resubmit, ResubmitReason}) => ({ PdfFileID, Resubmit, ResubmitReason})))
-            // setPdf(data.result) 
+            
           } catch (error) {
               console.error('Error parsing JSON response:', error);
           }

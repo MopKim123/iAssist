@@ -86,13 +86,19 @@ import { Document, Page,pdfjs } from 'react-pdf';
           }
 
           try {
-            const data = await uploadResponse.json(); // Wait for the JSON data to be parsed
-            // console.log(data.result);
-            // data.forEach(element => {
-            //   console.log(element);
-            // });
-            setPdfResubmit(data.result.map(({ PdfFileID, Resubmit, ResubmitReason}) => ({ PdfFileID, Resubmit, ResubmitReason})))
-            setPdf(data.result) 
+            const responseData = await uploadResponse.json();
+            const sortedData = responseData.result.sort((a, b) => {
+                // First, sort by name
+                if (a.RequirementName !== b.RequirementName) {
+                    return a.RequirementName.localeCompare(b.RequirementName);
+                } else {
+                    // If names are the same, sort by the variable containing the number
+                    return b.Updated - a.Updated;
+                }
+            }); 
+            
+            setPdf(sortedData);
+            
           } catch (error) {
               console.error('Error parsing JSON response:', error);
           }
@@ -131,22 +137,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const handleCloseModal = () => {
       setShowModal(false);
     };
-
-    // Checkbox 
-    const checkbox = (id, status) => {
-      console.log(pdfResubmit)
-      console.log(id, status.target.value)
-
-      const isChecked = status.target.checked;
-      setPdfResubmit(
-        pdfResubmit.map(pdfResubmit => { 
-          if (pdfResubmit.PdfFileID === id) { 
-            return { ...pdfResubmit, Resubmit: !pdfResubmit.PdfFileID };
-          } 
-          return pdfResubmit;
-        })
-      )
-    } 
+ 
     
     return (
       <div id="wrapper">
