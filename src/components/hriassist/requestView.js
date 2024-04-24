@@ -3,12 +3,11 @@ import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
-import '../../App.css';
-import { variables } from '../../variables';
+import '../../App.css'; 
 import { base64pdf } from '../../vblob';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-// import pdf1 from '../../dummy.pdf'
+import Button from 'react-bootstrap/Button'; 
+import emailjs from '@emailjs/browser'; 
 import "react-pdf/dist/esm/Page/TextLayer.css"; 
 
 import { Document, Page,pdfjs } from 'react-pdf'; 
@@ -20,17 +19,15 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    // console.log(data);
+    console.log(data.EmailAddress);
 
     const { employeeId } = useParams();
     const [showModal, setShowModal] = useState(false);
-    const [numPages, setNumPages] = useState();
-    const [pageNumber, setPageNumber] = useState(1); 
+    const [numPages, setNumPages] = useState(); 
     const [pdfUrl, setPdfUrl] = useState(''); 
     
 
-    const [pdf, setPdf] = useState([]);
-    const [pdfResubmit, setPdfResubmit] = useState([]);
+    const [pdf, setPdf] = useState([]); 
     
     // Converts base64 to pdf
     const convertToPDF = (base64) => {
@@ -63,9 +60,9 @@ import { Document, Page,pdfjs } from 'react-pdf';
       document.body.removeChild(a);
     };
   
-    useEffect(() => { 
-      getSubmissionPDF()
-    }, [employeeId]); 
+    useEffect(() => {  
+      getSubmissionPDF() 
+    },[]); 
 
     // Get all pdf of a transaction
     const getSubmissionPDF = async () => {
@@ -178,6 +175,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
       setShowModal(false);
     };
 
+    
     // Checkbox 
     const checkbox = (id, status) => { 
     
@@ -196,7 +194,35 @@ import { Document, Page,pdfjs } from 'react-pdf';
         pdf[index].ResubmitReason = reasonPDF; 
         setPdf([...pdf]); // Update the state with the modified array
       }
-    };   
+    }; 
+
+
+    // Function to handle form submission
+    const sendEmail = (template) => {  
+   
+      //email content
+      const formData = {
+        sender_name: 'senderName',
+        sender_email: data.EmailAddress,
+        receiver_name: 'receiverName',
+        reciever_email: 'joakimtrinidad234@gmail.com',
+        transaction_type: 'message',
+        document_name: 'imageLink',
+        reason: 'imageLink',
+        contact_person: 'imageLink',
+      }; 
+     
+      //email sender (Emailjs)
+      emailjs.send('service_2cen06m', 'template_resubmit', formData, 'hrQ_V5JOOkQWdddTK')
+        .then((result) => {
+          console.log('Email sent successfully:', result.text);
+           
+        }, (error) => {
+          console.error('Email sending failed:', error.text);
+        });
+    };
+
+       
 
     return (
       <div id="wrapper">

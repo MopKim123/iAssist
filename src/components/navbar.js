@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../App.css';
 import { useState } from "react";
 //  import { variables } from '../variables';
@@ -10,6 +10,12 @@ import { useState } from "react";
   // Get user data from location state
   const location = useLocation();
   const data = location.state;
+  const navigate = useNavigate()
+  
+  if (data) {
+    navigate('/'); 
+  }
+
   const [showPages, setShowPages] = useState(false);
   const [showLoans, setShowLoans] = useState(false);
   const [showMaternity, setShowMaternity] = useState(false);

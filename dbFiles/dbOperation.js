@@ -39,6 +39,7 @@ const getSubmissions = async () => {
             .query(`
                 SELECT 
                     Employee.Name,
+                    Employee.EmailAddress,
                     Submission.SubmissionID,
                     Submission.TransactionType,
                     Submission.TurnAround,
