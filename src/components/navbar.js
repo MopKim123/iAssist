@@ -12,9 +12,9 @@ import { useState } from "react";
   const data = location.state;
   const navigate = useNavigate()
   
-  if (data) {
-    navigate('/'); 
-  }
+//   if (data) {
+//     navigate('/'); 
+//   }
 
   const [showPages, setShowPages] = useState(false);
   const [showLoans, setShowLoans] = useState(false);

@@ -19,7 +19,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    console.log(data.EmailAddress);
+    // console.log(data.EmailAddress);
+    const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
     const [showModal, setShowModal] = useState(false);
@@ -106,24 +107,40 @@ import { Document, Page,pdfjs } from 'react-pdf';
   
 
     const handleFormSubmit = async (e) => {
-      e.preventDefault();  
+      e.preventDefault();   
+      const reasonArray = [];
+      const documentNameArray = []; 
+
       pdf.forEach(pdf => {
-        if(pdf.Resubmit && pdf.ResubmitReason && !pdf.Updated){
-          // console.log("this - ",pdf)
+        if(pdf.Resubmit && pdf.ResubmitReason && !pdf.Updated){ 
+          documentNameArray.push(pdf.RequirementName); 
+          reasonArray.push(pdf.ResubmitReason);
+          
           updatePdf(pdf)
         }
-      });
+      }); 
+ 
+      let documentName = documentNameArray.join(', '); 
+      documentName = documentName.replace(/,([^,]*)$/, ' &$1'); 
+      let reason = reasonArray.join(', '); 
+      reason = reason.replace(/,([^,]*)$/, ' & $1');
+      if(reasonArray.length > 1){ 
+        reason += ' respectively'
+      }    
+      if(reasonArray.length !== 0 && documentNameArray.length !== 0) { 
+        sendEmail('template_resubmit', reason, documentName)
+      }
+
     }; 
     
     //update pdf for resubmission
-    const updatePdf = async (pdfSubmit) => {
+    const updatePdf = async (pdfSubmit) => { 
       
       const formData = new FormData();
       formData.append('id', pdfSubmit.PdfFileID); 
       formData.append('reason', pdfSubmit.ResubmitReason); 
       formData.append('SubmissionID', data.SubmissionID); 
-       
-       
+        
       try {
         const uploadResponse = await fetch('http://localhost:5000/updatepdf', {
           method: 'POST',
@@ -133,9 +150,6 @@ import { Document, Page,pdfjs } from 'react-pdf';
         if (!uploadResponse.ok) {
           console.error('Failed:', uploadResponse.statusText);
           return;
-        } else {
-          alert('Submission updated successfully'); 
-          getSubmissionPDF()
         } 
       } catch (error) {
         console.error('Error:', error);
@@ -155,11 +169,11 @@ import { Document, Page,pdfjs } from 'react-pdf';
     
         if (!uploadResponse.ok) {
           console.error('Failed:', uploadResponse.statusText);
-          return;
-        } else { 
-          alert('Submission updated successfully'); 
-          window.history.back();
-        } 
+          return;  
+        }  
+        if(await sendEmail('template_complete')){
+          window.history.back(); 
+        }
       } catch (error) {
         console.error('Error:', error);
       }
@@ -192,34 +206,37 @@ import { Document, Page,pdfjs } from 'react-pdf';
       const index = pdf.findIndex(pdf => pdf.PdfFileID === id);
       if (index !== -1) {
         pdf[index].ResubmitReason = reasonPDF; 
-        setPdf([...pdf]); // Update the state with the modified array
+        setPdf([...pdf]); 
       }
     }; 
 
 
     // Function to handle form submission
-    const sendEmail = (template) => {  
-   
-      //email content
-      const formData = {
-        sender_name: 'senderName',
-        sender_email: data.EmailAddress,
-        receiver_name: 'receiverName',
-        reciever_email: 'joakimtrinidad234@gmail.com',
-        transaction_type: 'message',
-        document_name: 'imageLink',
-        reason: 'imageLink',
-        contact_person: 'imageLink',
-      }; 
-     
-      //email sender (Emailjs)
-      emailjs.send('service_2cen06m', 'template_resubmit', formData, 'hrQ_V5JOOkQWdddTK')
-        .then((result) => {
-          console.log('Email sent successfully:', result.text);
-           
-        }, (error) => {
-          console.error('Email sending failed:', error.text);
-        });
+    const sendEmail = async (template, reason, documentName) => {  
+      return new Promise((resolve, reject) => {
+        //email content
+        const formData = {
+          sender_name: 'senderName',
+          sender_email: data.EmailAddress,
+          receiver_name: 'receiverName',
+          receiver_email: sampleEmail,
+          transaction_type: data.TransactionType,
+          document_name: documentName,
+          reason: reason,
+          contact_person: 'Ms Cham',
+        };  
+        
+        emailjs.send('service_2cen06m', template, formData, 'hrQ_V5JOOkQWdddTK')
+          .then((result) => {
+            console.log('Email sent successfully:', result.text);
+            alert('Updated Successfully')
+            getSubmissionPDF() 
+            resolve(true);
+          }, (error) => {
+            console.error('Email sending failed:', error.text);
+            reject(error);
+          });
+      });
     };
 
        
@@ -238,7 +255,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                   </div>
           <div className="row justify-content-center">
             <div className="col-xl-12 col-xl-9">
-            <form onSubmit={handleFormSubmit}>
+            {/* <form > */}
               <div className="card shadow mb-4">
                 <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <ul className="nav nav-tabs nav-fill">
@@ -432,9 +449,9 @@ import { Document, Page,pdfjs } from 'react-pdf';
                 </div> */}
                 {/* Page content ends here */}
                 {data.Status !== 'Complete' &&
-                  <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                  <button type="submit" className="btn btn-primary d-block mx-auto" onClick={handleFormSubmit}>Submit</button>
                 }
-                </form>
+                {/* </form> */}
               </div>
 
               
