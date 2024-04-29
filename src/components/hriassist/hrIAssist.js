@@ -14,6 +14,9 @@ const HRIAssist = () => {
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [submissions, setSubmissions] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [pageSize] = useState(10);
  
   const viewRequest = (data) => {
     navigate('/request', { state: { data } }) 
@@ -22,19 +25,23 @@ const HRIAssist = () => {
 
   
   useEffect(() => {
-    handleFormSubmit()
-  }, []);
+    getSubmissions(currentPage, pageSize)
+    subCountPages()
+  }, [currentPage, pageSize]);
   
-  const handleFormSubmit = async () => {
+  const getSubmissions = async (pageNumber, pageSize) => {
     
     const EmpId = '10023'
 
     const formData = new FormData();
     formData.append('EmpId', EmpId); 
+    formData.append('pageNumber', pageNumber);
+    formData.append('pageSize', pageSize);
      
     try {
       const uploadResponse = await fetch('http://localhost:5000/hrsubmission', {
         method: 'POST',
+        body: formData
       }) 
   
       if (!uploadResponse.ok) {
@@ -43,9 +50,31 @@ const HRIAssist = () => {
       } 
 
       try {
-        const data = await uploadResponse.json(); // Wait for the JSON data to be parsed
-        // console.log(data.result);
+        const data = await uploadResponse.json();  
         setSubmissions(data.result) 
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
+ 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const subCountPages = async () => { 
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/subcountpages', {
+        method: 'POST'
+      }) 
+  
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
+
+      try {
+        const data = await uploadResponse.json();
+        setTotalPages(Math.ceil(data.result / pageSize))  
       } catch (error) {
           console.error('Error parsing JSON response:', error);
       }
@@ -55,8 +84,35 @@ const HRIAssist = () => {
       console.error('Error:', error);
     }
   };
-   
-  // console.log(submissions);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const Pagination = ({ currentPage }) => { 
+  
+    const handleNextClick = () => {
+      setCurrentPage(currentPage + 1);
+    };
+  
+    const handlePreviousClick = () => {
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    };
+  
+    return (
+      <div className='pagination-btn'>
+        <button onClick={handlePreviousClick} disabled={currentPage === 1} >
+          Previous
+        </button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button onClick={handleNextClick} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </div>
+    );
+  };
 
   return (
     
@@ -141,6 +197,14 @@ const HRIAssist = () => {
                                       )}
                                     </tbody>
                                 </table>
+                                <div className='pagination'>
+                                  <Pagination
+                                    currentPage={currentPage}
+                                    pageSize={pageSize}
+                                    totalCount={submissions.length} // You may need to fetch the total count from the backend
+                                    onPageChange={handlePageChange}
+                                  />
+                                </div>
                             <br />
                             </div>
                           </div>

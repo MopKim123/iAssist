@@ -314,3 +314,18 @@
   margin-left: 15px;
   margin-right: 15px;
 }
+
+.pagination {
+  margin-left: 15px;
+  margin-right: 15px; 
+  justify-content: center;
+}
+
+.pagination-btn {
+  margin-left: 15px;
+  margin-right: 15px; 
+  justify-content: center; 
+  width: 15vw;
+  display: flex; 
+  justify-content: space-between;
+}

@@ -30,46 +30,103 @@ const insertPDF = async (filename) => {
     }
 }
 
-const getSubmissions = async () => {
+// const getSubmissions = async () => {
+//     try {
+//         let pool = await sql.connect(config);
+
+//         // Query the database to get the PDF data based on the ID
+//         let result = await pool.request() 
+//             .query(`
+//                 SELECT 
+//                     Employee.Name,
+//                     Employee.EmailAddress,
+//                     Submission.SubmissionID,
+//                     Submission.TransactionType,
+//                     Submission.TurnAround,
+//                     Submission.Status,
+//                     Submission.DateTime,
+//                     Submission.LoanAppDate,
+//                     Submission.TransactionNum,
+//                     Submission.TypeOfDelivery
+//                 FROM Submission
+//                 LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
+//             `);
+
+//         // If there's no result, return null
+//         if (result.recordset.length === 0) {
+//             return null;
+//         } 
+    
+//         return result.recordset;
+
+//     } catch (error) {
+//         console.error("Error retrieving PDF data:", error);
+//         throw error;
+//     }
+// }
+const getSubmissions = async (pageNumber, pageSize) => {
+    try {
+      let pool = await sql.connect(config);
+      let result = await pool.request()
+        .input('PageNumber', sql.Int, pageNumber)
+        .input('PageSize', sql.Int, pageSize) 
+        .query(`SELECT 
+                    SubsWithRowNumber.Name,
+                    SubsWithRowNumber.EmailAddress,
+                    SubsWithRowNumber.SubmissionID,
+                    SubsWithRowNumber.TransactionType,
+                    SubsWithRowNumber.TurnAround,
+                    SubsWithRowNumber.Status,
+                    SubsWithRowNumber.DateTime,
+                    SubsWithRowNumber.LoanAppDate,
+                    SubsWithRowNumber.TransactionNum,
+                    SubsWithRowNumber.TypeOfDelivery
+                FROM (
+                    SELECT 
+                        Employee.Name,
+                        Employee.EmailAddress,
+                        Submission.*,
+                        ROW_NUMBER() OVER (ORDER BY SubmissionID) AS RowNumber
+                    FROM Submission
+                    LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
+                ) AS SubsWithRowNumber
+                WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
+        `); 
+      if (result.recordset.length === 0) {
+          return null;
+      }
+      return result.recordset;
+    } catch (error) {
+      console.error("Error retrieving submission data:", error);
+      throw error;
+    }
+  }
+const submissionCountPages = async () => {
     try {
         let pool = await sql.connect(config);
 
         // Query the database to get the PDF data based on the ID
         let result = await pool.request() 
             .query(`
-                SELECT 
-                    Employee.Name,
-                    Employee.EmailAddress,
-                    Submission.SubmissionID,
-                    Submission.TransactionType,
-                    Submission.TurnAround,
-                    Submission.Status,
-                    Submission.DateTime,
-                    Submission.LoanAppDate,
-                    Submission.TransactionNum,
-                    Submission.TypeOfDelivery
-                FROM Submission
-                LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
+                SELECT COUNT(*) FROM Submission;
             `);
 
         // If there's no result, return null
         if (result.recordset.length === 0) {
             return null;
-        } 
-    
-        return result.recordset;
+        }   
+        return result.recordset[0][''];
 
     } catch (error) {
         console.error("Error retrieving PDF data:", error);
         throw error;
     }
 }
-
+  
 const getUserSubmissions = async (id) => {
     try {
         let pool = await sql.connect(config);
-
-        // Query the database to get the PDF data based on the ID
+ 
         let result = await pool.request() 
             .input('id', sql.Int, id)
             .query(`
@@ -87,8 +144,7 @@ const getUserSubmissions = async (id) => {
                 LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
                 Where Submission.EmpId = @id
             `);
-
-        // If there's no result, return null
+ 
         if (result.recordset.length === 0) {
             return null;
         } 
@@ -104,8 +160,7 @@ const getUserSubmissions = async (id) => {
 const getPDF = async (id) => {
     try {
         let pool = await sql.connect(config);
-
-        // Query the database to get the PDF data based on the ID
+ 
         let result = await pool.request() 
             .input('id', sql.Int, id)
             .query(`
@@ -113,12 +168,10 @@ const getPDF = async (id) => {
                 FROM PdfFile
                 WHERE SubmissionID = @id
             `);
-
-        // If there's no result, return null
+ 
         if (result.recordset.length === 0) {
             return null;
-        } 
-        // console.log(result.recordset)
+        }  
         return result.recordset;
     } catch (error) {
         console.error("Error retrieving PDF data:", error);
@@ -180,7 +233,9 @@ module.exports = {
     insertPDF,
     getSubmissions,
     getUserSubmissions,
+    submissionCountPages,
     getPDF,
     updatePDF,
     updateSubmission,
+
 };

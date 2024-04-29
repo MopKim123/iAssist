@@ -31,17 +31,29 @@ app.post('/upload', upload.single('sssloanPDF'), async (req, res) => {
 });
 
 
-app.post('/hrsubmission', async (req, res) => {
-
+app.post('/hrsubmission',  upload.single(''), async (req, res) => {
+ 
   try {
-  
-    const result = await dbOperation.getSubmissions();
+    const { pageNumber, pageSize } = req.body; // Extract pagination parameters
+    console.log('pageNumber',pageNumber,'pageSize', pageSize)
+    const result = await dbOperation.getSubmissions(pageNumber, pageSize);
     res.status(200).json({ result: result });
-
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+app.post('/subcountpages', async (req, res) => {
+
+  try { 
+    const result = await dbOperation.submissionCountPages();
+
+    res.status(200).json({ result: result });  
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }  
 });
 
 app.post('/submissionpdf',  upload.single('SubmissionID'), async (req, res) => {
