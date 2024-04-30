@@ -17,24 +17,54 @@ const HRIAssist = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize] = useState(10);
+  const [sortColumn, setSortColumn] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
  
   const viewRequest = (data) => {
     navigate('/request', { state: { data } }) 
   };
 
 
+  const SortableHeader = ({ label, column, sortColumn, sortDirection, onSort }) => {
+    const handleClick = () => {
+      onSort(column);
+    };
+  
+    return (
+      <th onClick={handleClick} style={{ cursor: 'pointer' }}>
+        {label} {sortColumn === column && <span>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+      </th>
+    );
+  };
+
+  const handleSort = (column) => {
+    if (column === sortColumn) {
+      // Reverse the sort direction if the same column is clicked again
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedSubmissions = [...submissions].sort((a, b) => {
+    if (sortColumn) {
+      const comparison = a[sortColumn].localeCompare(b[sortColumn]);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    } else {
+      return 0;
+    }
+  });
   
   useEffect(() => {
-    getSubmissions(currentPage, pageSize)
-    subCountPages()
+    getSubmissions(currentPage, pageSize) 
   }, [currentPage, pageSize]);
   
   const getSubmissions = async (pageNumber, pageSize) => {
     
     const EmpId = '10023'
 
-    const formData = new FormData();
-    formData.append('EmpId', EmpId); 
+    const formData = new FormData(); 
     formData.append('pageNumber', pageNumber);
     formData.append('pageSize', pageSize);
      
@@ -50,8 +80,9 @@ const HRIAssist = () => {
       } 
 
       try {
-        const data = await uploadResponse.json();  
-        setSubmissions(data.result) 
+        const data = await uploadResponse.json();   
+        setSubmissions(data.result.submissions) 
+        setTotalPages(Math.ceil(data.result.count / pageSize))  
       } catch (error) {
           console.error('Error parsing JSON response:', error);
       }
@@ -59,31 +90,7 @@ const HRIAssist = () => {
     } catch (error) {
       console.error('Error:', error);
     }
-  };
-
-  const subCountPages = async () => { 
-    try {
-      const uploadResponse = await fetch('http://localhost:5000/subcountpages', {
-        method: 'POST'
-      }) 
-  
-      if (!uploadResponse.ok) {
-        console.error('Failed:', uploadResponse.statusText);
-        return;
-      } 
-
-      try {
-        const data = await uploadResponse.json();
-        setTotalPages(Math.ceil(data.result / pageSize))  
-      } catch (error) {
-          console.error('Error parsing JSON response:', error);
-      }
-
-      // console.log('PDF uploaded successfully');
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+  }; 
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -143,29 +150,17 @@ const HRIAssist = () => {
                             <div className="table-responsive">
                                 <table className="table table-striped">
                                     <thead>
-                                        <tr>
-                                            <th>
-                                                Name
-                                            </th> 
-                                            <th>
-                                                Transaction Type
-                                            </th> 
-                                            <th>
-                                                Turn-Around time
-                                            </th> 
-                                            <th>
-                                                Status
-                                            </th> 
-                                            <th>
-                                                Date Sent
-                                            </th> 
-                                            <th>
-                                                Action/s
-                                            </th>  
+                                        <tr> 
+                                            <SortableHeader label="Name" column="Name" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                                            <SortableHeader label="Transaction Type" column="TransactionType" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                                            <SortableHeader label="Turn Around" column="TurnAround" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                                            <SortableHeader label="Status" column="Status" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                                            <SortableHeader label="Date Time" column="DateTime" sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort} />
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                      {submissions.map((sub, index) =>
+                                      {sortedSubmissions.map((sub, index) =>
                                         <tr key={index}>
                                             <td className='column'>
                                                   <label>{sub.Name}</label>
