@@ -241,8 +241,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                             <div className="card shadow mb-4">
                                 {/* Card Header - New Hire Upload */}
                                 <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 className="m-0 font-weight-bold text-primary">{pdf.RequirementName}</h6> 
-                                    <h6 className="m-0 font-weight-bold" style={{color: 'red'}}>{pdf.Resubmit?'Resubmit':''}</h6> 
+                                  <h6 className="m-0 font-weight-bold text-primary">{pdf.RequirementName}</h6> 
+                                  <h6 className="m-0 font-weight-bold" style={{color: 'red'}}>{pdf.Resubmit?'Resubmit':''}</h6> 
                                 </div>
                                 {/* Card Body - New Hire Options */}
                                 <div className="card-body">

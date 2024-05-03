@@ -9,12 +9,10 @@ import { useState } from "react";
 
   // Get user data from location state
   const location = useLocation();
-  const data = location.state;
-  const navigate = useNavigate()
-  
-//   if (data) {
-//     navigate('/'); 
-//   }
+//   const data = location.state;
+  const data = 'location.state';
+  const navigate = useNavigate() 
+  console.log(data); 
 
   const [showPages, setShowPages] = useState(false);
   const [showLoans, setShowLoans] = useState(false);
@@ -77,15 +75,15 @@ import { useState } from "react";
              {/* Nav Item - New Hire Upload */}
              <li className="nav-item">
                  {/* <a className="nav-link" href="/newHireUpload"> */}
-                 <Link className="nav-link">
+                 <label className="nav-link">
                   <i className="fas fa-fw fa-info-circle"></i>
                   <span onClick={togglePages}>iASSIST</span>
-                </Link>
+                </label>
                 {showPages && (
                     <ul className="custom-bullet-list">
                         {/* Add your list of pages here */}  
                         <li onClick={toggleLoans}>
-                            <Link className="dropdown-text" state={data}>Government Loan</Link>
+                            <Link className="dropdown-text">Government Loan</Link>
                             {showLoans && (
                                 <ul className="custom-bullet-list">
                                     <li>

@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 const Submissions = () => {
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();  
   const [submissions, setSubmissions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
