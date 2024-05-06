@@ -18,9 +18,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
 
     const location = useLocation();
-    const data = location.state.data;
-
-    // console.log(data);
+    const data = location.state.data; 
 
     const { employeeId } = useParams();
     const [showModal, setShowModal] = useState(false);

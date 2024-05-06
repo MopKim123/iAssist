@@ -7,6 +7,7 @@ import Footer from '../footer';
 // import { useNavigate } from "react-router-dom";
 import { variables } from '../../variables'; 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Button from 'react-bootstrap/Button'; 
 import { useEffect } from 'react';
 
 const HRIAssist = () => {
@@ -136,16 +137,38 @@ const HRIAssist = () => {
             {/* Start of Page Content */}
             <div className="container-fluid">
               <div className="row justify-content-center">
-                <div className="col-xl-12 col-lg-12">
-                  <div className="card shadow mb-4">
+                <div className="col-xl-12 col-lg-12"> 
+                  <div className="card shadow mb-4"> 
+                    <br/>
+                    <div className="tab-content">
+                      <div className="tab-pane fade show active" id="personalDetails" role="tabpanel" aria-labelledby="personalDetails-tab">
+                        {/* Personal Details Form */}
+                        <div className="container">
+                          <div className="justify-content-center"> 
+                            <div className="d-flex justify-content-between">
+                              <label>Name</label>
+                              <label>DateTime</label>
+                              <label>TurnAround Days</label>
+                              <label>Status</label>
+                              {/* {(data.Status !== 'Complete' && data.Status !== 'Expired') && */}
+                                <Button >Complete</Button> 
+                              {/* } */}
+                            </div> 
+                          </div> 
+                        </div>
+                        <br/> 
+                      </div>  
+                    </div>
+                  </div> 
+                  <div className="card shadow mb-4"> 
                     <div className="card-body">
                       <div className="tab-content"> 
                         <div
-                                  className={`tab-pane fade show active `}
-                                  id="newHireReports"
-                                  role="tabpanel"
-                                  aria-labelledby="reports-tab"
-                                > 
+                            className={`tab-pane fade show active `}
+                            id="newHireReports"
+                            role="tabpanel"
+                            aria-labelledby="reports-tab"
+                          > 
                           <div className="card-body">
                             <div className="table-responsive">
                                 <table className="table table-striped">

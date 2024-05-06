@@ -9,10 +9,8 @@ import { useState } from "react";
 
   // Get user data from location state
   const location = useLocation();
-//   const data = location.state;
-  const data = 'location.state';
-  const navigate = useNavigate() 
-  console.log(data); 
+  const data = location.state; 
+  const navigate = useNavigate()  
 
   const [showPages, setShowPages] = useState(false);
   const [showLoans, setShowLoans] = useState(false);
@@ -56,16 +54,14 @@ import { useState } from "react";
                  MAIN
              </div>
              {/* Nav Item - New Hire Upload */}
-             <li className="nav-item">
-                 {/* <a className="nav-link" href="/newHireUpload"> */}
+             <li className="nav-item"> 
                  <Link className="nav-link" to={{ pathname: "/newHireUpload"}} state={data}>
                   <i className="fas fa-fw fa-upload"></i>
                   <span>New Hire Upload</span>
                 </Link>
                  {/* </a> */}
              </li>
-             <li className="nav-item">
-                 {/* <a className="nav-link" href="/newHireUpload"> */}
+             <li className="nav-item"> 
                  <Link className="nav-link" to={{ pathname: "/submissions"}} state={data}>
                   <i className="fas fa-fw fa-book"></i>
                   <span>Submissions</span>
@@ -73,25 +69,21 @@ import { useState } from "react";
                  {/* </a> */}
              </li>
              {/* Nav Item - New Hire Upload */}
-             <li className="nav-item">
-                 {/* <a className="nav-link" href="/newHireUpload"> */}
-                 <label className="nav-link">
+             <li className="nav-item"> 
+                 <label className="mb-0 nav-link" onClick={togglePages}>
                   <i className="fas fa-fw fa-info-circle"></i>
-                  <span onClick={togglePages}>iASSIST</span>
+                  <span>iASSIST</span>
                 </label>
                 {showPages && (
                     <ul className="custom-bullet-list">
                         {/* Add your list of pages here */}  
-                        <li onClick={toggleLoans}>
-                            <Link className="dropdown-text">Government Loan</Link>
+                        <li onClick={toggleLoans} className="nav-item">
+                            <label className="dropdown-text">Government Loan</label>
                             {showLoans && (
-                                <ul className="custom-bullet-list">
-                                    <li>
+                                <ul className="custom-bullet-list">  
+                                    <li className="nav-item">
                                         <Link to="/sssloan" className="dropdown-text" state={data}>SSS Loan</Link>
-                                    </li>
-                                    {/* <li>
-                                        <Link to="/loan2" className="dropdown-text" state={data}>Pag-Ibig Loan</Link>
-                                    </li> */}
+                                    </li> 
                                     <li> 
                                         <Link to="/landbankcard" className="dropdown-text" state={data}>
                                             Pag-Ibig Loan:
@@ -115,11 +107,11 @@ import { useState } from "react";
                         </li>
 
                         <li onClick={toggleMaternity}> 
-                            <Link className="dropdown-text" state={data}>Maternity</Link>
+                            <Link className="dropdown-text">Maternity</Link>
                             {showMaternity && (
                                 <ul className="custom-bullet-list sub-menu">
                                     <li>
-                                        <Link to="/notification" className="dropdown-text" state={data}>
+                                        <Link to="/notification" className="dropdown-text">
                                             Maternity   
                                             <div className="list-padding">Notification</div>
                                         </Link>
@@ -132,33 +124,12 @@ import { useState } from "react";
                                     </li>
                                 </ul>
                             )}
-                        </li>
-                        
-                        {/* <li onClick={toggleMaternity}>
-                            <Link className="dropdown-text" state={data} > 
-                                <span>Maternity</span>
-                            </Link>
                         </li> 
-                        {setShowMaternity && (
-                            <ul className="custom-bullet-list"> 
-                                <li onClick={toggleLoans}>
-                                    <Link className="dropdown-text" state={data} > 
-                                        <span>Maternity 1</span>
-                                    </Link>
-                                </li>
-                                <li onClick={toggleMaternity}>
-                                    <Link className="dropdown-text" state={data} > 
-                                        <span>Maternity 2</span>
-                                    </Link>
-                                </li> 
-                            </ul>
-                        )} */}
                     </ul>
                 )}
                  {/* </a> */}
              </li> 
-             <li className="nav-item">
-                 {/* <a className="nav-link" href="/newHireUpload"> */}
+             <li className="nav-item"> 
                  <Link className="nav-link" to={{ pathname: "/hriassist"}} state={data}>
                   <i className="fas fa-fw fa-upload"></i>
                   <span>HR iAssist</span>

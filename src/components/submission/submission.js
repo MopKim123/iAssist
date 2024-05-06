@@ -15,7 +15,8 @@ const Submissions = () => {
   const [pageSize] = useState(10);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
-  const EmpId = '10023'
+  const EmpId = '10023' 
+ 
   
   const viewSubmission = (data) => {
     navigate('/submissionview', { state: { data } }) 
