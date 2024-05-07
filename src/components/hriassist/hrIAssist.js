@@ -12,19 +12,24 @@ import { useEffect } from 'react';
 
 const HRIAssist = () => {
 
-  const navigate = useNavigate();
-  const [file, setFile] = useState(null);
+  const navigate = useNavigate(); 
+  const currentYear = new Date().getFullYear(); 
+  const [maxYear, setMaxYear] = useState(currentYear);
+
   const [submissions, setSubmissions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(1);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
- 
+  const [filter, setFilter] = useState({transactionType:'',status:'',month:'',year:''});
+  const [searhFilter, setSearchFilter] = useState(false) 
+    
   const viewRequest = (data) => {
     navigate('/request', { state: { data } }) 
   };
 
+     
 
   const SortableHeader = ({ label, column, sortColumn, sortDirection, onSort }) => {
     const handleClick = () => {
@@ -57,9 +62,16 @@ const HRIAssist = () => {
     }
   });
   
-  useEffect(() => {
-    getSubmissions(currentPage, pageSize) 
-  }, [currentPage, pageSize]);
+  useEffect(() => { 
+    if(Object.values(filter).every(value => value === '')){
+      setSearchFilter(false)
+    }
+    if(!searhFilter){   
+      getSubmissions(currentPage, pageSize)   
+    }else{  
+      getFilteredSubmissions(currentPage, pageSize)   
+    }
+  }, [currentPage, pageSize, filter]);
   
   const getSubmissions = async (pageNumber, pageSize) => {
     
@@ -93,6 +105,38 @@ const HRIAssist = () => {
     }
   }; 
 
+  const getFilteredSubmissions = async (pageNumber, pageSize, filter) => {
+    
+    const EmpId = '10023'
+
+    const formData = new FormData(); 
+    formData.append('pageNumber', pageNumber);
+    formData.append('pageSize', pageSize);
+     
+    // try {
+    //   const uploadResponse = await fetch('http://localhost:5000/hrsubmission', {
+    //     method: 'POST',
+    //     body: formData
+    //   }) 
+  
+    //   if (!uploadResponse.ok) {
+    //     console.error('Failed:', uploadResponse.statusText);
+    //     return;
+    //   } 
+
+    //   try {
+    //     const data = await uploadResponse.json();   
+    //     setSubmissions(data.result.submissions) 
+    //     setTotalPages(Math.ceil(data.result.count / pageSize))  
+    //   } catch (error) {
+    //       console.error('Error parsing JSON response:', error);
+    //   }
+ 
+    // } catch (error) {
+    //   console.error('Error:', error);
+    // }
+  }; 
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -122,6 +166,26 @@ const HRIAssist = () => {
     );
   };
 
+  const filterSearch = () => {
+    setCurrentPage(1)
+    setSubmissions([]) 
+    if(Object.values(filter).every(value => value === '')){ 
+      setSearchFilter(false)
+      getSubmissions(currentPage, pageSize) 
+    }else{ 
+      getFilteredSubmissions(currentPage, pageSize, filter) 
+      setSearchFilter(true)
+    }
+  };
+
+  const handleFilterSubmit = (e) => {
+    const { name, value } = e.target;
+    setFilter((prevFilter) => ({
+      ...prevFilter,
+      [name]: value
+    }));
+  };
+
   return (
     
           <div>
@@ -143,17 +207,63 @@ const HRIAssist = () => {
                     <div className="tab-content">
                       <div className="tab-pane fade show active" id="personalDetails" role="tabpanel" aria-labelledby="personalDetails-tab">
                         {/* Personal Details Form */}
-                        <div className="container">
-                          <div className="justify-content-center"> 
-                            <div className="d-flex justify-content-between">
-                              <label>Name</label>
-                              <label>DateTime</label>
-                              <label>TurnAround Days</label>
-                              <label>Status</label>
-                              {/* {(data.Status !== 'Complete' && data.Status !== 'Expired') && */}
-                                <Button >Complete</Button> 
-                              {/* } */}
-                            </div> 
+                        <div className="container-fluid d-flex justify-content-center" >
+                          <div className="justify-content-between ">    
+                              <table className="" style={{ tableLayout: 'fixed', width: '100%' }}>
+                                <thead>
+                                  <tr>
+                                    <th className="pr-3 pl-3" style={{ width: '25%' }}>Transaction Type</th>
+                                    <th className="pr-1 pl-1" style={{ width: '25%' }}>Status</th>
+                                    <th className="pr-1 pl-1" style={{ width: '25%' }}>Month</th>
+                                    <th className="pr-1 pl-1" style={{ width: '25%' }}>Year</th>
+                                    <th style={{ width: '10%' }}> </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td className="pr-1 pl-1" > 
+                                      <select className="form-control" id="transactionType" name="transactionType" onChange={handleFilterSubmit}>
+                                        <option value="">Select Transaction Type</option>
+                                        <option value="SSS Loan">SSS Loan</option>
+                                        <option value="Pag-Ibig Landbank Card">Pag-Ibig Landbank Card</option>
+                                        <option value="Pag-Ibig DBP Card">Pag-Ibig DBP Card</option>
+                                        <option value="Pag-Ibig Virtual Account">Pag-Ibig Virtual Account</option>
+                                        <option value="Maternity Notication">Maternity Notication</option>
+                                        <option value="Maternity Benefit">Maternity Benefit</option> 
+                                        <option value="Other">Other</option> 
+                                      </select></td> 
+                                    <td className="pr-1 pl-1" > 
+                                      <select className="form-control" id="status" name="status" onChange={handleFilterSubmit}>
+                                        <option value="">Select Status</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Resubmit">Resubmit</option>
+                                        <option value="Complete">Complete</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Expired">Expired</option> 
+                                      </select></td><td className="pr-1 pl-1" >
+                                      <select className="form-control" id="month" name="month" onChange={handleFilterSubmit}>
+                                        <option value="">Select Month</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                      </select>
+                                    </td>   
+                                    <td className="pr-1 pl-1" >
+                                      <input type="number"  className="form-control" id="year" name="year" pattern="\d*" max={new Date().getFullYear()}  onChange={handleFilterSubmit}/>
+                                    </td>
+                                    <td className="d-flex align-items-center justify-content-center"><Button onClick={filterSearch}>Filter</Button></td> 
+                                  </tr>
+                                </tbody>
+                              </table>  
                           </div> 
                         </div>
                         <br/> 
@@ -198,7 +308,7 @@ const HRIAssist = () => {
                                               {sub.Status === 'Complete' && <label style={{color: 'blue'}}>{sub.Status}</label>}
                                               {sub.Status === 'Pending' && <label style={{color: 'green'}}>{sub.Status}</label>}
                                               {sub.Status === 'Resubmit' && <label style={{color: 'orange'}}>{sub.Status}</label>}
-                                              {sub.Status === 'Expired' && <label style={{color: 'red'}}>{sub.Status}</label>}
+                                              {(sub.Status === 'Expired' || sub.Status === 'Cancelled') && <label style={{color: 'red'}}>{sub.Status}</label>}
                                             </td>  
                                             <td className='column'>
                                               <label>{sub.DateTime}</label> 
