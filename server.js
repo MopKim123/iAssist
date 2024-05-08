@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); // Specify upload directory
+const util = require('util');
 
 const dbOperation = require('./dbFiles/dbOperation.js');
 
@@ -36,6 +37,18 @@ app.post('/hrsubmission',  upload.single(''), async (req, res) => {
   try {
     const { pageNumber, pageSize } = req.body; 
     const result = await dbOperation.getSubmissions(pageNumber, pageSize);
+    res.status(200).json({ result: result });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}); 
+
+app.post('/hrfiltersubmission', upload.single(''),  async (req, res) => {
+ 
+  try {
+    const { pageNumber, pageSize, transactionType, status, month, year } = req.body;   
+    const result = await dbOperation.getFilteredSubmissions(pageNumber, pageSize, transactionType, status, month, year);
     res.status(200).json({ result: result });
   } catch (error) {
     console.error('Error:', error);

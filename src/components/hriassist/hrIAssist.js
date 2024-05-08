@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
-import '../../App.css';
-import * as XLSX from 'xlsx';
+import '../../App.css'; 
 import Navbar from '../navbar';
 import TopNavbar from '../topnavbar'; 
-import Footer from '../footer';
-// import { useNavigate } from "react-router-dom";
-import { variables } from '../../variables'; 
+import Footer from '../footer'; 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button'; 
 import { useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css" 
 
 const HRIAssist = () => {
 
@@ -19,7 +18,7 @@ const HRIAssist = () => {
   const [submissions, setSubmissions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [pageSize] = useState(1);
+  const [pageSize] = useState(10);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
   const [filter, setFilter] = useState({transactionType:'',status:'',month:'',year:''});
@@ -71,7 +70,7 @@ const HRIAssist = () => {
     }else{  
       getFilteredSubmissions(currentPage, pageSize)   
     }
-  }, [currentPage, pageSize, filter]);
+  }, [currentPage, pageSize]);
   
   const getSubmissions = async (pageNumber, pageSize) => {
     
@@ -105,36 +104,41 @@ const HRIAssist = () => {
     }
   }; 
 
-  const getFilteredSubmissions = async (pageNumber, pageSize, filter) => {
+  const getFilteredSubmissions = async (pageNumber, pageSize) => {
     
     const EmpId = '10023'
-
+  
     const formData = new FormData(); 
     formData.append('pageNumber', pageNumber);
-    formData.append('pageSize', pageSize);
-     
-    // try {
-    //   const uploadResponse = await fetch('http://localhost:5000/hrsubmission', {
-    //     method: 'POST',
-    //     body: formData
-    //   }) 
+    formData.append('pageSize', pageSize); 
+    formData.append('transactionType', filter.transactionType);
+    formData.append('status', filter.status);
+    formData.append('month', filter.month);
+    formData.append('year', filter.year);
+    
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/hrfiltersubmission', {
+        method: 'POST',
+        body: formData
+      }) 
   
-    //   if (!uploadResponse.ok) {
-    //     console.error('Failed:', uploadResponse.statusText);
-    //     return;
-    //   } 
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
 
-    //   try {
-    //     const data = await uploadResponse.json();   
-    //     setSubmissions(data.result.submissions) 
-    //     setTotalPages(Math.ceil(data.result.count / pageSize))  
-    //   } catch (error) {
-    //       console.error('Error parsing JSON response:', error);
-    //   }
+      try {
+        const data = await uploadResponse.json();   
+        console.log(data.result);
+        setSubmissions(data.result ? data.result.submissions:[]) 
+        setTotalPages(data.result ? Math.ceil(data.result.count / pageSize):1)  
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
  
-    // } catch (error) {
-    //   console.error('Error:', error);
-    // }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }; 
 
   const handlePageChange = (pageNumber) => {
@@ -167,14 +171,30 @@ const HRIAssist = () => {
   };
 
   const filterSearch = () => {
-    setCurrentPage(1)
-    setSubmissions([]) 
-    if(Object.values(filter).every(value => value === '')){ 
-      setSearchFilter(false)
-      getSubmissions(currentPage, pageSize) 
-    }else{ 
-      getFilteredSubmissions(currentPage, pageSize, filter) 
-      setSearchFilter(true)
+    const month = filter.month
+    const year = filter.year
+    if((month && year)||(!month && year) || (!month && !year))
+    {
+      setCurrentPage(1)
+      setSubmissions([]) 
+      if(Object.values(filter).every(value => value === '')){ 
+        setSearchFilter(false)
+        getSubmissions(currentPage, pageSize) 
+      }else{ 
+        getFilteredSubmissions(currentPage, pageSize, filter) 
+        setSearchFilter(true)
+      }
+    }else{
+      toast.error('Year is required!', {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light", 
+      });
     }
   };
 
@@ -243,15 +263,15 @@ const HRIAssist = () => {
                                       </select></td><td className="pr-1 pl-1" >
                                       <select className="form-control" id="month" name="month" onChange={handleFilterSubmit}>
                                         <option value="">Select Month</option>
-                                        <option value="1">January</option>
-                                        <option value="2">February</option>
-                                        <option value="3">March</option>
-                                        <option value="4">April</option>
-                                        <option value="5">May</option>
-                                        <option value="6">June</option>
-                                        <option value="7">July</option>
-                                        <option value="8">August</option>
-                                        <option value="9">September</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
                                         <option value="10">October</option>
                                         <option value="11">November</option>
                                         <option value="12">December</option>
@@ -347,9 +367,22 @@ const HRIAssist = () => {
           </div>
           {/* Footer */}
           <Footer />
+
           {/* End of Page Content */}
         </div>
         {/* End of Content Wrapper */}
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light" 
+        />
       </div>
       {/* End of Page Wrapper */}
       </div>

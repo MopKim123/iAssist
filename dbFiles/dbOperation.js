@@ -235,6 +235,75 @@ const getSubmissions = async (pageNumber, pageSize) => {
       throw error;
     }
 }
+// HR side - get all employee submissions
+const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, status, month, year) => {
+    let query =   `SELECT 
+                        SubsWithRowNumber.Name,
+                        SubsWithRowNumber.EmailAddress,
+                        SubsWithRowNumber.SubmissionID,
+                        SubsWithRowNumber.TransactionType,
+                        SubsWithRowNumber.TurnAround,
+                        SubsWithRowNumber.Status,
+                        SubsWithRowNumber.DateTime,
+                        SubsWithRowNumber.LoanAppDate,
+                        SubsWithRowNumber.TransactionNum,
+                        SubsWithRowNumber.TypeOfDelivery
+                    FROM (
+                        SELECT 
+                            Employee.Name,
+                            Employee.EmailAddress,
+                            Submission.*,
+                            ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
+                        FROM Submission
+                        LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId
+                        WHERE 1 = 1 
+                    `
+    let endQuery =   `) AS SubsWithRowNumber
+                    WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
+                    `
+    let countFilter = ' WHERE 1=1 '
+
+    if(transactionType){
+        query += ` AND Submission.TransactionType = '${transactionType}' `
+        countFilter += ` AND TransactionType = '${transactionType}' `
+    } 
+    if(status){
+        query += `AND Submission.Status = '${status}' `
+        countFilter += `AND Status = '${status}' `
+    }
+    if(month){
+        const date = year+'-'+month 
+        query += `AND Submission.DateTime LIKE '${date}%' `
+        countFilter += `AND DateTime LIKE '${date}%' `
+    }
+    else if(year){ 
+        query += `AND Submission.DateTime LIKE '${year}%' `
+        countFilter += `AND DateTime LIKE '${year}%' `
+    }
+    query += endQuery; 
+    console.log(countFilter)
+
+    try {
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('PageNumber', sql.Int, pageNumber)
+            .input('PageSize', sql.Int, pageSize) 
+            .query(query); 
+        
+        let count = await pool.request() 
+            .query(`
+                SELECT COUNT(*) FROM Submission
+            `+countFilter);
+        if (result.recordset.length === 0) {
+            return null;
+        }
+        //   return result.recordset;
+        return { count: count.recordset[0][''], submissions: result.recordset };
+    } catch (error) {
+      console.error("Error retrieving submission data:", error);
+      throw error;
+    }
+}
  
 
 
@@ -276,9 +345,10 @@ const sample = async () => {
 module.exports = {
     insertPDF,
     getSubmissions,
+    getFilteredSubmissions,
     getUserSubmissions, 
     getPDF,
     updatePDF,
     updateSubmission,
-
+    
 };
