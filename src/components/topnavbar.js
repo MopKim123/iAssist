@@ -2,6 +2,9 @@ import React from "react";
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 // import { variables } from '../variables';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
+import { useState } from "react";
 
 function TopNavbar() {
   // const location = useLocation();
@@ -10,6 +13,7 @@ function TopNavbar() {
    // Retrieve user's name from session storage
    const firstName = sessionStorage.getItem('firstName');
    const lastName = sessionStorage.getItem('lastName');
+   const [hasNotification, setHasNotification] = useState(true);
  
 
   const handleLogout = () => {
@@ -18,8 +22,7 @@ function TopNavbar() {
 
     // Redirect to login page
     navigate('../');
-  };
-
+  }; 
   return (
     <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
       {/* Sidebar Toggle (Topbar) */}
@@ -35,6 +38,39 @@ function TopNavbar() {
             <i className="fas fa-search fa-fw"></i>
           </a>
         </li>
+
+        
+        <li className="nav-item dropdown no-arrow notification-drowpdown">
+          <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span className="mr-2 d-none d-lg-inline text-gray-600 small">{firstName} {lastName}</span>
+            <FontAwesomeIcon icon={faBell} className="notification-bell" /> 
+            {hasNotification && <div className="notification-dot"></div>}          
+          </a> 
+
+          <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in notification-dropdown p-2" aria-labelledby="userDropdown">
+            <div className="d-flex justify-content-between notification">
+              <a className="" href="#"> 
+                Profile
+              </a>
+              <a className="mb-1" href="#"> 
+                Profile
+              </a>
+            </div>
+            
+
+            <a className="dropdown-item notification" href="#">
+              <div className="notification-card">
+              <div className="notification-title">
+                <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                <label className="notification-title">title</label>
+              </div>
+              <label className="truncate-text">message sadsaj jdaskjdkoas dasdsa dsadsadsa dajdia jdoijasokdjasokjd isjdoiasj dasdsa sadsa dsads</label>
+              </div>
+            </a> 
+
+          </div>
+        </li>
+
         <div className="topbar-divider d-none d-sm-block"></div>
 
         {/* Nav Item - User Information */}
