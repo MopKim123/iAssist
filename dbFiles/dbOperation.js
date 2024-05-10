@@ -66,7 +66,7 @@ const insertPDF = async (filename) => {
 //     }
 // }
 
-// HR side - get all employee submissions
+// Employee side - get employee's submissions
 const getUserSubmissions = async (id, pageNumber, pageSize) => {
     try {
         // console.log('this log');
@@ -304,7 +304,36 @@ const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, sta
       throw error;
     }
 }
+
+
+
+// All - get notifications
+const getNotifications = async (id) => {
+    try {
+        let pool = await sql.connect(config);
  
+        let result = await pool.request() 
+            .input('id', sql.Int, id)
+            .query(`
+            SELECT *,
+                CASE 
+                    WHEN CONVERT(DATE, Timestamp) = CONVERT(DATE, GETDATE()) THEN 'Today'
+                    ELSE CONVERT(VARCHAR(20), CONVERT(DATETIME, Timestamp), 107)
+                END + ' ' + FORMAT(CONVERT(DATETIME, Timestamp), 'h:mm tt') AS FormattedDateTime
+            FROM Notification
+            ORDER BY NotificationID DESC;
+            `);
+ 
+            // WHERE SubmissionID = @id
+        if (result.recordset.length === 0) {
+            return null;
+        }  
+        return result.recordset;
+    } catch (error) {
+        console.error("Error retrieving PDF data:", error);
+        throw error;
+    }
+}
 
 
 const sample = async () => {
@@ -350,5 +379,5 @@ module.exports = {
     getPDF,
     updatePDF,
     updateSubmission,
-    
+    getNotifications
 };

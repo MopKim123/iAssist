@@ -4,16 +4,19 @@ import '../App.css';
 // import { variables } from '../variables';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function TopNavbar() {
   // const location = useLocation();
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   // const { FirstName, LastName } = location.state || {};
    // Retrieve user's name from session storage
-   const firstName = sessionStorage.getItem('firstName');
-   const lastName = sessionStorage.getItem('lastName');
-   const [hasNotification, setHasNotification] = useState(true);
+  const firstName = sessionStorage.getItem('firstName');
+  const lastName = sessionStorage.getItem('lastName');
+
+  const [hasNotification, setHasNotification] = useState(true);
+  const [notification, setNotification] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); 
  
 
   const handleLogout = () => {
@@ -23,6 +26,46 @@ function TopNavbar() {
     // Redirect to login page
     navigate('../');
   }; 
+
+
+  
+  useEffect(() => {  
+    getSubmissions(currentPage)    
+  }, [currentPage]);
+
+  const getSubmissions = async (pageNumber, pageSize) => {
+    
+    const EmpId = '10023'
+
+    const formData = new FormData(); 
+    formData.append('pageNumber', pageNumber);
+    formData.append('pageSize', pageSize);
+     
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/getnotification', {
+        method: 'POST',
+        body: formData
+      }) 
+  
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
+
+      try {
+        const data = await uploadResponse.json();  
+        console.log(data.result); 
+        setNotification(data.result) 
+        // setTotalPages(Math.ceil(data.result.count / pageSize))  
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
+ 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
       {/* Sidebar Toggle (Topbar) */}
@@ -58,16 +101,20 @@ function TopNavbar() {
             </div>
             
 
-            <a className="dropdown-item notification" href="#">
+            {notification.map((notification, index) =>
+            <a className={`dropdown-item ${notification.IsSeen ? 'notification-seen' : 'notification'}`} href="#">
               <div className="notification-card">
-              <div className="notification-title">
-                <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                <label className="notification-title">title</label>
-              </div>
-              <label className="truncate-text">message sadsaj jdaskjdkoas dasdsa dsadsadsa dajdia jdoijasokdjasokjd isjdoiasj dasdsa sadsa dsads</label>
+                <div className="notification-title d-flex justify-content-between">
+                  <div>
+                  <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                  <label className="notification-title">{notification.Title}</label>
+                  </div>
+                  <label className="notification-title">{notification.FormattedDateTime}</label>
+                </div>
+                <label className="truncate-text">{notification.Message}</label>
               </div>
             </a> 
-
+            )}
           </div>
         </li>
 

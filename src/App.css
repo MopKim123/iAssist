@@ -348,10 +348,18 @@
   height: 20px;
 }
 .notification {
-  border-bottom: 1px solid #4E73DF;  
+  border-bottom: 1px solid #d1ddff;  
   padding: 0px;  
   padding-left: 10px;  
   padding-right: 10px;  
+  color: #4E73DF; 
+}
+.notification-seen {
+  border-bottom: 1px solid #d1ddff;  
+  padding: 0px;  
+  padding-left: 10px;  
+  padding-right: 10px;  
+  background-color: rgb(223, 223, 223);
   color: #4E73DF; 
 }
 .notification-dropdown {
@@ -359,12 +367,13 @@
   padding-left: 10px;  
   padding-right: 10px;  
   color: #4E73DF;  
-  min-width: 22vw;
-  max-width: 22vw;
-
+  min-width: 25vw;
+  max-width: 25vw;
+  
 }
 .notification-card {  
   max-width: 22vw;
+  padding-top: 4px;  
 
 }
 .notification-title {

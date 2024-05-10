@@ -116,4 +116,18 @@ app.post('/updatesubmission', upload.single(''), async (req, res) => {
   }
 });
 
+
+app.post('/getnotification',  upload.single(''), async (req, res) => {
+
+  try { 
+    // const result = await dbOperation.getPDF(req.body.SubmissionID);
+    const result = await dbOperation.getNotifications(10023);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
