@@ -310,8 +310,7 @@ const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, sta
 // All - get notifications
 const getNotifications = async (id) => {
     try {
-        let pool = await sql.connect(config);
- 
+        let pool = await sql.connect(config); 
         let result = await pool.request() 
             .input('id', sql.Int, id)
             .query(`
@@ -321,12 +320,36 @@ const getNotifications = async (id) => {
                     ELSE CONVERT(VARCHAR(20), CONVERT(DATETIME, Timestamp), 107)
                 END + ' ' + FORMAT(CONVERT(DATETIME, Timestamp), 'h:mm tt') AS FormattedDateTime
             FROM Notification
+            WHERE ReceiverID = @id
             ORDER BY NotificationID DESC;
             `);
  
-            // WHERE SubmissionID = @id
+            // WHERE SubmissionID = @id 
         if (result.recordset.length === 0) {
-            return null;
+            return [];
+        }  
+        return result.recordset;
+    } catch (error) {
+        console.error("Error retrieving PDF data:", error);
+        throw error;
+    }
+}
+
+// All - mark notifications as read
+const markAllNotificationsRead = async (id) => {
+    try {
+        let pool = await sql.connect(config); 
+        console.log(id);
+        let result = await pool.request() 
+            .input('id', sql.Int, id)
+            .query(`
+                UPDATE Notification
+                SET IsSeen = 1
+                WHERE ReceiverID = @id;
+            `);
+  
+        if (result.recordset.length === 0) {
+            return [];
         }  
         return result.recordset;
     } catch (error) {
@@ -379,5 +402,6 @@ module.exports = {
     getPDF,
     updatePDF,
     updateSubmission,
-    getNotifications
+    getNotifications,
+    markAllNotificationsRead,
 };

@@ -4,7 +4,8 @@ import '../App.css';
 // import { variables } from '../variables';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
+import { notificationMarkAllRead } from "./globalFunctions";
 
 function TopNavbar() {
   // const location = useLocation();
@@ -13,6 +14,8 @@ function TopNavbar() {
    // Retrieve user's name from session storage
   const firstName = sessionStorage.getItem('firstName');
   const lastName = sessionStorage.getItem('lastName');
+  
+  const EmpId = '10023'
 
   const [hasNotification, setHasNotification] = useState(true);
   const [notification, setNotification] = useState([]);
@@ -30,16 +33,14 @@ function TopNavbar() {
 
   
   useEffect(() => {  
-    getSubmissions(currentPage)    
-  }, [currentPage]);
+    getNotifications()     
+  }, []);
 
-  const getSubmissions = async (pageNumber, pageSize) => {
+  const getNotifications = async () => {
     
-    const EmpId = '10023'
 
     const formData = new FormData(); 
-    formData.append('pageNumber', pageNumber);
-    formData.append('pageSize', pageSize);
+    formData.append('EmpId', EmpId); 
      
     try {
       const uploadResponse = await fetch('http://localhost:5000/getnotification', {
@@ -53,9 +54,17 @@ function TopNavbar() {
       } 
 
       try {
-        const data = await uploadResponse.json();  
-        console.log(data.result); 
-        setNotification(data.result) 
+        const data = await uploadResponse.json();   
+        if(data.result != 0){  
+          if(data.result.some(notification => notification.IsSeen === false)){
+            setHasNotification(true)
+          } else {
+            setHasNotification(false)
+          }
+          setNotification(data.result)
+        }else{
+          setHasNotification(false)
+        }
         // setTotalPages(Math.ceil(data.result.count / pageSize))  
       } catch (error) {
           console.error('Error parsing JSON response:', error);
@@ -65,6 +74,7 @@ function TopNavbar() {
       console.error('Error:', error);
     }
   };
+
 
   return (
     <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -92,28 +102,34 @@ function TopNavbar() {
 
           <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in notification-dropdown p-2" aria-labelledby="userDropdown">
             <div className="d-flex justify-content-between notification">
-              <a className="" href="#"> 
-                Profile
-              </a>
-              <a className="mb-1" href="#"> 
-                Profile
+              <a className="" href="/viewnotifications"> 
+                View All
+              </a> 
+              <a className="mb-1" onClick={()=>{notificationMarkAllRead(EmpId);getNotifications()}}> 
+                Mark all as read
               </a>
             </div>
             
 
-            {notification.map((notification, index) =>
-            <a className={`dropdown-item ${notification.IsSeen ? 'notification-seen' : 'notification'}`} href="#">
-              <div className="notification-card">
-                <div className="notification-title d-flex justify-content-between">
-                  <div>
-                  <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                  <label className="notification-title">{notification.Title}</label>
-                  </div>
-                  <label className="notification-title">{notification.FormattedDateTime}</label>
-                </div>
-                <label className="truncate-text">{notification.Message}</label>
+            {notification.length === 0 ? (
+              <div className="d-flex justify-content-center p-1">
+                <label className="m-auto text-center">You have no notifications yet!</label>
               </div>
-            </a> 
+            ) : (
+              notification.map((notification, index) => (
+                <a className={`dropdown-item ${notification.IsSeen ? 'notification-seen' : 'notification'}`} href="#" key={index}>
+                  <div className="notification-card">
+                    <div className="notification-title d-flex justify-content-between">
+                      <div>
+                        <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                        <label className="notification-title">{notification.Title}</label>
+                      </div>
+                      <label className="notification-title">{notification.FormattedDateTime}</label>
+                    </div>
+                    <label className="truncate-text">{notification.Message}</label>
+                  </div>
+                </a>
+              ))
             )}
           </div>
         </li>

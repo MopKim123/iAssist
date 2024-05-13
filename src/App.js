@@ -21,6 +21,7 @@ import SubmissionView from './components/submission/submissionView';
 
 import HRIAssist from './components/hriassist/hrIAssist';
 import RequestView from './components/hriassist/requestView';
+import ViewNotifications from './components/notification/viewNotifications';
 
 
 import Test from './components/test';
@@ -57,6 +58,9 @@ function App() {
           {/* HR iAssist Pages */}
           <Route path="/hriassist" element={<HRIAssist />} />
             <Route path="/request" element={<RequestView />} />
+   
+          {/* All */}
+          <Route path="/viewnotifications" element={<ViewNotifications />} />
 
             <Route path="/test" element={<Test/>} />
 

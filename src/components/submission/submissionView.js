@@ -258,8 +258,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                               </div>
                                               <label>Date Submitted: {pdf.UploadDate}</label>  
                                             </div>
-
-                                            {console.log(pdf)}
+ 
                                             {/* For Resubmission */}
                                             {pdf.Resubmit === 1 &&
                                               <div className="d-flex justify-content-between">

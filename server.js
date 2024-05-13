@@ -119,9 +119,21 @@ app.post('/updatesubmission', upload.single(''), async (req, res) => {
 
 app.post('/getnotification',  upload.single(''), async (req, res) => {
 
-  try { 
+  try {   
     // const result = await dbOperation.getPDF(req.body.SubmissionID);
-    const result = await dbOperation.getNotifications(10023);
+    const result = await dbOperation.getNotifications(req.body.EmpId);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/notificationmarkallread',  upload.single(''), async (req, res) => {
+
+  try {    
+    const result = await dbOperation.markAllNotificationsRead(req.body.EmpId);
     res.status(200).json({ result: result });
 
   } catch (error) {
