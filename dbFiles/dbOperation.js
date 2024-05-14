@@ -307,8 +307,36 @@ const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, sta
 
 
 
-// All - get notifications
+// All - get notifications for 'bell'
 const getNotifications = async (id) => {
+    try {
+        let pool = await sql.connect(config); 
+        let result = await pool.request() 
+            .input('id', sql.Int, id)
+            .query(`
+            SELECT TOP 8 *,
+                CASE 
+                    WHEN CONVERT(DATE, Timestamp) = CONVERT(DATE, GETDATE()) THEN 'Today'
+                    ELSE CONVERT(VARCHAR(20), CONVERT(DATETIME, Timestamp), 107)
+                END + ' ' + FORMAT(CONVERT(DATETIME, Timestamp), 'h:mm tt') AS FormattedDateTime
+            FROM Notification
+            WHERE ReceiverID = @id
+            ORDER BY NotificationID DESC;
+            `);
+ 
+            // WHERE SubmissionID = @id 
+        if (result.recordset.length === 0) {
+            return [];
+        }  
+        return result.recordset;
+    } catch (error) {
+        console.error("Error retrieving PDF data:", error);
+        throw error;
+    }
+}
+
+// All - get notifications for 'view all'
+const getNotificationsForView = async (id) => {
     try {
         let pool = await sql.connect(config); 
         let result = await pool.request() 

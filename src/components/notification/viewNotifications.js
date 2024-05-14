@@ -54,7 +54,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
       } 
 
       try {
-        const data = await uploadResponse.json();   
+        const data = await uploadResponse.json();
+        console.log(data.result[0])
         if(data.result != 0){  
           if(data.result.some(notification => notification.IsSeen === false)){
             setHasNotification(true)
@@ -85,108 +86,41 @@ import { Document, Page,pdfjs } from 'react-pdf';
           <div className="container-fluid">
                   <div className="container-fluid">
                     <div className="row justify-content-center">
-                      <h4 className="m-0 font-weight-bold text-primary header-name"> dsa</h4>
+                      <h4 className="m-0 font-weight-bold text-primary header-name">Notification</h4>
                     </div>
                   </div>
           <div className="row justify-content-center">
             <div className="col-xl-12 col-xl-9">
-              <div className="card shadow mb-4">
-                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <ul className="nav nav-tabs nav-fill">
-                        <li className="nav-item">
-                            <a className="nav-link active " id="personalDetails-tab" data-toggle="tab" href="#personalDetails" role="tab" aria-controls="personalDetails" 
-                            aria-selected="false"> </a>
-                        </li> 
-                    </ul>
-                    </div>
-                  <br/>
-                    <div className="tab-content">
-                      <div className="tab-pane fade show active" id="personalDetails" role="tabpanel" aria-labelledby="personalDetails-tab">
-                          {/* Personal Details Form */}
-                      <div className="container">
-                              <div className="justify-content-center">
-                                <div > 
-                                <div className="d-flex justify-content-between"> 
-                                </div>
-                                </div> 
-                              </div> 
-                      </div>
-                      <br/> 
-                      </div> 
-                      {/* Add more tab content here */}
-                      </div>
-                </div> 
-
+              <br/> 
                 {/* page content begin here */}  
-                {notification && notification.map((pdf, index) =>
-                <div className="container-fluid">
-                    <div className="row justify-content-center">
-                        <div className="col-xl-8 col-lg-7">
-                            <div className="card shadow mb-4">
-                                {/* Card Header - New Hire Upload */}
-                                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                  <h6 className="m-0 font-weight-bold text-primary">{pdf.RequirementName}</h6> 
-                                  <h6 className="m-0 font-weight-bold" style={{color: 'red'}}>{pdf.Resubmit?'Resubmit':''}</h6> 
-                                </div>
-                                {/* Card Body - New Hire Options */}
-                                <div className="card-body">
-                                    <div className="tab-content">
-                                        <div className="card-body">
-                                            <div className="d-flex justify-content-between align-items-center">
-                                               
-                                              <label>Date Submitted: {pdf.UploadDate}</label>  
-                                            </div>
- 
-                                            {/* For Resubmission */}
-                                            {pdf.Resubmit === 1 &&
-                                              <div className="d-flex justify-content-between">
-                                                  {pdf.EmpResubmitted === 0 &&
-                                                  <div className="d-flex justify-content-left">
-                                                      <input type="file" className="input-file" aria-describedby="fileHelp"/> 
-                                                  </div> }
-                                                  <label>Reason: {pdf.ResubmitReason}</label>
-                                              </div>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {notification && notification.map((notification, index) =>
+                  <div className="container-fluid">
+                      <div className="row justify-content-center">
+                          <div className="col-xl-8 col-lg-7"> 
+                              <div className="card shadow mb-4 notificationView-card">
+                                  {/* Card Header - New Hire Upload */}
+                                  <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 className="m-0 font-weight-bold text-primary">{notification.Title}</h6> 
+                                    <h6 className="m-0 font-weight-bold">{notification.FormattedDateTime}</h6> 
+                                  </div>
+                                  {/* Card Body - New Hire Options */}
+                                  <div className=" ">
+                                      <div className="tab-content">
+                                          <div className="card-body">
+                                              <div className="d-flex justify-content-between align-items-center">
+                                                
+                                                <label>{notification.Message}</label>  
+                                              </div> 
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div> 
+                          </div>
+                      </div>
+                  </div>
                 )} 
                 {/* Page content ends here */} 
-                
-                {/* page content begin here */}
-                <div className="container-fluid">
-                    <div className="row justify-content-center">
-                        <div className="col-xl-8 col-lg-7">
-                            <div className="card shadow mb-4">
-                                {/* Card Header - New Hire Upload */}
-                                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 className="m-0 font-weight-bold text-primary">Remark</h6>
-                                </div>
-                                {/* Card Body - New Hire Options */}
-                                <div className="card-body">
-                                    <div className="tab-content">
-                                        <div className="card-body loan-row"> 
-                                            <div className="form-group"> <textarea 
-                                              className="form-control" 
-                                              id="remark" 
-                                              name="remark"
-                                              rows="3" 
-                                              style={{ resize: "vertical" }}
-                                            />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {/* Page content ends here */}
-                <button type="submit" className="btn btn-primary d-block mx-auto">Submit</button>
+                 
               </div>
  
               </div>   
