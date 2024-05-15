@@ -62,6 +62,34 @@ export async function notificationMarkAllRead(id){
   }
 };
 
+export async function setNotificationAsRead(NotificationID){
+    
+
+  const formData = new FormData(); 
+  formData.append('NotificationID', NotificationID); 
+    
+  try {
+    const uploadResponse = await fetch('http://localhost:5000/setnotificationasread', {
+      method: 'POST',
+      body: formData
+    }) 
+
+    if (!uploadResponse.ok) {
+      console.error('Failed:', uploadResponse.statusText);
+      return;
+    } 
+
+    try {
+      const data = await uploadResponse.json();     
+    } catch (error) {
+        console.error('Error parsing JSON response:', error);
+    }
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
 export function add(a, b) {
   return a + b;
 }

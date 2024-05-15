@@ -5,7 +5,7 @@ import '../App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from "react"; 
-import { notificationMarkAllRead } from "./globalFunctions";
+import { notificationMarkAllRead, setNotificationAsRead } from "./globalFunctions";
 
 function TopNavbar() {
   // const location = useLocation();
@@ -75,6 +75,42 @@ function TopNavbar() {
     }
   };
 
+  const clickNotification = async (notification) => {  
+    setNotificationAsRead(notification.NotificationID)
+    getNotifications()
+    // get data before viewing
+    const SubmissionID = 32
+    // navigate('/submissionview');  
+  
+    const formData = new FormData(); 
+    formData.append('SubmissionID', SubmissionID); 
+    
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/getsubmissionfornotification', {
+        method: 'POST',
+        body: formData
+      }) 
+  
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
+
+      try {
+        const submission = await uploadResponse.json();   
+        const data = submission.result.submissions[0] 
+        navigate('/submissionview', {state: { data }});
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
+ 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  
+
 
   return (
     <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -117,16 +153,19 @@ function TopNavbar() {
               </div>
             ) : (
               notification.map((notification, index) => (
-                <a className={`dropdown-item ${notification.IsSeen ? 'notification-seen' : 'notification'}`} href="#" key={index}>
+                <a className={`dropdown-item ${notification.IsSeen ? 'notification-seen' : 'notification'}`} key={index}  
+                onClick={()=>clickNotification(notification)}>
                   <div className="notification-card">
                     <div className="notification-title d-flex justify-content-between">
                       <div>
-                        <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                        {!notification.IsSeen && <i className="fas fa-exclamation fa-sm fa-fw mr-2 text-blue"></i>}
                         <label className="notification-title">{notification.Title}</label>
                       </div>
                       <label className="notification-title">{notification.FormattedDateTime}</label>
                     </div>
                     <label className="truncate-text">{notification.Message}</label>
+                    <label className="truncate-text">{notification.NotificationID}</label>
+                    <label className="truncate-text">{notification.SubmissionID}</label>
                   </div>
                 </a>
               ))

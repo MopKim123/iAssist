@@ -142,4 +142,28 @@ app.post('/notificationmarkallread',  upload.single(''), async (req, res) => {
   }
 });
 
+app.post('/setnotificationasread',  upload.single(''), async (req, res) => {
+
+  try {    
+    const result = await dbOperation.setNotificationAsRead(req.body.NotificationID);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/getsubmissionfornotification',  upload.single(''), async (req, res) => {
+
+  try {    
+    const result = await dbOperation.getSubmissionForNotification(req.body.SubmissionID);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

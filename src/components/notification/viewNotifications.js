@@ -3,21 +3,16 @@ import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
-import '../../App.css';
-import { variables } from '../../variables';
-import { base64pdf } from '../../vblob';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-// import pdf1 from '../../dummy.pdf'
-import "react-pdf/dist/esm/Page/TextLayer.css"; 
-
-import { Document, Page,pdfjs } from 'react-pdf'; 
+import '../../App.css'; 
+import { useNavigate } from 'react-router-dom';
+ 
+import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctions";
 
 
- function ViewNotifications() {
-    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
+ function ViewNotifications() { 
 
     const location = useLocation();
+    const navigate = useNavigate();
  
     const [numPages, setNumPages] = useState();
     const [pageNumber, setPageNumber] = useState(1);  
@@ -75,7 +70,40 @@ import { Document, Page,pdfjs } from 'react-pdf';
       console.error('Error:', error);
     }
   };
+    
+  const clickNotification = async (notification) => {  
+    setNotificationAsRead(notification.NotificationID)
+    getNotifications()
+    // get data before viewing
+    const SubmissionID = 32
+    // navigate('/submissionview');  
+  
+    const formData = new FormData(); 
+    formData.append('SubmissionID', SubmissionID); 
+    
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/getsubmissionfornotification', {
+        method: 'POST',
+        body: formData
+      }) 
+  
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
+
+      try {
+        const submission = await uploadResponse.json();   
+        const data = submission.result.submissions[0] 
+        navigate('/submissionview', {state: { data }});
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
  
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
   
     return (
       <div id="wrapper">
@@ -97,7 +125,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                   <div className="container-fluid">
                       <div className="row justify-content-center">
                           <div className="col-xl-8 col-lg-7"> 
-                              <div className="card shadow mb-4 notificationView-card">
+                              <div className="card shadow mb-4 notificationView-card" onClick={clickNotification}>
                                   {/* Card Header - New Hire Upload */}
                                   <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 className="m-0 font-weight-bold text-primary">{notification.Title}</h6> 

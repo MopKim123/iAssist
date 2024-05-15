@@ -139,7 +139,6 @@ const getPDF = async (id) => {
         throw error;
     }
 }
-
 // HR side - update if need resubmission
 const updatePDF = async (id,reason,subId) => {
     try {
@@ -170,7 +169,6 @@ const updatePDF = async (id,reason,subId) => {
         throw error;
     }
 }
-
 // HR side - update if complete
 const updateSubmission = async (id) => {
     try {
@@ -190,9 +188,8 @@ const updateSubmission = async (id) => {
         throw error;
     }
 }
-
 // HR side - get all employee submissions
-const getSubmissions = async (pageNumber, pageSize) => {
+const getSubmissions = async (pageNumber, pageSize, id) => {
     try {
       let pool = await sql.connect(config);
       let result = await pool.request()
@@ -334,22 +331,30 @@ const getNotifications = async (id) => {
         throw error;
     }
 }
-
 // All - get notifications for 'view all'
-const getNotificationsForView = async (id) => {
+const getNotificationsForView = async (id, pageNumber, pageSize) => {
     try {
         let pool = await sql.connect(config); 
         let result = await pool.request() 
             .input('id', sql.Int, id)
             .query(`
-            SELECT *,
-                CASE 
-                    WHEN CONVERT(DATE, Timestamp) = CONVERT(DATE, GETDATE()) THEN 'Today'
-                    ELSE CONVERT(VARCHAR(20), CONVERT(DATETIME, Timestamp), 107)
-                END + ' ' + FORMAT(CONVERT(DATETIME, Timestamp), 'h:mm tt') AS FormattedDateTime
-            FROM Notification
-            WHERE ReceiverID = @id
-            ORDER BY NotificationID DESC;
+                SELECT 
+                    NotifWithRowNumber.NotificationID,
+                    NotifWithRowNumber.SenderID,
+                    NotifWithRowNumber.ReceiverID,
+                    NotifWithRowNumber.Title,
+                    NotifWithRowNumber.Message,
+                    NotifWithRowNumber.Timestamp,
+                    NotifWithRowNumber.IsSeen,
+                    NotifWithRowNumber.SubmissionID,
+                    NotifWithRowNumber.RowNumber
+                FROM (
+                    SELECT 
+                        Notification.*,
+                        ROW_NUMBER() OVER (ORDER BY NotificationID DESC) AS RowNumber
+                    FROM Notification
+                ) AS NotifWithRowNumber
+                WHERE NotifWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize;
             `);
  
             // WHERE SubmissionID = @id 
@@ -362,8 +367,7 @@ const getNotificationsForView = async (id) => {
         throw error;
     }
 }
-
-// All - mark notifications as read
+// All - mark all notifications as read
 const markAllNotificationsRead = async (id) => {
     try {
         let pool = await sql.connect(config); 
@@ -385,7 +389,54 @@ const markAllNotificationsRead = async (id) => {
         throw error;
     }
 }
-
+// All - mark 1 notification as read
+const setNotificationAsRead = async (id) => {
+    try {
+        let pool = await sql.connect(config); 
+        console.log(id);
+        let result = await pool.request() 
+            .input('id', sql.Int, id)
+            .query(`
+                UPDATE Notification
+                SET IsSeen = 1
+                WHERE NotificationID = @id;
+            `);
+  
+        if (result.recordset) {
+            return null;
+        }  
+        return result.recordset;
+    } catch (error) {
+        console.error("Error retrieving PDF data:", error);
+        throw error;
+    }
+}
+// All - mark 1 notification as read
+const getSubmissionForNotification = async (SubmissionID) => {
+    try {
+      let pool = await sql.connect(config);
+      let result = await pool.request()
+        .input('id', sql.Int, SubmissionID) 
+        .query(` 
+            SELECT 
+                Employee.Name,
+                Employee.EmailAddress,
+                Submission.* 
+            FROM Submission
+            LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId  
+            WHERE Submission.SubmissionID = @id;
+        `); 
+         
+        if (result.recordset.length === 0) {
+            return null;
+        }
+        //   return result.recordset;
+        return { submissions: result.recordset };
+    } catch (error) {
+      console.error("Error retrieving submission data:", error);
+      throw error;
+    }
+}
 
 const sample = async () => {
     try {
@@ -432,4 +483,6 @@ module.exports = {
     updateSubmission,
     getNotifications,
     markAllNotificationsRead,
+    setNotificationAsRead,
+    getSubmissionForNotification
 };
