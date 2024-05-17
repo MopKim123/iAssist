@@ -19,7 +19,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    // console.log(data.EmailAddress);
+    // console.log(data);
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
@@ -27,6 +27,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const [numPages, setNumPages] = useState(); 
     const [pdfUrl, setPdfUrl] = useState(''); 
     
+    const EmpId = 10024
 
     const [pdf, setPdf] = useState([]); 
     
@@ -178,6 +179,31 @@ import { Document, Page,pdfjs } from 'react-pdf';
         console.error('Error:', error);
       }
     }; 
+
+    //insert notification
+    const insertNotification = async (notificationType) => { 
+  
+      const formData = new FormData();
+      formData.append('EmployeeName', data.Name);  
+      formData.append('TransactionType', data.TransactionType);  
+      formData.append('SenderID', EmpId);  
+      formData.append('ReceiverID', data.EmpID);  
+      formData.append('NotificationType', 'complete');  
+      formData.append('SubmissionID', data.SubmissionID);   
+      try {
+        const uploadResponse = await fetch('http://localhost:5000/insertnotification', {
+          method: 'POST',
+          body: formData
+        }) 
+    
+        if (!uploadResponse.ok) {
+          console.error('Failed:', uploadResponse.statusText);
+          return;  
+        }   
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }; 
     
     
     // Modal functions
@@ -218,7 +244,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
         const formData = {
           sender_name: 'senderName',
           sender_email: data.EmailAddress,
-          receiver_name: 'receiverName',
+          receiver_name: `receiverName`,
           receiver_email: sampleEmail,
           transaction_type: data.TransactionType,
           document_name: documentName,
@@ -248,23 +274,16 @@ import { Document, Page,pdfjs } from 'react-pdf';
           <div id="content">
             <TopNavbar />
           <div className="container-fluid">
-                  <div className="container-fluid">
-                    <div className="row justify-content-center">
-                      <h4 className="m-0 font-weight-bold text-primary header-name">{data.TransactionType}</h4>
-                    </div>
-                  </div>
+          <div className="container-fluid">
+            <div className="row justify-content-center">
+              <h4 className="m-0 font-weight-bold text-primary header-name">{data.TransactionType}</h4>
+            </div>
+          </div>
+          <br/>
           <div className="row justify-content-center">
             <div className="col-xl-12 col-xl-9">
             {/* <form > */}
-              <div className="card shadow mb-4">
-                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <ul className="nav nav-tabs nav-fill">
-                        <li className="nav-item">
-                            <a className="nav-link active " id="personalDetails-tab" data-toggle="tab" href="#personalDetails" role="tab" aria-controls="personalDetails" 
-                            aria-selected="false">{data.TransactionType}</a>
-                        </li> 
-                    </ul>
-                    </div>
+              <div className="card shadow mb-4 "> 
                   <br/>
                     <div className="tab-content">
                       <div className="tab-pane fade show active" id="personalDetails" role="tabpanel" aria-labelledby="personalDetails-tab">

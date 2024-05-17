@@ -29,42 +29,7 @@ const insertPDF = async (filename) => {
         throw error;
     }
 }
-
-// // Employee side - get employee's submissions
-// const getUserSubmissions = async (id) => {
-//     try {
-//         let pool = await sql.connect(config);
  
-//         let result = await pool.request() 
-//             .input('id', sql.Int, id)
-//             .query(`
-//                 SELECT 
-//                     Employee.Name,
-//                     Submission.SubmissionID,
-//                     Submission.TransactionType,
-//                     Submission.TurnAround,
-//                     Submission.Status,
-//                     Submission.DateTime,
-//                     Submission.LoanAppDate,
-//                     Submission.TransactionNum,
-//                     Submission.TypeOfDelivery
-//                 FROM Submission
-//                 LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
-//                 Where Submission.EmpId = @id
-//                 ORDER BY Submission.SubmissionID DESC;
-//             `);
- 
-//         if (result.recordset.length === 0) {
-//             return null;
-//         } 
-    
-//         return result.recordset;
-
-//     } catch (error) {
-//         console.error("Error retrieving PDF data:", error);
-//         throw error;
-//     }
-// }
 
 // Employee side - get employee's submissions
 const getUserSubmissions = async (id, pageNumber, pageSize) => {
@@ -189,7 +154,7 @@ const updateSubmission = async (id) => {
     }
 }
 // HR side - get all employee submissions
-const getSubmissions = async (pageNumber, pageSize, id) => {
+const getSubmissions = async (pageNumber, pageSize) => {
     try {
       let pool = await sql.connect(config);
       let result = await pool.request()
@@ -197,6 +162,7 @@ const getSubmissions = async (pageNumber, pageSize, id) => {
         .input('PageSize', sql.Int, pageSize) 
         .query(`SELECT 
                     SubsWithRowNumber.Name,
+                    SubsWithRowNumber.EmpID,
                     SubsWithRowNumber.EmailAddress,
                     SubsWithRowNumber.SubmissionID,
                     SubsWithRowNumber.TransactionType,
@@ -309,7 +275,7 @@ const getNotifications = async (id) => {
     try {
         let pool = await sql.connect(config); 
         let result = await pool.request() 
-            .input('id', sql.Int, id)
+            .input('id', sql.VarChar, id)
             .query(`
             SELECT TOP 8 *,
                 CASE 
@@ -392,8 +358,7 @@ const markAllNotificationsRead = async (id) => {
 // All - mark 1 notification as read
 const setNotificationAsRead = async (id) => {
     try {
-        let pool = await sql.connect(config); 
-        console.log(id);
+        let pool = await sql.connect(config);  
         let result = await pool.request() 
             .input('id', sql.Int, id)
             .query(`
@@ -411,7 +376,7 @@ const setNotificationAsRead = async (id) => {
         throw error;
     }
 }
-// All - mark 1 notification as read
+// All - get submission data for notification
 const getSubmissionForNotification = async (SubmissionID) => {
     try {
       let pool = await sql.connect(config);
@@ -419,12 +384,62 @@ const getSubmissionForNotification = async (SubmissionID) => {
         .input('id', sql.Int, SubmissionID) 
         .query(` 
             SELECT 
+                Employee.EmpId,
                 Employee.Name,
                 Employee.EmailAddress,
                 Submission.* 
             FROM Submission
             LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId  
             WHERE Submission.SubmissionID = @id;
+        `); 
+         
+        if (result.recordset.length === 0) {
+            return null;
+        }
+        //   return result.recordset;
+        return { submissions: result.recordset };
+    } catch (error) {
+      console.error("Error retrieving submission data:", error);
+      throw error;
+    }
+}
+// All - insert new notification
+const insertNotification = async ( EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID) => {
+ 
+    let title
+    let message 
+    switch(NotificationType){
+        case 'complete':
+            title = `Your ${TransactionType} has been Successfully Completed`
+            message = `Dear ${EmployeeName}, we are pleased to notify you that 
+                your ${TransactionType} transaction has been completed successfully. For 
+                any further assistance, please reach out to our support team.`
+            break
+        case 'resubmit':
+            title = `Important: Resubmit File for Your ${TransactionType} Transaction`
+            message = `Dear ${EmployeeName}, we are pleased to notify you that 
+            your ${TransactionType} transaction has been completed successfully. For 
+            any further assistance, please reach out to our support team.`
+            break
+        case 'expired':
+            title = `Attention: Your ${TransactionType} Transaction Has Expired`
+            message = `Dear ${EmployeeName}, we are writing to inform you that 
+            your ${TransactionType} transaction has expired. For assistance with resubmission 
+            or further inquiries, please contact our support team.`
+            break;
+    }
+    
+    try {
+      let pool = await sql.connect(config);
+      let result = await pool.request()  
+        .input('SenderID', sql.VarChar, SenderID)
+        .input('ReceiverID', sql.VarChar, ReceiverID) 
+        .input('Title', sql.VarChar, title) 
+        .input('Message', sql.VarChar, message) 
+        .input('SubmissionID', sql.Int, SubmissionID)
+        .query(` 
+            INSERT INTO Notification (SenderID, ReceiverID, Title, Message, SubmissionID)
+            VALUES (@SenderID, @ReceiverID, @Title, @Message, @SubmissionID);
         `); 
          
         if (result.recordset.length === 0) {
@@ -484,5 +499,6 @@ module.exports = {
     getNotifications,
     markAllNotificationsRead,
     setNotificationAsRead,
-    getSubmissionForNotification
+    getSubmissionForNotification,
+    insertNotification,
 };

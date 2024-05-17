@@ -250,6 +250,7 @@ const HRIAssist = () => {
                                         <option value="Pag-Ibig Virtual Account">Pag-Ibig Virtual Account</option>
                                         <option value="Maternity Notication">Maternity Notication</option>
                                         <option value="Maternity Benefit">Maternity Benefit</option> 
+                                        <option value="Certification Request">Certification Request</option> 
                                         <option value="Other">Other</option> 
                                       </select></td> 
                                     <td className="pr-1 pl-1" > 
@@ -280,7 +281,9 @@ const HRIAssist = () => {
                                     <td className="pr-1 pl-1" >
                                       <input type="number"  className="form-control" id="year" name="year" pattern="\d*" max={new Date().getFullYear()}  onChange={handleFilterSubmit}/>
                                     </td>
-                                    <td className="d-flex align-items-center justify-content-center"><Button onClick={filterSearch}>Filter</Button></td> 
+                                    <td className="d-flex align-items-center justify-content-center">
+                                      <Button onClick={filterSearch}>Filter</Button>
+                                    </td> 
                                   </tr>
                                 </tbody>
                               </table>  

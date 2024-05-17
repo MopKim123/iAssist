@@ -74,12 +74,9 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
   const clickNotification = async (notification) => {  
     setNotificationAsRead(notification.NotificationID)
     getNotifications()
-    // get data before viewing
-    const SubmissionID = 32
-    // navigate('/submissionview');  
-  
+    
     const formData = new FormData(); 
-    formData.append('SubmissionID', SubmissionID); 
+    formData.append('SubmissionID', notification.SubmissionID); 
     
     try {
       const uploadResponse = await fetch('http://localhost:5000/getsubmissionfornotification', {
@@ -95,7 +92,7 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
       try {
         const submission = await uploadResponse.json();   
         const data = submission.result.submissions[0] 
-        navigate('/submissionview', {state: { data }});
+        navigate('/request', {state: { data }});
       } catch (error) {
           console.error('Error parsing JSON response:', error);
       }
@@ -125,7 +122,7 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
                   <div className="container-fluid">
                       <div className="row justify-content-center">
                           <div className="col-xl-8 col-lg-7"> 
-                              <div className="card shadow mb-4 notificationView-card" onClick={clickNotification}>
+                              <div className="card shadow mb-4 notificationView-card" onClick={() => clickNotification(notification)}>
                                   {/* Card Header - New Hire Upload */}
                                   <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 className="m-0 font-weight-bold text-primary">{notification.Title}</h6> 

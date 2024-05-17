@@ -31,7 +31,7 @@ app.post('/upload', upload.single('sssloanPDF'), async (req, res) => {
   // }
 });
 
-
+// HR - get all employee submission
 app.post('/hrsubmission',  upload.single(''), async (req, res) => {
  
   try {
@@ -43,7 +43,7 @@ app.post('/hrsubmission',  upload.single(''), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 }); 
-
+// HR - get all employee submission with filter
 app.post('/hrfiltersubmission', upload.single(''),  async (req, res) => {
  
   try {
@@ -55,7 +55,7 @@ app.post('/hrfiltersubmission', upload.single(''),  async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 }); 
-
+// HR - get submission pdfs
 app.post('/submissionpdf',  upload.single('SubmissionID'), async (req, res) => {
 
   try {
@@ -68,21 +68,7 @@ app.post('/submissionpdf',  upload.single('SubmissionID'), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-app.post('/usersubmission',  upload.single('EmpId'), async (req, res) => {
-
-  try { 
-  
-    const { pageNumber, pageSize } = req.body; 
-    const result = await dbOperation.getUserSubmissions(req.body.EmpId,pageNumber, pageSize);
-    res.status(200).json({ result: result });
-
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
+// HR - update pdf status
 app.post('/updatepdf', upload.single(''), async (req, res) => {
 
   try {
@@ -99,7 +85,7 @@ app.post('/updatepdf', upload.single(''), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
+// HR - update submission status
 app.post('/updatesubmission', upload.single(''), async (req, res) => {
 
   try {
@@ -117,11 +103,13 @@ app.post('/updatesubmission', upload.single(''), async (req, res) => {
 });
 
 
-app.post('/getnotification',  upload.single(''), async (req, res) => {
+// Employee - get employee submission
+app.post('/usersubmission',  upload.single('EmpId'), async (req, res) => {
 
-  try {   
-    // const result = await dbOperation.getPDF(req.body.SubmissionID);
-    const result = await dbOperation.getNotifications(req.body.EmpId);
+  try { 
+  
+    const { pageNumber, pageSize } = req.body; 
+    const result = await dbOperation.getUserSubmissions(req.body.EmpId,pageNumber, pageSize);
     res.status(200).json({ result: result });
 
   } catch (error) {
@@ -130,6 +118,22 @@ app.post('/getnotification',  upload.single(''), async (req, res) => {
   }
 });
 
+
+// All - get notifications
+app.post('/getnotification',  upload.single(''), async (req, res) => {
+
+  try {   
+    // const result = await dbOperation.getPDF(req.body.SubmissionID);
+    // console.log(req.body.EmpId)
+    const result = await dbOperation.getNotifications(req.body.EmpId);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// All - mark all notifications as read
 app.post('/notificationmarkallread',  upload.single(''), async (req, res) => {
 
   try {    
@@ -141,7 +145,7 @@ app.post('/notificationmarkallread',  upload.single(''), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
+// All - mark one notification as read
 app.post('/setnotificationasread',  upload.single(''), async (req, res) => {
 
   try {    
@@ -153,7 +157,7 @@ app.post('/setnotificationasread',  upload.single(''), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
+// All - get submission details for notification
 app.post('/getsubmissionfornotification',  upload.single(''), async (req, res) => {
 
   try {    
@@ -165,5 +169,23 @@ app.post('/getsubmissionfornotification',  upload.single(''), async (req, res) =
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+// All - insert notification
+app.post('/insertnotification',  upload.single(''), async (req, res) => {
+
+  try {
+
+    const { EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID } = req.body; 
+    // console.log(EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID);
+    // const insertNotification = async ( EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID) => {
+    
+    const result = await dbOperation.insertNotification(EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

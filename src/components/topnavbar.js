@@ -41,7 +41,7 @@ function TopNavbar() {
 
     const formData = new FormData(); 
     formData.append('EmpId', EmpId); 
-     
+    
     try {
       const uploadResponse = await fetch('http://localhost:5000/getnotification', {
         method: 'POST',
@@ -77,13 +77,10 @@ function TopNavbar() {
 
   const clickNotification = async (notification) => {  
     setNotificationAsRead(notification.NotificationID)
-    getNotifications()
-    // get data before viewing
-    const SubmissionID = 32
-    // navigate('/submissionview');  
+    getNotifications()  
   
     const formData = new FormData(); 
-    formData.append('SubmissionID', SubmissionID); 
+    formData.append('SubmissionID', notification.SubmissionID); 
     
     try {
       const uploadResponse = await fetch('http://localhost:5000/getsubmissionfornotification', {
@@ -157,15 +154,13 @@ function TopNavbar() {
                 onClick={()=>clickNotification(notification)}>
                   <div className="notification-card">
                     <div className="notification-title d-flex justify-content-between">
-                      <div>
+                      <div className="notification-title-div">
                         {!notification.IsSeen && <i className="fas fa-exclamation fa-sm fa-fw mr-2 text-blue"></i>}
-                        <label className="notification-title">{notification.Title}</label>
+                        <label className="notification-title truncate-text">{notification.Title}</label>
                       </div>
                       <label className="notification-title">{notification.FormattedDateTime}</label>
                     </div>
                     <label className="truncate-text">{notification.Message}</label>
-                    <label className="truncate-text">{notification.NotificationID}</label>
-                    <label className="truncate-text">{notification.SubmissionID}</label>
                   </div>
                 </a>
               ))
