@@ -55,6 +55,18 @@ app.post('/hrfiltersubmission', upload.single(''),  async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 }); 
+// HR - download submissions
+app.post('/hrdownloadsubmissions', upload.single(''),  async (req, res) => {
+ 
+  try {
+    const { transactionType, status, month, year } = req.body;   
+    const result = await dbOperation.downloadSubmissions(transactionType, status, month, year);
+    res.status(200).json({ result: result });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}); 
 // HR - get submission pdfs
 app.post('/submissionpdf',  upload.single('SubmissionID'), async (req, res) => {
 
@@ -179,6 +191,19 @@ app.post('/insertnotification',  upload.single(''), async (req, res) => {
     // const insertNotification = async ( EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID) => {
     
     const result = await dbOperation.insertNotification(EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+app.post('/getnotificationsforviewall',  upload.single('EmpId'), async (req, res) => {
+
+  try { 
+  
+    const { pageNumber, pageSize } = req.body; 
+    const result = await dbOperation.getNotificationsForViewAll(req.body.EmpId,pageNumber, pageSize);
     res.status(200).json({ result: result });
 
   } catch (error) {

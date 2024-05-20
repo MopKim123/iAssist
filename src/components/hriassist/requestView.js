@@ -9,6 +9,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button'; 
 import emailjs from '@emailjs/browser'; 
 import "react-pdf/dist/esm/Page/TextLayer.css"; 
+import { insertNotification } from '../globalFunctions';
 
 import { Document, Page,pdfjs } from 'react-pdf'; 
 
@@ -129,7 +130,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
         reason += ' respectively'
       }    
       if(reasonArray.length !== 0 && documentNameArray.length !== 0) { 
-        sendEmail('template_resubmit', reason, documentName)
+        insertNotification(data.Name, data.TransactionType, EmpId, data.EmpID, 'resubmit', data.SubmissionID) 
+        sendEmail('template_resubmit', reason, documentName) 
       }
 
     }; 
@@ -171,7 +173,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
         if (!uploadResponse.ok) {
           console.error('Failed:', uploadResponse.statusText);
           return;  
-        }  
+        }   
+        insertNotification(data.Name, data.TransactionType, EmpId, data.EmpID, 'complete', data.SubmissionID)
         if(await sendEmail('template_complete')){
           window.history.back(); 
         }
@@ -181,29 +184,29 @@ import { Document, Page,pdfjs } from 'react-pdf';
     }; 
 
     //insert notification
-    const insertNotification = async (notificationType) => { 
+    // const insertNotification = async (notificationType) => { 
   
-      const formData = new FormData();
-      formData.append('EmployeeName', data.Name);  
-      formData.append('TransactionType', data.TransactionType);  
-      formData.append('SenderID', EmpId);  
-      formData.append('ReceiverID', data.EmpID);  
-      formData.append('NotificationType', 'complete');  
-      formData.append('SubmissionID', data.SubmissionID);   
-      try {
-        const uploadResponse = await fetch('http://localhost:5000/insertnotification', {
-          method: 'POST',
-          body: formData
-        }) 
+    //   const formData = new FormData();
+    //   formData.append('EmployeeName', data.Name);  
+    //   formData.append('TransactionType', data.TransactionType);  
+    //   formData.append('SenderID', EmpId);  
+    //   formData.append('ReceiverID', data.EmpID);  
+    //   formData.append('NotificationType', 'complete');  
+    //   formData.append('SubmissionID', data.SubmissionID);   
+    //   try {
+    //     const uploadResponse = await fetch('http://localhost:5000/insertnotification', {
+    //       method: 'POST',
+    //       body: formData
+    //     }) 
     
-        if (!uploadResponse.ok) {
-          console.error('Failed:', uploadResponse.statusText);
-          return;  
-        }   
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }; 
+    //     if (!uploadResponse.ok) {
+    //       console.error('Failed:', uploadResponse.statusText);
+    //       return;  
+    //     }   
+    //   } catch (error) {
+    //     console.error('Error:', error);
+    //   }
+    // }; 
     
     
     // Modal functions

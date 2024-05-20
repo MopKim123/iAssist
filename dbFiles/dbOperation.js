@@ -267,6 +267,66 @@ const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, sta
       throw error;
     }
 }
+// HR side - download submissions
+const downloadSubmissions = async (transactionType, status, month, year) => {
+    let query =   `SELECT 
+                        SubsWithRowNumber.EmpId,
+                        SubsWithRowNumber.Name,
+                        SubsWithRowNumber.EmailAddress,
+                        SubsWithRowNumber.TransactionType,
+                        FORMAT(CONVERT(DATETIME, SubsWithRowNumber.DateTime, 120), 'MMMM dd, yyyy') AS DateTime,
+                        SubsWithRowNumber.Status
+                    FROM (
+                        SELECT  
+                            Employee.Name,
+                            Employee.EmailAddress,
+                            Submission.*,
+                            ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
+                        FROM Submission
+                        LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId
+                        WHERE 1 = 1 
+                    `
+    let endQuery =   `) AS SubsWithRowNumber`
+    let countFilter = ' WHERE 1=1 '
+
+    if(transactionType){
+        query += ` AND Submission.TransactionType = '${transactionType}' `
+        countFilter += ` AND TransactionType = '${transactionType}' `
+    } 
+    if(status){
+        query += `AND Submission.Status = '${status}' `
+        countFilter += `AND Status = '${status}' `
+    }
+    if(month){
+        const date = year+'-'+month 
+        query += `AND Submission.DateTime LIKE '${date}%' `
+        countFilter += `AND DateTime LIKE '${date}%' `
+    }
+    else if(year){ 
+        query += `AND Submission.DateTime LIKE '${year}%' `
+        countFilter += `AND DateTime LIKE '${year}%' `
+    }
+    query += endQuery;  
+
+    try {
+        let pool = await sql.connect(config);
+        let result = await pool.request() 
+            .query(query); 
+        
+        let count = await pool.request() 
+            .query(`
+                SELECT COUNT(*) FROM Submission
+            `+countFilter);
+        if (result.recordset.length === 0) {
+            return null;
+        }
+        //   return result.recordset;
+        return { count: count.recordset[0][''], submissions: result.recordset };
+    } catch (error) {
+      console.error("Error retrieving submission data:", error);
+      throw error;
+    }
+}
 
 
 
@@ -298,11 +358,13 @@ const getNotifications = async (id) => {
     }
 }
 // All - get notifications for 'view all'
-const getNotificationsForView = async (id, pageNumber, pageSize) => {
+const getNotificationsForViewAll = async (id, pageNumber, pageSize) => {
     try {
         let pool = await sql.connect(config); 
         let result = await pool.request() 
             .input('id', sql.Int, id)
+            .input('PageNumber', sql.Int, pageNumber)
+            .input('PageSize', sql.Int, pageSize) 
             .query(`
                 SELECT 
                     NotifWithRowNumber.NotificationID,
@@ -322,12 +384,16 @@ const getNotificationsForView = async (id, pageNumber, pageSize) => {
                 ) AS NotifWithRowNumber
                 WHERE NotifWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize;
             `);
- 
-            // WHERE SubmissionID = @id 
+
+        let count = await pool.request() 
+            .query(`
+                SELECT COUNT(*) FROM Notification;
+            `);
         if (result.recordset.length === 0) {
-            return [];
-        }  
-        return result.recordset;
+            return null;
+        }
+        //   return result.recordset;
+        return { count: count.recordset[0][''], notification: result.recordset };
     } catch (error) {
         console.error("Error retrieving PDF data:", error);
         throw error;
@@ -339,7 +405,7 @@ const markAllNotificationsRead = async (id) => {
         let pool = await sql.connect(config); 
         console.log(id);
         let result = await pool.request() 
-            .input('id', sql.Int, id)
+            .input('id', sql.VarChar, id)
             .query(`
                 UPDATE Notification
                 SET IsSeen = 1
@@ -497,8 +563,10 @@ module.exports = {
     updatePDF,
     updateSubmission,
     getNotifications,
+    getNotificationsForViewAll,
     markAllNotificationsRead,
     setNotificationAsRead,
     getSubmissionForNotification,
     insertNotification,
+    downloadSubmissions,
 };

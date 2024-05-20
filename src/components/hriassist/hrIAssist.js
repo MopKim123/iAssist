@@ -8,6 +8,9 @@ import Button from 'react-bootstrap/Button';
 import { useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css" 
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 const HRIAssist = () => {
 
@@ -29,7 +32,7 @@ const HRIAssist = () => {
   };
 
      
-
+  // sort submissions by columns
   const SortableHeader = ({ label, column, sortColumn, sortDirection, onSort }) => {
     const handleClick = () => {
       onSort(column);
@@ -41,7 +44,6 @@ const HRIAssist = () => {
       </th>
     );
   };
-
   const handleSort = (column) => {
     if (column === sortColumn) {
       // Reverse the sort direction if the same column is clicked again
@@ -51,7 +53,6 @@ const HRIAssist = () => {
       setSortDirection('asc');
     }
   };
-
   const sortedSubmissions = [...submissions].sort((a, b) => {
     if (sortColumn) {
       const comparison = a[sortColumn].localeCompare(b[sortColumn]);
@@ -72,6 +73,7 @@ const HRIAssist = () => {
     }
   }, [currentPage, pageSize]);
   
+  // get all the employee submissions
   const getSubmissions = async (pageNumber, pageSize) => {
     
     const EmpId = '10023'
@@ -102,8 +104,96 @@ const HRIAssist = () => {
     } catch (error) {
       console.error('Error:', error);
     }
+  };  
+
+  // get the submissions for download for report
+  const downloadSubmissions = async () => {
+     
+  
+    const formData = new FormData();  
+    formData.append('transactionType', filter.transactionType);
+    formData.append('status', filter.status);
+    formData.append('month', filter.month);
+    formData.append('year', filter.year);
+    
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/hrdownloadsubmissions', {
+        method: 'POST',
+        body: formData
+      }) 
+  
+      if (!uploadResponse.ok) {
+        console.error('Failed:', uploadResponse.statusText);
+        return;
+      } 
+
+      try { 
+        const data = await uploadResponse.json();   
+        console.log('this',data.result.submissions);
+        exportToExcel(data.result.submissions); 
+      } catch (error) {
+          console.error('Error parsing JSON response:', error); 
+          toast.error('No records found!', {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light", 
+          });
+      }
+ 
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }; 
 
+  // export the submissions as excel
+  const exportToExcel = (data) => { 
+    const workbook = XLSX.utils.book_new(); 
+    const worksheet = autoAdjustColumnWidths(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1'); 
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' }); 
+    const dataBlob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    
+
+    let fileName = 'Submissions'
+    if (filter.transactionType) {
+      fileName += ' - ' + filter.transactionType;
+    }
+    if (filter.month) {
+      fileName += ' - ' + filter.month;
+    }
+    if (filter.year) {
+      fileName += ' - ' + filter.year;
+    }
+    if (filter.status) {
+      fileName += ' - ' + filter.status;
+    }
+     
+    
+    saveAs(dataBlob, `${fileName}.xlsx`);
+  };
+
+  // adjust excel column width based on text length
+  const autoAdjustColumnWidths = (data) => { 
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const colWidths = data.reduce((acc, row) => {
+      Object.keys(row).forEach((key, index) => {
+        const colLength = row[key] ? row[key].toString().length : 0;
+        acc[index] = Math.max(acc[index] || 10, colLength);
+      });
+      return acc;
+    }, []);
+   
+    worksheet['!cols'] = colWidths.map(width => ({ wch: width + 2 })); 
+  
+    return worksheet;
+  };
+
+  // get submissions based on filter
   const getFilteredSubmissions = async (pageNumber, pageSize) => {
     
     const EmpId = '10023'
@@ -140,11 +230,8 @@ const HRIAssist = () => {
       console.error('Error:', error);
     }
   }; 
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
+  
+  // pagination
   const Pagination = ({ currentPage }) => { 
   
     const handleNextClick = () => {
@@ -170,6 +257,12 @@ const HRIAssist = () => {
     );
   };
 
+  // pagination change page
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // filter requirements before retrieving
   const filterSearch = () => {
     const month = filter.month
     const year = filter.year
@@ -196,8 +289,7 @@ const HRIAssist = () => {
         theme: "light", 
       });
     }
-  };
-
+  };  
   const handleFilterSubmit = (e) => {
     const { name, value } = e.target;
     setFilter((prevFilter) => ({
@@ -236,7 +328,7 @@ const HRIAssist = () => {
                                     <th className="pr-1 pl-1" style={{ width: '25%' }}>Status</th>
                                     <th className="pr-1 pl-1" style={{ width: '25%' }}>Month</th>
                                     <th className="pr-1 pl-1" style={{ width: '25%' }}>Year</th>
-                                    <th style={{ width: '10%' }}> </th>
+                                    <th style={{ width: '15%' }}> </th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -283,6 +375,7 @@ const HRIAssist = () => {
                                     </td>
                                     <td className="d-flex align-items-center justify-content-center">
                                       <Button onClick={filterSearch}>Filter</Button>
+                                      <Button onClick={downloadSubmissions} className='ml-3'>Download</Button>
                                     </td> 
                                   </tr>
                                 </tbody>

@@ -90,6 +90,31 @@ export async function setNotificationAsRead(NotificationID){
   }
 };
 
+//insert notification
+export async function insertNotification(Name, TransactionType, SenderID, ReceiverID, notificationType, SubmissionID){ 
+
+  const formData = new FormData();
+  formData.append('EmployeeName', Name);  
+  formData.append('TransactionType', TransactionType);  
+  formData.append('SenderID', SenderID);  
+  formData.append('ReceiverID', ReceiverID);  
+  formData.append('NotificationType', notificationType);  
+  formData.append('SubmissionID', SubmissionID);   
+  try {
+    const uploadResponse = await fetch('http://localhost:5000/insertnotification', {
+      method: 'POST',
+      body: formData
+    }) 
+
+    if (!uploadResponse.ok) {
+      console.error('Failed:', uploadResponse.statusText);
+      return;  
+    }   
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}; 
+
 export function add(a, b) {
   return a + b;
 }

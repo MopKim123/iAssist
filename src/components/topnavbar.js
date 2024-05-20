@@ -154,8 +154,8 @@ function TopNavbar() {
                 onClick={()=>clickNotification(notification)}>
                   <div className="notification-card">
                     <div className="notification-title d-flex justify-content-between">
-                      <div className="notification-title-div">
-                        {!notification.IsSeen && <i className="fas fa-exclamation fa-sm fa-fw mr-2 text-blue"></i>}
+                      <div className="notification-title-div d-flex">
+                        {!notification.IsSeen && <i className="fas fa-exclamation fa-sm fa-fw mr-2 mt-1 text-blue"></i>}
                         <label className="notification-title truncate-text">{notification.Title}</label>
                       </div>
                       <label className="notification-title">{notification.FormattedDateTime}</label>

@@ -21,24 +21,29 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
 
     const [hasNotification, setHasNotification] = useState(true);
     const [notification, setNotification] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1); 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize] = useState(10);
    
      
   
     useEffect(() => { 
-      getNotifications()    
-    }, []); 
+      getNotifications(currentPage, pageSize)    
+    }, [currentPage, pageSize]); 
 
     
-  const getNotifications = async () => {
+  const getNotifications = async (pageNumber, pageSize) => {
     
-    const EmpId = '10023'
+    const EmpId = '10023' 
+    
 
     const formData = new FormData(); 
     formData.append('EmpId', EmpId); 
+    formData.append('pageNumber', pageNumber); 
+    formData.append('pageSize', pageSize); 
      
     try {
-      const uploadResponse = await fetch('http://localhost:5000/getnotification', {
+      const uploadResponse = await fetch('http://localhost:5000/getnotificationsforviewall', {
         method: 'POST',
         body: formData
       }) 
@@ -50,18 +55,8 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
 
       try {
         const data = await uploadResponse.json();
-        console.log(data.result[0])
-        if(data.result != 0){  
-          if(data.result.some(notification => notification.IsSeen === false)){
-            setHasNotification(true)
-          } else {
-            setHasNotification(false)
-          }
-          setNotification(data.result)
-        }else{
-          setHasNotification(false)
-        }
-        // setTotalPages(Math.ceil(data.result.count / pageSize))  
+        setNotification(data.result.notification) 
+        setTotalPages(Math.ceil(data.result.count / pageSize))    
       } catch (error) {
           console.error('Error parsing JSON response:', error);
       }
@@ -102,6 +97,35 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
     }
   };
   
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const Pagination = ({ currentPage }) => { 
+  
+    const handleNextClick = () => {
+      setCurrentPage(currentPage + 1);
+    };
+  
+    const handlePreviousClick = () => {
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    };
+  
+    return (
+      <div className='pagination-btn'>
+        <button onClick={handlePreviousClick} disabled={currentPage === 1} >
+          Previous
+        </button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button onClick={handleNextClick} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </div>
+    );
+  };
+  
     return (
       <div id="wrapper">
           <Navbar />
@@ -116,6 +140,15 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
                   </div>
           <div className="row justify-content-center">
             <div className="col-xl-12 col-xl-9">
+              <br/> 
+                <div className='pagination'>
+                  <Pagination
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    // totalCount={submissions.length} // You may need to fetch the total count from the backend
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               <br/> 
                 {/* page content begin here */}  
                 {notification && notification.map((notification, index) =>
@@ -145,6 +178,14 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
                   </div>
                 )} 
                 {/* Page content ends here */} 
+                <div className='pagination'>
+                  <Pagination
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    // totalCount={submissions.length} // You may need to fetch the total count from the backend
+                    onPageChange={handlePageChange}
+                  />
+                </div>
                  
               </div>
  

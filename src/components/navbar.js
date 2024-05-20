@@ -107,7 +107,7 @@ import { useState } from "react";
                         </li>
 
                         <li onClick={toggleMaternity}> 
-                            <Link className="dropdown-text">Maternity</Link>
+                            <label className="dropdown-text">Maternity</label>
                             {showMaternity && (
                                 <ul className="custom-bullet-list sub-menu">
                                     <li>
