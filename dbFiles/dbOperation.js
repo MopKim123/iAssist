@@ -143,7 +143,8 @@ const updateSubmission = async (id) => {
             .input('id', sql.Int, id) 
             .query(`
                 UPDATE Submission
-                SET Status = 'Complete'
+                SET Status = 'Complete',
+                CompletionDate = CONVERT(VARCHAR, GETDATE(), 23)
                 WHERE SubmissionID = @id
             `);
  
@@ -161,17 +162,7 @@ const getSubmissions = async (pageNumber, pageSize) => {
         .input('PageNumber', sql.Int, pageNumber)
         .input('PageSize', sql.Int, pageSize) 
         .query(`SELECT 
-                    SubsWithRowNumber.Name,
-                    SubsWithRowNumber.EmpID,
-                    SubsWithRowNumber.EmailAddress,
-                    SubsWithRowNumber.SubmissionID,
-                    SubsWithRowNumber.TransactionType,
-                    SubsWithRowNumber.TurnAround,
-                    SubsWithRowNumber.Status,
-                    SubsWithRowNumber.DateTime,
-                    SubsWithRowNumber.LoanAppDate,
-                    SubsWithRowNumber.TransactionNum,
-                    SubsWithRowNumber.TypeOfDelivery
+                    SubsWithRowNumber.* 
                 FROM (
                     SELECT 
                         Employee.Name,
@@ -199,18 +190,9 @@ const getSubmissions = async (pageNumber, pageSize) => {
     }
 }
 // HR side - get all employee submissions
-const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, status, month, year) => {
+const getFilteredSubmissions = async (pageNumber, pageSize, name, transactionType, status, month, year) => {
     let query =   `SELECT 
-                        SubsWithRowNumber.Name,
-                        SubsWithRowNumber.EmailAddress,
-                        SubsWithRowNumber.SubmissionID,
-                        SubsWithRowNumber.TransactionType,
-                        SubsWithRowNumber.TurnAround,
-                        SubsWithRowNumber.Status,
-                        SubsWithRowNumber.DateTime,
-                        SubsWithRowNumber.LoanAppDate,
-                        SubsWithRowNumber.TransactionNum,
-                        SubsWithRowNumber.TypeOfDelivery
+                        SubsWithRowNumber.* 
                     FROM (
                         SELECT 
                             Employee.Name,
@@ -224,8 +206,12 @@ const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, sta
     let endQuery =   `) AS SubsWithRowNumber
                     WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
                     `
-    let countFilter = ' WHERE 1=1 '
+    let countFilter = ' LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId WHERE 1=1 '
 
+    if(name){
+        query += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        countFilter += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+    } 
     if(transactionType){
         query += ` AND Submission.TransactionType = '${transactionType}' `
         countFilter += ` AND TransactionType = '${transactionType}' `
@@ -268,13 +254,14 @@ const getFilteredSubmissions = async (pageNumber, pageSize, transactionType, sta
     }
 }
 // HR side - download submissions
-const downloadSubmissions = async (transactionType, status, month, year) => {
+const downloadSubmissions = async (name, transactionType, status, month, year) => {
     let query =   `SELECT 
                         SubsWithRowNumber.EmpId,
                         SubsWithRowNumber.Name,
                         SubsWithRowNumber.EmailAddress,
                         SubsWithRowNumber.TransactionType,
                         FORMAT(CONVERT(DATETIME, SubsWithRowNumber.DateTime, 120), 'MMMM dd, yyyy') AS DateTime,
+                        FORMAT(CONVERT(DATETIME, SubsWithRowNumber.CompletionDate, 120), 'MMMM dd, yyyy') AS CompletionDate,
                         SubsWithRowNumber.Status
                     FROM (
                         SELECT  
@@ -287,8 +274,12 @@ const downloadSubmissions = async (transactionType, status, month, year) => {
                         WHERE 1 = 1 
                     `
     let endQuery =   `) AS SubsWithRowNumber`
-    let countFilter = ' WHERE 1=1 '
+    let countFilter = ' LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId WHERE 1=1 '
 
+    if(name){
+        query += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        countFilter += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+    } 
     if(transactionType){
         query += ` AND Submission.TransactionType = '${transactionType}' `
         countFilter += ` AND TransactionType = '${transactionType}' `
@@ -508,11 +499,8 @@ const insertNotification = async ( EmployeeName, TransactionType, SenderID, Rece
             VALUES (@SenderID, @ReceiverID, @Title, @Message, @SubmissionID);
         `); 
          
-        if (result.recordset.length === 0) {
-            return null;
-        }
         //   return result.recordset;
-        return { submissions: result.recordset };
+        return;
     } catch (error) {
       console.error("Error retrieving submission data:", error);
       throw error;
@@ -541,12 +529,8 @@ const sample = async () => {
                 LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
             `);
 
-        // If there's no result, return null
-        if (result.recordset.length === 0) {
-            return null;
-        } 
     
-        return result.recordset;
+        return;
 
     } catch (error) {
         console.error("Error retrieving PDF data:", error);

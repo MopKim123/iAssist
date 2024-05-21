@@ -47,8 +47,8 @@ app.post('/hrsubmission',  upload.single(''), async (req, res) => {
 app.post('/hrfiltersubmission', upload.single(''),  async (req, res) => {
  
   try {
-    const { pageNumber, pageSize, transactionType, status, month, year } = req.body;   
-    const result = await dbOperation.getFilteredSubmissions(pageNumber, pageSize, transactionType, status, month, year);
+    const { pageNumber, pageSize, name, transactionType, status, month, year } = req.body;   
+    const result = await dbOperation.getFilteredSubmissions(pageNumber, pageSize, name, transactionType, status, month, year);
     res.status(200).json({ result: result });
   } catch (error) {
     console.error('Error:', error);
@@ -59,8 +59,8 @@ app.post('/hrfiltersubmission', upload.single(''),  async (req, res) => {
 app.post('/hrdownloadsubmissions', upload.single(''),  async (req, res) => {
  
   try {
-    const { transactionType, status, month, year } = req.body;   
-    const result = await dbOperation.downloadSubmissions(transactionType, status, month, year);
+    const { name, transactionType, status, month, year } = req.body;   
+    const result = await dbOperation.downloadSubmissions(name, transactionType, status, month, year);
     res.status(200).json({ result: result });
   } catch (error) {
     console.error('Error:', error);

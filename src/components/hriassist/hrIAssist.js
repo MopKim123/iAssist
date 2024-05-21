@@ -24,7 +24,7 @@ const HRIAssist = () => {
   const [pageSize] = useState(10);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
-  const [filter, setFilter] = useState({transactionType:'',status:'',month:'',year:''});
+  const [filter, setFilter] = useState({name: '',transactionType:'',status:'',month:'',year:''});
   const [searhFilter, setSearchFilter] = useState(false) 
     
   const viewRequest = (data) => {
@@ -111,6 +111,7 @@ const HRIAssist = () => {
      
   
     const formData = new FormData();  
+    formData.append('name', filter.name);
     formData.append('transactionType', filter.transactionType);
     formData.append('status', filter.status);
     formData.append('month', filter.month);
@@ -128,8 +129,7 @@ const HRIAssist = () => {
       } 
 
       try { 
-        const data = await uploadResponse.json();   
-        console.log('this',data.result.submissions);
+        const data = await uploadResponse.json();    
         exportToExcel(data.result.submissions); 
       } catch (error) {
           console.error('Error parsing JSON response:', error); 
@@ -201,6 +201,7 @@ const HRIAssist = () => {
     const formData = new FormData(); 
     formData.append('pageNumber', pageNumber);
     formData.append('pageSize', pageSize); 
+    formData.append('name', filter.name);
     formData.append('transactionType', filter.transactionType);
     formData.append('status', filter.status);
     formData.append('month', filter.month);
@@ -324,15 +325,19 @@ const HRIAssist = () => {
                               <table className="" style={{ tableLayout: 'fixed', width: '100%' }}>
                                 <thead>
                                   <tr>
-                                    <th className="pr-3 pl-3" style={{ width: '25%' }}>Transaction Type</th>
-                                    <th className="pr-1 pl-1" style={{ width: '25%' }}>Status</th>
-                                    <th className="pr-1 pl-1" style={{ width: '25%' }}>Month</th>
-                                    <th className="pr-1 pl-1" style={{ width: '25%' }}>Year</th>
+                                    <th className="pr-3 pl-3" style={{ width: '20%' }}>Name/Code</th>
+                                    <th className="pr-3 pl-3" style={{ width: '20%' }}>Transaction Type</th>
+                                    <th className="pr-1 pl-1" style={{ width: '20%' }}>Status</th>
+                                    <th className="pr-1 pl-1" style={{ width: '20%' }}>Month</th>
+                                    <th className="pr-1 pl-1" style={{ width: '20%' }}>Year</th>
                                     <th style={{ width: '15%' }}> </th>
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <tr>
+                                  <tr> 
+                                    <td className="pr-1 pl-1" >
+                                      <input className="form-control" id="name" name="name" onChange={handleFilterSubmit}/>
+                                    </td>
                                     <td className="pr-1 pl-1" > 
                                       <select className="form-control" id="transactionType" name="transactionType" onChange={handleFilterSubmit}>
                                         <option value="">Select Transaction Type</option>
