@@ -397,5 +397,8 @@
   font-weight: 900;
 }
 .notificationView-card:hover {
-  background-color: #e2eefc; /* This color is similar to the dropdown-item hover */
+  background-color: #e2eefc; 
+}
+.notificationView-card-seen {
+  background-color: #d2e3f7;  
 }

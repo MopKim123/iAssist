@@ -6,8 +6,7 @@ import Dashboard from './components/dashboard';
 import NewHireUpload from './components/newHireUpload';
 import Reports from './components/reports';
 import Footer from './components/footer';
-import UpdateEmployeeInfo from './components/update'; 
-import IAssist from './components/iassist';
+import UpdateEmployeeInfo from './components/update';  
 
 import SSSLoan from './components/loans/sssLoan';
 import PagIbigLandbankCard from './components/loans/pagIbigLandbankCard';
@@ -46,8 +45,7 @@ function App() {
           <Route path="/submissions" element={<Submissions />} />
             <Route path="/submissionview" element={<SubmissionView/>} />
 
-          {/* iAssist Pages */}
-          <Route path="/iassist" element={<IAssist />} />
+          {/* iAssist Pages */} 
             <Route path="/sssloan" element={<SSSLoan />} />
             <Route path="/landbankcard" element={<PagIbigLandbankCard />} />
             <Route path="/dbpcard" element={<PagIbigDBPCard />} />

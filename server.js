@@ -200,9 +200,8 @@ app.post('/insertnotification',  upload.single(''), async (req, res) => {
 });
 app.post('/getnotificationsforviewall',  upload.single('EmpId'), async (req, res) => {
 
-  try { 
-  
-    const { pageNumber, pageSize } = req.body; 
+  try {  
+    const { EmpId, pageNumber, pageSize } = req.body; 
     const result = await dbOperation.getNotificationsForViewAll(req.body.EmpId,pageNumber, pageSize);
     res.status(200).json({ result: result });
 

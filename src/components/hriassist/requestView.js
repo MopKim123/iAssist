@@ -20,7 +20,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    console.log(data);
+    console.log(data.EmailAddress);
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
@@ -136,6 +136,24 @@ import { Document, Page,pdfjs } from 'react-pdf';
 
     }; 
     
+  const resubmit = `
+  Dear ${data.receiver_name}, \n\n\n
+
+  I hope this email finds you well. 
+  \n
+  We would like to bring to your attention that there is a requirement for resubmission of a document related to the ${data.transaction_type} you initiated. It appears that the ${data.document_name} submitted did not meet the necessary criteria.
+  \n
+  To ensure the completion of the transaction process, we kindly request you to resubmit the ${data.document_name} at your earliest convenience. The reason for resubmission is ${data.reason}.
+  \n
+  Your prompt attention to this matter will greatly assist us in finalizing the transaction smoothly. 
+  \n
+  If you require any assistance or clarification regarding the resubmission process, please do not hesitate to reach out to ${data.contact_person}.
+  \n
+  Thank you for your cooperation and understanding.
+  \n\n
+  ${data.sample}`
+
+  console.log(resubmit);
     //update pdf for resubmission
     const updatePdf = async (pdfSubmit) => { 
       
@@ -174,7 +192,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
           console.error('Failed:', uploadResponse.statusText);
           return;  
         }    
-        
+
         insertNotification(data.Name, data.TransactionType, EmpId, data.EmpId, 'complete', data.SubmissionID)
         if(await sendEmail('template_complete')){
           window.history.back(); 
@@ -182,32 +200,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
       } catch (error) {
         console.error('Error:', error);
       }
-    }; 
-
-    //insert notification
-    // const insertNotification = async (notificationType) => { 
-  
-    //   const formData = new FormData();
-    //   formData.append('EmployeeName', data.Name);  
-    //   formData.append('TransactionType', data.TransactionType);  
-    //   formData.append('SenderID', EmpId);  
-    //   formData.append('ReceiverID', data.EmpID);  
-    //   formData.append('NotificationType', 'complete');  
-    //   formData.append('SubmissionID', data.SubmissionID);   
-    //   try {
-    //     const uploadResponse = await fetch('http://localhost:5000/insertnotification', {
-    //       method: 'POST',
-    //       body: formData
-    //     }) 
-    
-    //     if (!uploadResponse.ok) {
-    //       console.error('Failed:', uploadResponse.statusText);
-    //       return;  
-    //     }   
-    //   } catch (error) {
-    //     console.error('Error:', error);
-    //   }
-    // }; 
+    };  
     
     
     // Modal functions
@@ -247,9 +240,10 @@ import { Document, Page,pdfjs } from 'react-pdf';
         //email content
         const formData = {
           sender_name: 'senderName',
-          sender_email: data.EmailAddress,
-          receiver_name: `receiverName`,
+          sender_email: data.EmailAddress, // hr's email
+          receiver_name: data.Name,
           receiver_email: sampleEmail,
+          // receiver_email: data.EmailAddress,
           transaction_type: data.TransactionType,
           document_name: documentName,
           reason: reason,

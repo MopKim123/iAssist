@@ -1,5 +1,7 @@
 // global.js
 
+import emailjs from '@emailjs/browser'; 
+
 // Define your functions
 export async function notification2() { 
 
@@ -114,6 +116,60 @@ export async function insertNotification(Name, TransactionType, SenderID, Receiv
     console.error('Error:', error);
   }
 }; 
+
+
+export async function sendEmail (template, reason, documentName, data) {  
+  const complete = `test ${data}`
+  const submit = `test ${data}`
+  const resubmit = `
+  Dear ${data.receiver_name}, \n\n\n
+
+  I hope this email finds you well. 
+  \n\n
+  We would like to bring to your attention that there is a requirement for resubmission of a document related to the ${data.transaction_type} you initiated. 
+  It appears that the ${data.document_name} submitted did not meet the necessary criteria.
+  \n\n
+  To ensure the completion of the transaction process, we kindly request you to resubmit the ${data.document_name} at your earliest convenience. 
+  The reason for resubmission is ${data.reason}.
+  \n\n
+  Your prompt attention to this matter will greatly assist us in finalizing the transaction smoothly.
+  \n\n
+  If you require any assistance or clarification regarding the resubmission process, please do not hesitate to reach out to ${data.contact_person}.
+  \n\n
+  Thank you for your cooperation and understanding.
+  \n\n\n
+  ${data.sample}`
+
+  const resubmitted = `test ${data}`
+  const expired = `test ${data}`
+
+
+  return new Promise((resolve, reject) => {
+    //email content
+    const formData = {
+      sender_name: 'senderName',
+      sender_email: data.EmailAddress, // hr's email
+      receiver_name: data.Name,
+      // receiver_email: sampleEmail,
+      receiver_email: data.EmailAddress,
+      transaction_type: data.TransactionType,
+      document_name: documentName,
+      reason: reason,
+      contact_person: 'Ms Cham',
+    };  
+    
+    emailjs.send('service_2cen06m', template, formData, 'hrQ_V5JOOkQWdddTK')
+      .then((result) => {
+        console.log('Email sent successfully:', result.text);
+        alert('Updated Successfully')
+        // getSubmissionPDF() 
+        resolve(true);
+      }, (error) => {
+        console.error('Email sending failed:', error.text);
+        reject(error);
+      });
+  });
+};
 
 export function add(a, b) {
   return a + b;

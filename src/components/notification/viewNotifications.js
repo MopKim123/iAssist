@@ -67,8 +67,7 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
   };
     
   const clickNotification = async (notification) => {  
-    setNotificationAsRead(notification.NotificationID)
-    getNotifications()
+    setNotificationAsRead(notification.NotificationID) 
     
     const formData = new FormData(); 
     formData.append('SubmissionID', notification.SubmissionID); 
@@ -154,19 +153,18 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
                 {notification && notification.map((notification, index) =>
                   <div className="container-fluid">
                       <div className="row justify-content-center">
-                          <div className="col-xl-8 col-lg-7"> 
-                              <div className="card shadow mb-4 notificationView-card" onClick={() => clickNotification(notification)}>
+                          <div className="col-xl-8 col-lg-7">  
+                              <div className={`card shadow mb-2 ${notification.IsSeen && 'notificationView-card-seen'} notificationView-card`} onClick={() => clickNotification(notification)}>
                                   {/* Card Header - New Hire Upload */}
                                   <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 className="m-0 font-weight-bold text-primary">{notification.Title}</h6> 
                                     <h6 className="m-0 font-weight-bold">{notification.FormattedDateTime}</h6> 
                                   </div>
                                   {/* Card Body - New Hire Options */}
-                                  <div className=" ">
+                                  <div className="">
                                       <div className="tab-content">
                                           <div className="card-body">
                                               <div className="d-flex justify-content-between align-items-center">
-                                                
                                                 <label>{notification.Message}</label>  
                                               </div> 
                                           </div>
