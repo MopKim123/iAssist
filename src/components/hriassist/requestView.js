@@ -20,14 +20,15 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    console.log(data.EmailAddress);
+    // console.log(data.EmailAddress);
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
     const [showModal, setShowModal] = useState(false);
     const [numPages, setNumPages] = useState(); 
     const [pdfUrl, setPdfUrl] = useState(''); 
-    
+    const [imageUrl, setImageUrl] = useState('');
+
     const EmpId = 10024
 
     const [pdf, setPdf] = useState([]); 
@@ -46,6 +47,25 @@ import { Document, Page,pdfjs } from 'react-pdf';
       setPdfUrl(URL.createObjectURL(blob))
       return(URL.createObjectURL(blob))
     } 
+
+    const convertToImage = (base64,type) => {
+      // Decode the base64 string to binary data
+      const binaryString = atob(base64);
+    
+      // Create a buffer and a uint8 array from the binary string
+      const arrayBuffer = new ArrayBuffer(binaryString.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < binaryString.length; i++) {
+        uint8Array[i] = binaryString.charCodeAt(i);
+      }
+    
+      // Create a blob from the uint8 array and specify the image type
+      const blob = new Blob([arrayBuffer], { type: `image/${type}` });
+    
+      // Create a URL for the blob
+      const imageUrl = URL.createObjectURL(blob);
+      return imageUrl;
+    };
     
     // Converts and download
     const convertAndDownloadPDF = (base64, fileName) => {  
@@ -85,18 +105,17 @@ import { Document, Page,pdfjs } from 'react-pdf';
           }
 
           try {
-            const responseData = await uploadResponse.json();
-            const sortedData = responseData.result.sort((a, b) => {
-                // First, sort by name
+            const responseData = await uploadResponse.json();  
+            if(responseData.result){
+              const sortedData = responseData.result.sort((a, b) => {   
                 if (a.RequirementName !== b.RequirementName) {
-                    return a.RequirementName.localeCompare(b.RequirementName);
-                } else {
-                    // If names are the same, sort by the variable containing the number
-                    return b.Updated - a.Updated;
+                  return a.RequirementName.localeCompare(b.RequirementName);
+                } else { 
+                  return b.Updated - a.Updated;
                 }
-            }); 
-            
-            setPdf(sortedData);
+              }); 
+              setPdf(sortedData);
+            }            
             
           } catch (error) {
               console.error('Error parsing JSON response:', error);
@@ -152,8 +171,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
   Thank you for your cooperation and understanding.
   \n\n
   ${data.sample}`
-
-  console.log(resubmit);
+ 
     //update pdf for resubmission
     const updatePdf = async (pdfSubmit) => { 
       
@@ -204,8 +222,16 @@ import { Document, Page,pdfjs } from 'react-pdf';
     
     
     // Modal functions
-    const handleButtonClick = (base64) => { 
-      convertToPDF(base64);
+    const handleButtonClick = (data) => {
+      if(data.ContentType=='pdf'){  
+        convertToPDF(data.PdfData);
+        setImageUrl(''); 
+      } else {  
+        const url = convertToImage(data.PdfData,data.ContentType); 
+        setImageUrl(url); 
+        setPdfUrl(''); 
+      }
+
       setShowModal(true);
     };
     const handleCloseModal = () => {
@@ -417,8 +443,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                         <div className="card-body">
                                           <div className="d-flex justify-content-between align-items-center">
                                             <div> 
-                                              <button onClick={() => handleButtonClick(pdf.PdfData)}>
-                                                View PDF
+                                              <button onClick={() => handleButtonClick(pdf)}>
+                                                View File
                                               </button>
                                               <button onClick={() => convertAndDownloadPDF(pdf.PdfData,pdf.FileName)} className='btnClose'>
                                                 Download
@@ -528,8 +554,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                       <button type="button" className="btnClose" onClick={handleCloseModal}>Close</button>
                     </div>
                   </Modal.Header>
-                  <Modal.Body style={{backgroundColor: 'lightgray'}}>  
-                    <Document
+                  <Modal.Body style={{backgroundColor: 'lightgray'}}>   
+                    {pdfUrl && <Document
                         file={pdfUrl} 
                         onLoadSuccess={({ numPages })=>setNumPages(numPages)} 
                     >
@@ -543,7 +569,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                               renderTextLayer={false}
                             />
                           </div>)}
-                    </Document>
+                    </Document>}
+                    {imageUrl && <img src={imageUrl} alt="Converted Image" />}
                   </Modal.Body>
                   <Modal.Footer> 
                     <div>

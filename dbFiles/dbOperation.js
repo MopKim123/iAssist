@@ -229,8 +229,7 @@ const getFilteredSubmissions = async (pageNumber, pageSize, name, transactionTyp
         query += `AND Submission.DateTime LIKE '${year}%' `
         countFilter += `AND DateTime LIKE '${year}%' `
     }
-    query += endQuery; 
-    console.log(countFilter)
+    query += endQuery;  
 
     try {
         let pool = await sql.connect(config);
