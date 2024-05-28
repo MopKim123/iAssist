@@ -355,6 +355,7 @@ const HRIAssist = () => {
                                         <option value="">Select Status</option>
                                         <option value="Pending">Pending</option>
                                         <option value="Resubmit">Resubmit</option>
+                                        <option value="Resubmitted">Resubmitted</option>
                                         <option value="Complete">Complete</option>
                                         <option value="Cancelled">Cancelled</option>
                                         <option value="Expired">Expired</option> 
@@ -429,6 +430,7 @@ const HRIAssist = () => {
                                               {sub.Status === 'Complete' && <label style={{color: 'blue'}}>{sub.Status}</label>}
                                               {sub.Status === 'Pending' && <label style={{color: 'green'}}>{sub.Status}</label>}
                                               {sub.Status === 'Resubmit' && <label style={{color: 'orange'}}>{sub.Status}</label>}
+                                              {sub.Status === 'Resubmitted' && <label style={{color: 'green'}}>{sub.Status}</label>}
                                               {(sub.Status === 'Expired' || sub.Status === 'Cancelled') && <label style={{color: 'red'}}>{sub.Status}</label>}
                                             </td>  
                                             <td className='column'>

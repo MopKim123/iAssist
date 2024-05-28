@@ -118,47 +118,77 @@ export async function insertNotification(Name, TransactionType, SenderID, Receiv
 }; 
 
 
-export async function sendEmail (template, reason, documentName, data) {  
-  const complete = `test ${data}`
-  const submit = `test ${data}`
-  const resubmit = `
-  Dear ${data.receiver_name}, \n\n\n
+export async function sendEmailjs (emailType, data) {  
+
+  let message = ''
+  let title = ''
+
+  const titleComplete = `${data.transaction_type} Approval and Completion Confirmation`
+  const messageComplete = `
+  Dear ${data.receiver_name},
+
+  I hope this email finds you well.
+  
+  I am pleased to inform you that the ${data.transaction_type} you submitted has been successfully approved and processed. Your diligent efforts in ensuring its accuracy and completeness are greatly appreciated.
+  
+  Please review the attached confirmation document for your reference. Should you have any questions or require further assistance, feel free to reach out to me at any time.
+  
+  Thank you for your prompt attention to this matter.
+  
+  Best regards,
+  
+  ${data.sender_name}`
+
+  const messageSubmit = `test ${data}`
+
+  const titleResubmit = `Action Required: Resubmission of Document for ${data.transaction_type}`
+  const messageResubmit = `
+  Dear ${data.receiver_name},
 
   I hope this email finds you well. 
-  \n\n
-  We would like to bring to your attention that there is a requirement for resubmission of a document related to the ${data.transaction_type} you initiated. 
-  It appears that the ${data.document_name} submitted did not meet the necessary criteria.
-  \n\n
-  To ensure the completion of the transaction process, we kindly request you to resubmit the ${data.document_name} at your earliest convenience. 
-  The reason for resubmission is ${data.reason}.
-  \n\n
+  
+  We would like to bring to your attention that there is a requirement for resubmission of a document related to the ${data.transaction_type} you initiated. It appears that the ${data.document_name} submitted did not meet the necessary criteria.
+  
+  To ensure the completion of the transaction process, we kindly request you to resubmit the ${data.document_name} at your earliest convenience. The reason for resubmission is ${data.reason}.
+  
   Your prompt attention to this matter will greatly assist us in finalizing the transaction smoothly.
-  \n\n
+  
   If you require any assistance or clarification regarding the resubmission process, please do not hesitate to reach out to ${data.contact_person}.
-  \n\n
+  
   Thank you for your cooperation and understanding.
-  \n\n\n
-  ${data.sample}`
+  
+  
+  
+  Best regards,
 
-  const resubmitted = `test ${data}`
-  const expired = `test ${data}`
+  ${data.sender_name} `
+  const messageResubmitted = `test ${data}`
+  const messageExpired = `test ${data}`
 
+  switch(emailType){
+    case 'complete':
+      title = titleComplete
+      message = messageComplete
+      break;
+    case 'resubmit':
+      title = titleResubmit
+      message = messageResubmit
+      break;      
+  }
 
   return new Promise((resolve, reject) => {
     //email content
     const formData = {
-      sender_name: 'senderName',
-      sender_email: data.EmailAddress, // hr's email
-      receiver_name: data.Name,
-      // receiver_email: sampleEmail,
-      receiver_email: data.EmailAddress,
-      transaction_type: data.TransactionType,
-      document_name: documentName,
-      reason: reason,
-      contact_person: 'Ms Cham',
+      sender_name: data.sender_name,
+      sender_email: data.sender_email, 
+      receiver_name: data.receiver_name, 
+      // receiver_email: data.receiver_email,
+      receiver_email: 'joakimtrinidad234@gmail.com', //temporary email
+      message: message,  
+      title: title,
     };  
-    
-    emailjs.send('service_2cen06m', template, formData, 'hrQ_V5JOOkQWdddTK')
+    console.log('this function');
+    emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
       .then((result) => {
         console.log('Email sent successfully:', result.text);
         alert('Updated Successfully')

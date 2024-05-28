@@ -9,7 +9,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button'; 
 import emailjs from '@emailjs/browser'; 
 import "react-pdf/dist/esm/Page/TextLayer.css"; 
-import { insertNotification } from '../globalFunctions';
+import { insertNotification, sendEmailjs } from '../globalFunctions';
 
 import { Document, Page,pdfjs } from 'react-pdf'; 
 
@@ -20,7 +20,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    // console.log(data.EmailAddress);
+    console.log(data.EmailAddress);
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
@@ -150,27 +150,11 @@ import { Document, Page,pdfjs } from 'react-pdf';
       }    
       if(reasonArray.length !== 0 && documentNameArray.length !== 0) { 
         insertNotification(data.Name, data.TransactionType, EmpId, data.EmpId, 'resubmit', data.SubmissionID) 
-        sendEmail('template_resubmit', reason, documentName) 
+        sendEmail('resubmit', reason, documentName) 
       }
 
     }; 
-    
-  const resubmit = `
-  Dear ${data.receiver_name}, \n\n\n
-
-  I hope this email finds you well. 
-  \n
-  We would like to bring to your attention that there is a requirement for resubmission of a document related to the ${data.transaction_type} you initiated. It appears that the ${data.document_name} submitted did not meet the necessary criteria.
-  \n
-  To ensure the completion of the transaction process, we kindly request you to resubmit the ${data.document_name} at your earliest convenience. The reason for resubmission is ${data.reason}.
-  \n
-  Your prompt attention to this matter will greatly assist us in finalizing the transaction smoothly. 
-  \n
-  If you require any assistance or clarification regarding the resubmission process, please do not hesitate to reach out to ${data.contact_person}.
-  \n
-  Thank you for your cooperation and understanding.
-  \n\n
-  ${data.sample}`
+     
  
     //update pdf for resubmission
     const updatePdf = async (pdfSubmit) => { 
@@ -209,10 +193,10 @@ import { Document, Page,pdfjs } from 'react-pdf';
         if (!uploadResponse.ok) {
           console.error('Failed:', uploadResponse.statusText);
           return;  
-        }    
+        }
 
         insertNotification(data.Name, data.TransactionType, EmpId, data.EmpId, 'complete', data.SubmissionID)
-        if(await sendEmail('template_complete')){
+        if(await sendEmail('complete')){
           window.history.back(); 
         }
       } catch (error) {
@@ -223,7 +207,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     
     // Modal functions
     const handleButtonClick = (data) => {
-      if(data.ContentType=='pdf'){  
+      if(data.ContentType=='.pdf'){  
         convertToPDF(data.PdfData);
         setImageUrl(''); 
       } else {  
@@ -261,32 +245,46 @@ import { Document, Page,pdfjs } from 'react-pdf';
 
 
     // Function to handle form submission
-    const sendEmail = async (template, reason, documentName) => {  
-      return new Promise((resolve, reject) => {
-        //email content
-        const formData = {
-          sender_name: 'senderName',
-          sender_email: data.EmailAddress, // hr's email
-          receiver_name: data.Name,
-          receiver_email: sampleEmail,
-          // receiver_email: data.EmailAddress,
-          transaction_type: data.TransactionType,
-          document_name: documentName,
-          reason: reason,
-          contact_person: 'Ms Cham',
-        };  
+    const sendEmail = async (type, reason, documentName) => {  
+      const content = {
+        sender_name: `sender's name`,
+        sender_email: sampleEmail, // hr's email
+        receiver_name: data.Name,
+        receiver_email: data.EmailAddress, // employee's email
+        transaction_type: data.TransactionType,
+        document_name: documentName,
+        reason: reason,
+        contact_person: 'Ms Cham', 
+      };  
+      console.log(content);
+      sendEmailjs(type, content)
+      // return new Promise((resolve, reject) => {
+      //   //email content
+      //   const formData = {
+      //     sender_name: `senderName`,
+      //     sender_email: data.EmailAddress, // hr's email
+      //     receiver_name: data.Name,
+      //     receiver_email: sampleEmail,
+      //     // receiver_email: data.EmailAddress,
+      //     transaction_type: data.TransactionType,
+      //     document_name: documentName,
+      //     reason: reason,
+      //     contact_person: 'Ms Cham',
+      //     reason,
+      //     documentName,
+      //   };  
         
-        emailjs.send('service_2cen06m', template, formData, 'hrQ_V5JOOkQWdddTK')
-          .then((result) => {
-            console.log('Email sent successfully:', result.text);
-            alert('Updated Successfully')
-            getSubmissionPDF() 
-            resolve(true);
-          }, (error) => {
-            console.error('Email sending failed:', error.text);
-            reject(error);
-          });
-      });
+      //   emailjs.send('service_2cen06m', template, formData, 'hrQ_V5JOOkQWdddTK')
+      //     .then((result) => {
+      //       console.log('Email sent successfully:', result.text);
+      //       alert('Updated Successfully')
+      //       getSubmissionPDF() 
+      //       resolve(true);
+      //     }, (error) => {
+      //       console.error('Email sending failed:', error.text);
+      //       reject(error);
+      //     });
+      // });
     };
 
        
@@ -320,7 +318,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                     <label>{data.DateTime}</label>
                                     <label>{data.TurnAround} Days</label>
                                     <label>{data.Status}</label>
-                                    {(data.Status !== 'Complete' && data.Status !== 'Expired') ?
+                                    {(data.Status !== 'Complete' && data.Status !== 'Expired' && data.Status !== 'Cancelled') ?
                                       <Button onClick={completeSubmission}>Complete</Button> :
                                       <label>Completion Date: {data.CompletionDate}</label>
                                   }
