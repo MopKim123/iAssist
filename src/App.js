@@ -7,6 +7,10 @@ import NewHireUpload from './components/newHireUpload';
 import Reports from './components/reports';
 import Footer from './components/footer';
 import UpdateEmployeeInfo from './components/update';  
+import Profile from './components/profile';
+import Employee from './components/employee';
+import EmployeeProfile from './components/employeeProfile';
+import ChangePassword from './components/changePassword';
 
 import SSSLoan from './components/loans/sssLoan';
 import PagIbigLandbankCard from './components/loans/pagIbigLandbankCard';
@@ -38,8 +42,12 @@ function App() {
           <Route path="/newHireUpload" element={<NewHireUpload />} />
           <Route path="/footer" element={<Footer />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/update" element={<UpdateEmployeeInfo />} />
           <Route path="/update/:employeeId" element={<UpdateEmployeeInfo />} />
+          <Route path="/employee" element={<Employee />} />
+          <Route path="/employeeProfile" element={<EmployeeProfile />} />
+          <Route path="/changePassword" element={<ChangePassword />} />
 
           {/* Submission Pages */}
           <Route path="/submissions" element={<Submissions />} />

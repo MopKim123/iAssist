@@ -1,9 +1,13 @@
-// Define your Employee class here
 class Employee {
-    constructor(employeeId, name, eventId) {
-        this.employeeId = employeeId;
-        this.name = name;
-        this.eventId = eventId;
+    constructor(EmployeeId, LastName, FirstName, MiddleName, EmailAddress, Password, Role) {
+        this.UserId = null; // UserId will be auto-incremented by the database
+        this.EmployeeId = EmployeeId;
+        this.LastName = LastName;
+        this.FirstName = FirstName;
+        this.MiddleName = MiddleName;
+        this.EmailAddress = EmailAddress;
+        this.Password = Password;
+        this.Role = Role;
     }
 }
 

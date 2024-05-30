@@ -9,7 +9,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button'; 
 import emailjs from '@emailjs/browser'; 
 import "react-pdf/dist/esm/Page/TextLayer.css"; 
-import { insertNotification, sendEmailjs } from '../globalFunctions';
+import { insertNotification, sendEmailjs } from '../globalFunctions'; 
 
 import { Document, Page,pdfjs } from 'react-pdf'; 
 
@@ -196,8 +196,17 @@ import { Document, Page,pdfjs } from 'react-pdf';
         }
 
         insertNotification(data.Name, data.TransactionType, EmpId, data.EmpId, 'complete', data.SubmissionID)
-        if(await sendEmail('complete')){
-          window.history.back(); 
+        // if(await sendEmail('complete')){
+        //   window.history.back(); 
+        // }
+        try {
+          const result = await sendEmail('complete');
+          if (result) {
+            window.history.back();
+          }
+        } catch (error) {
+          console.error('Error sending email:', error);
+          // Handle error (e.g., show an error message to the user)
         }
       } catch (error) {
         console.error('Error:', error);
@@ -256,34 +265,24 @@ import { Document, Page,pdfjs } from 'react-pdf';
         reason: reason,
         contact_person: 'Ms Cham', 
       };  
-      console.log(content);
-      sendEmailjs(type, content)
-      // return new Promise((resolve, reject) => {
-      //   //email content
-      //   const formData = {
-      //     sender_name: `senderName`,
-      //     sender_email: data.EmailAddress, // hr's email
-      //     receiver_name: data.Name,
-      //     receiver_email: sampleEmail,
-      //     // receiver_email: data.EmailAddress,
-      //     transaction_type: data.TransactionType,
-      //     document_name: documentName,
-      //     reason: reason,
-      //     contact_person: 'Ms Cham',
-      //     reason,
-      //     documentName,
-      //   };  
+      try {
+        const result = await sendEmailjs(type, content);
+        if (result) {
+          return Promise.resolve(true);
+        } else {
+          return Promise.reject(false);
+        }
+      } catch (error) {
+        return Promise.reject(false);
+      }
+      
+      // return new Promise((resolve, reject) => { 
         
-      //   emailjs.send('service_2cen06m', template, formData, 'hrQ_V5JOOkQWdddTK')
-      //     .then((result) => {
-      //       console.log('Email sent successfully:', result.text);
-      //       alert('Updated Successfully')
-      //       getSubmissionPDF() 
-      //       resolve(true);
-      //     }, (error) => {
-      //       console.error('Email sending failed:', error.text);
-      //       reject(error);
-      //     });
+      //   if(await sendEmailjs(type, content)){
+      //     resolve(true);
+      //   } else {
+      //     reject(false); 
+      //   } 
       // });
     };
 

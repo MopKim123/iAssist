@@ -1,78 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import bcrypt from "bcryptjs"; // Import bcrypt for password hashing
 
-function LoginPage() {
+function ChangePassword() {
   const [formData, setFormData] = useState({
-    EmployeeId: "",
-    Password: "",
+    CurrentPassword: "",
+    NewPassword: "",
+    ConfirmPassword: ""
   });
   const navigate = useNavigate();
-
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  //function that handles the login
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Trim whitespace from form data
-    const trimmedFormData = Object.fromEntries(
-      Object.entries(formData).map(([key, value]) => [key, value.trim()])
-    );
-
+  
+    if (!formData.currentPassword || !formData.newPassword) {
+      setErrorMessage("Please provide both current and new passwords.");
+      return;
+    }
+  
+    if (formData.newPassword !== formData.confirmPassword) {
+      setErrorMessage("New password and confirm password must match.");
+      return;
+    }
+  
     try {
-      const response = await fetch("/login", {
-        method: "POST",
+      const response = await fetch('/changePassword', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(trimmedFormData),
+        body: JSON.stringify({
+          EmployeeId: sessionStorage.getItem('employeeId'),
+          CurrentPassword: formData.currentPassword,
+          NewPassword: formData.newPassword,
+        }),
       });
-
+  
       if (!response.ok) {
-        if (response.status === 401) {
-          const responseData = await response.json();
-          alert(responseData.error);
-        } else {
-          throw new Error("Login Failed");
-        }
+        const responseData = await response.json();
+        setErrorMessage(responseData.error || 'Password Change Failed');
         return;
       }
 
-      const data = await response.json();
-      console.log("Login Successful:", data);
-
-      sessionStorage.setItem("userId", data.UserId);
-      sessionStorage.setItem("employeeId", data.EmployeeId);
-      sessionStorage.setItem("firstName", data.FirstName);
-      sessionStorage.setItem("lastName", data.LastName);
-      sessionStorage.setItem("email", data.EmailAddress);
-      sessionStorage.setItem("middleName", data.MiddleName);
-      sessionStorage.setItem("profilePhoto", data.ProfilePhoto);
-      sessionStorage.setItem("role", data.Role);
-
-      if (data.Role === "HRAdmin") {
-        if (data.ChangePasswordRequired) {
-          navigate("/changePassword", { state: data });
-        } else {
-          navigate("/dashboard", { state: data });
-        }
-      } else if (data.Role === "Employee") {
-        if (data.ChangePasswordRequired) {
-          navigate("/changePassword", { state: data });
-        } else {
-          navigate("/employee", { state: data });
-        }
-      } else {
-        throw new Error("Invalid user role");
-      }
+      alert('Password has successfully changed!');
+      
+      navigate('/');
     } catch (error) {
-      console.error("Login Failed", error);
-      setErrorMessage(error.message || "Login Failed.");
+      console.error("Password Change Failed", error);
+      setErrorMessage(error.message || "Password Change Failed.");
     }
   };
 
@@ -109,35 +88,50 @@ function LoginPage() {
                 <hr />
                 <div className="text-center" style={{ margin: "20px" }}>
                   <img
-                    src="./img/login.png"
-                    alt="Login"
+                    src="./img/forgotpass.png"
+                    alt="changePass"
                     className="login-image"
-                    style={{ width: "100px", height: "90px" }}
+                    style={{ width: "140px", height: "120px" }}
                   />
                 </div>
                 <form className="user" onSubmit={handleSubmit}>
                   <div className="form-group">
+                    <label>Current Password</label>
                     <input
-                      type="text"
+                      type="password"
                       className="form-control form-control-user"
-                      id="EmployeeId"
-                      name="EmployeeId"
-                      placeholder="Employee ID"
-                      value={formData.EmployeeId}
+                      id="currentPassword"
+                      name="currentPassword"
+                      placeholder="Current Password"
+                      value={formData.currentPassword}
                       onChange={handleChange}
                       required
                     />
                   </div>
                   <div className="form-group">
+                    <label>New Password</label>
                     <input
                       type="password"
                       className="form-control form-control-user"
-                      id="Password"
-                      name="Password"
-                      placeholder="Password"
-                      value={formData.Password}
+                      id="newPassword"
+                      name="newPassword"
+                      placeholder="New Password"
+                      value={formData.newPassword}
                       onChange={handleChange}
-                      autoComplete="current-password"
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Confirm Password</label>
+                    <input
+                      type="password"
+                      className="form-control form-control-user"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="Confirm Password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
                       required
                     />
                   </div>
@@ -145,13 +139,13 @@ function LoginPage() {
                     type="submit"
                     className="btn btn-primary btn-user btn-block"
                   >
-                    Login
+                    Change Password
                   </button>
                 </form>
                 <hr />
                 <div className="text-center">
-                  <Link className="small" to="/changePassword">
-                    Change Password!
+                  <Link className="small" to="/">
+                    Back to Login!
                   </Link>
                 </div>
                 {errorMessage && (
@@ -168,4 +162,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default ChangePassword;

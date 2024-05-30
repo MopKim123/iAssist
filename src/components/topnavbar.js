@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom'; 
 import '../App.css';
 // import { variables } from '../variables';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,12 +8,20 @@ import { useState, useEffect } from "react";
 import { notificationMarkAllRead, setNotificationAsRead } from "./globalFunctions";
 
 function TopNavbar() {
-  // const location = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   // const { FirstName, LastName } = location.state || {};
-   // Retrieve user's name from session storage
+  // Retrieve user's name from session storage
+  const data = location.state;
+
+  // Retrieve user's first name and last name from sessionStorage
   const firstName = sessionStorage.getItem('firstName');
   const lastName = sessionStorage.getItem('lastName');
+  const profilePhoto = sessionStorage.getItem('profilePhoto');
+  const defaultPhoto = "/img/user.png";
+
+  // Retrieve user's role from sessionStorage
+  const userRole = sessionStorage.getItem('role');
   
   const EmpId = '10023'
 
@@ -23,10 +31,10 @@ function TopNavbar() {
  
 
   const handleLogout = () => {
-    // Clear stored login data
+    // Clear sessionStorage on logout
+    sessionStorage.removeItem('firstName');
+    sessionStorage.removeItem('lastName');
     localStorage.removeItem('user');
-
-    // Redirect to login page
     navigate('../');
   }; 
 
@@ -128,7 +136,7 @@ function TopNavbar() {
         
         <li className="nav-item dropdown no-arrow notification-drowpdown">
           <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span className="mr-2 d-none d-lg-inline text-gray-600 small">{firstName} {lastName}</span>
+            <span className="mr-2 d-none d-lg-inline text-gray-600 small"></span>
             <FontAwesomeIcon icon={faBell} className="notification-bell" /> 
             {hasNotification && <div className="notification-dot"></div>}          
           </a> 

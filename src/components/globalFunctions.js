@@ -1,6 +1,7 @@
 // global.js
 
-import emailjs from '@emailjs/browser'; 
+import emailjs from '@emailjs/browser';
+import { toast, ToastContainer } from 'react-toastify';
 
 // Define your functions
 export async function notification2() { 
@@ -186,13 +187,11 @@ export async function sendEmailjs (emailType, data) {
       receiver_email: 'joakimtrinidad234@gmail.com', //temporary email
       message: message,  
       title: title,
-    };  
-    console.log('this function');
+    };   
     emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
       .then((result) => {
         console.log('Email sent successfully:', result.text);
-        alert('Updated Successfully')
-        // getSubmissionPDF() 
+        // alert('Updated Successfully') 
         resolve(true);
       }, (error) => {
         console.error('Email sending failed:', error.text);

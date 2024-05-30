@@ -15,8 +15,9 @@ import { saveAs } from 'file-saver';
 const HRIAssist = () => {
 
   const navigate = useNavigate(); 
-  const currentYear = new Date().getFullYear(); 
-  const [maxYear, setMaxYear] = useState(currentYear);
+  const currentYear = new Date().getFullYear();  
+  
+  // sessionStorage.getItem("userId")
 
   const [submissions, setSubmissions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -264,7 +265,7 @@ const HRIAssist = () => {
   };
 
   // filter requirements before retrieving
-  const filterSearch = () => {
+  const filterSearch = () => { 
     const month = filter.month
     const year = filter.year
     if((month && year)||(!month && year) || (!month && !year))
@@ -325,7 +326,7 @@ const HRIAssist = () => {
                               <table className="" style={{ tableLayout: 'fixed', width: '100%' }}>
                                 <thead>
                                   <tr>
-                                    <th className="pr-3 pl-3" style={{ width: '20%' }}>Name/Code</th>
+                                    <th className="pr-3 pl-3" style={{ width: '20%' }}>Name/User ID</th>
                                     <th className="pr-3 pl-3" style={{ width: '20%' }}>Transaction Type</th>
                                     <th className="pr-1 pl-1" style={{ width: '20%' }}>Status</th>
                                     <th className="pr-1 pl-1" style={{ width: '20%' }}>Month</th>
