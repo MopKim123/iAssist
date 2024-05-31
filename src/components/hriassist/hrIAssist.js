@@ -348,8 +348,7 @@ const HRIAssist = () => {
                                         <option value="Pag-Ibig Virtual Account">Pag-Ibig Virtual Account</option>
                                         <option value="Maternity Notication">Maternity Notication</option>
                                         <option value="Maternity Benefit">Maternity Benefit</option> 
-                                        <option value="Certification Request">Certification Request</option> 
-                                        <option value="Other">Other</option> 
+                                        <option value="Certification Request">Certification Request</option>  
                                       </select></td> 
                                     <td className="pr-1 pl-1" > 
                                       <select className="form-control" id="status" name="status" onChange={handleFilterSubmit}>

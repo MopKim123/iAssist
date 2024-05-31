@@ -1,43 +1,4 @@
-/* .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-} */
-
-.sidebar-brand {
+ .sidebar-brand {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -272,42 +233,7 @@
 
 .column {     
   align-content: center;
-} 
-
-/*start*/
-/* .header-name {
-  padding-bottom: 20px;
-}
-.input-file{
-  width: 60%;
-}
-.card-tab{
-  display: grid;
-    grid-template-columns: 20vw 5px auto; 
-    grid-gap: 10px;
-}
-.vertical-line {
-  border-left: 1px solid #ccc;
-  height: 100%;
-}
-.no-selected{
-  padding: 50px;
-  margin: auto;
-}
-.content-holder{
-  display: flex;
-  flex-direction: column;
-}
-.loan-btn{
-  width: 64%;
-  margin-bottom: 30px;
-}
-
-.loan-row{
-  gap: 1rem;
-  display: grid;
-  grid-template-columns: 25vw 25vw;
-} */
+}  
 
 /* requestView */
 .btnClose{
@@ -401,4 +327,343 @@
 }
 .notificationView-card-seen {
   background-color: #d2e3f7;  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* PROFILE STYLES */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-photo {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  text-align: left;
+}
+/* label spacing for reports */
+/* Custom CSS for label and span spacing */
+.blueLabel {
+  color: #1a43bf;
+}
+.seeProfile{
+  color: blue;
+}
+.labelWithSpacing {
+  margin-right: 10px;
+}
+.valueCenter {
+  text-align: center;
+  /* display: flex;
+  justify-content: center; */
+}
+/* Define a custom class for cobalt blue horizontal lines */
+.hr-cobalt-blue {
+  border: 0;
+  height: 1px;
+  background: #0275d8;
+  margin: 5px 0;
+  width: 10%;
+}
+
+
+
+.autoAdjustSpan {
+  display: inline-block;
+  word-wrap: break-word;
+  white-space: normal;
+  max-width: 100%; 
+  border: 1px solid #ccc;
+  padding: 8px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+  margin-right: 10px;
+}
+
+.valueBadge{
+  text-align: center;
+  color: blue ;
+  text-decoration: underline;
+}
+.border {
+  border: 1px solid #ccc; 
+  padding: 10px; 
+}
+.textDecorationUnderline {
+  text-decoration: underline;
+}
+
+/* WELCOME MESSAGE */
+.welcome-message {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.welcome-message span {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333; 
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.sidebar-brand-icon {
+  display: flex;
+  align-items: center;
+}
+
+.logo1 {
+  width: 38px;
+  height: auto;
+  display: block;
+}
+
+.logo2 {
+  width: 150px;
+  height: auto;
+  display: block;
+}
+/* new hire upload styles here */
+ /* Center text within table headers */
+ .table th.center {
+  text-align: center;
+}
+/* button inside the table */
+  .button-cell button {
+    margin-right: 5px; /* Adjust this value to increase or decrease the spacing */
+  }
+/* NewHireUpload css */
+/* App.css */
+
+.custom-modal .modal-dialog {
+  max-width: 90%; 
+  width: auto; 
+}
+
+.custom-modal .modal-content {
+  width: 200%; 
+}
+
+.custom-modal .form-group {
+  margin-bottom: 15px; 
+}
+
+/* Define a class for auto-width input */
+.auto-width-input {
+  width: 100%;
+}
+/* Optional: Limit the maximum width to a specific value */
+@media (min-width: 576px) {
+  .auto-width-input {
+    max-width: 500px; 
+  }
+}
+
+.table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.table th,
+.table td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 300px; 
+}
+.auto-size-modal .modal-dialog {
+  max-width: 100%;
+}
+
+.auto-size-modal .modal-content {
+  width: auto;
+  padding: 20px; 
+}
+
+.auto-size-modal .modal-body {
+  overflow-x: hidden; 
+}
+
+.auto-size-modal .form-control {
+  width: 100%; 
+}
+
+/* Make table responsive and allow column adjustment */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Adjust table header font size for responsiveness */
+@media (max-width: 767px) {
+  .table-responsive thead th {
+    font-size: 12px;
+  }
+}
+.text-center {
+  text-align: center;
+}
+
+.table th {
+  text-align: center;
+  background-color: #4e73df; 
+  color: white;
+  height: 50px; 
+  width: 200px;
+}
+.table tbody tr {
+  height: 50px; 
+  width: 200px;
+}
+.table {
+  table-layout: auto;
+  width: 100%;
+  border-collapse: collapse; 
+}
+.table th,
+.table td {
+  min-width: 100px; 
+  max-width: 300px; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  text-align: center; 
+  padding: 8px; 
+}
+.update-button {
+  background-color: #4e73df; 
+  color: white; 
+  border: none; 
+  padding: 8px 12px; 
+  cursor: pointer; 
+  border-radius: 4px; 
+}
+
+.update-button:hover {
+  background-color: #1b0ecf; 
+}
+
+/* Style for Font Awesome icon */
+.update-button i {
+  margin-right: 5px; 
+}
+.add-button {
+  margin-left: 30px; 
+}
+
+.footer-logo {
+  width: 120px;
+  height: auto;
+  display: block;
+  margin: 0 auto 10px; 
+}
+/* this is for exit clearance */
+/*Exit Clearance stylesheet*/
+.paragraph, .exit-title{
+  margin: 20px;
+  text-align: left;
+}
+.exit-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  text-align: left;
+  padding: 20px;
+}
+
+.exit-content-holder{
+  display: flex;
+  flex-direction: row;
+}
+
+.exit-inputbox{
+  border-radius: 5px;
+  border: 1px solid gray;
+  width: 50%;
+  padding: 5px;
+}
+
+@media only screen and (min-width: 280px){
+  .exit-container{
+    display: grid;
+    grid-template-columns: auto;
+  }
+  .exit-inputbox{
+    overflow-x: hidden;
+  }
+}
+@media only screen and (min-width: 760px){
+  .exit-container{
+    display: grid;
+    grid-template-columns: auto auto;
+  } 
+  .exit-inputbox{
+    overflow-x: hidden;
+  }
+}
+
+.exit-item {
+  text-align: left;   
+  margin-left: 10px;
+  width: 50%;
+}
+
+/*A. Project Manager/PIC/Department Manager*/
+.exit-container-A{
+  text-align: left;
+  padding: 20px;
+}
+
+.exit-content-holder-A{
+  display:flex;
+  flex-direction: row;
+}
+.exit-inputbox-A {
+  border-radius: 5px;
+  border: 1px solid;
+  padding: 5px;
+  width: 50%;
+}
+
+/*B. Administration Clearance: The following items were returned by the employee:*/
+.exit-container-B, .exit-container-C{
+  display: grid;
+  grid-template-columns: auto auto auto;
+  padding: 20px;
+}
+.exit-inputbox-B, .exit-inputbox-C{
+  margin: 5px;
+}
+.exit-item-B, .exit-inputbox-C {
+  text-align: left;   
+  margin-left: 10px;
+  width: 100%;
+}
+
+/*D*/
+.exit-item-D{
+  border-top: 1px solid ;
+  width: 35%;
+  margin: auto;
+  padding-bottom: 25px;
 }

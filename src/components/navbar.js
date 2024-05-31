@@ -135,21 +135,7 @@ import { useState } from "react";
                   <span>HR iAssist</span>
                 </Link>
                  {/* </a> */}
-             </li>
-             {/* Nav Item - Reports*/}
-             <li className="nav-item">
-             <Link className="nav-link" to={{ pathname: "/reports"}} state={data} >
-                <i className="fas fa-fw fa-chart-bar"></i>
-                <span>Report</span>
-              </Link>
-             </li>
-             {/* Nav Item - Reports*/}
-             <li className="nav-item">
-             <Link className="nav-link" to={{ pathname: "/test"}} state={data} >
-                <i className="fas fa-fw fa-chart-bar"></i>
-                <span>Test</span>
-              </Link>
-             </li>
+             </li> 
             
              {/* Sidebar Toggler (Sidebar) */}
              <div className="text-center d-none d-md-inline">
