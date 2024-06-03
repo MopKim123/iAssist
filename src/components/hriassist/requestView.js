@@ -20,7 +20,12 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    console.log(data.EmailAddress);
+    // console.log(data.EmailAddress);
+    // console.log(JSON.stringify(sessionStorage));
+    Object.entries(sessionStorage).forEach(([key, value]) => {
+      console.log(`${key}: ${value}`);
+  });
+  
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
@@ -68,8 +73,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
     };
     
     // Converts and download
-    const convertAndDownloadPDF = (base64, fileName) => {  
-      console.log(base64)
+    const convertAndDownloadPDF = (base64, fileName) => {   
+
       const url = convertToPDF(base64);
       
       const a = document.createElement('a');
@@ -196,17 +201,14 @@ import { Document, Page,pdfjs } from 'react-pdf';
         }
 
         insertNotification(data.Name, data.TransactionType, EmpId, data.EmpId, 'complete', data.SubmissionID)
-        // if(await sendEmail('complete')){
-        //   window.history.back(); 
-        // }
+        
         try {
           const result = await sendEmail('complete');
           if (result) {
             window.history.back();
           }
         } catch (error) {
-          console.error('Error sending email:', error);
-          // Handle error (e.g., show an error message to the user)
+          console.error('Error sending email:', error); 
         }
       } catch (error) {
         console.error('Error:', error);
@@ -321,6 +323,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                       <Button onClick={completeSubmission}>Complete</Button> :
                                       <label>Completion Date: {data.CompletionDate}</label>
                                   }
+                                      <Button onClick={()=>sendEmail('complete')}>Send</Button>
                                 </div>
                                 </div> 
                               </div> 
@@ -335,7 +338,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                 {(data.LoanAppDate || data.TransactionNum || data.TypeOfDelivery || 
                   data.CorrectName || data.DeductionFor || data.Description || 
                   data.ErroneousName || data.OtherReq || data.ReasonType || 
-                  data.RequestTitle || data.RequestType) && 
+                  data.RequestTitle || data.RequestType || data.PlaceOfConfinement || 
+                  data.BankAccNumber || data.CompletionDate || data.DeductionFor ) && 
                   <div className="container-fluid">
                       <div className="row justify-content-center">
                           <div className="col-xl-8 col-lg-7">
@@ -412,6 +416,30 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                               <div className="form-group">
                                                   <label htmlFor="typeOfDelivery">Type of Delivery</label>
                                                   <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.TypeOfDelivery}/>
+                                              </div>
+                                              }
+                                              {data.PlaceOfConfinement && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">Place of Confinement</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.PlaceOfConfinement}/>
+                                              </div>
+                                              }
+                                              {data.BankAccNumber && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">Bank Account Number</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.BankAccNumber}/>
+                                              </div>
+                                              }
+                                              {data.CompletionDate && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">Completion Date</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.CompletionDate}/>
+                                              </div>
+                                              }
+                                              {data.DeductionFor && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">Deduction For</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.DeductionFor}/>
                                               </div>
                                               }
                                           </div> 

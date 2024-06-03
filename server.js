@@ -52,8 +52,7 @@ const EMPLOYEE_PASSWORD = 'employee123';
 // HR - get all employee submission
 app.post('/hrsubmission',  upload.single(''), async (req, res) => {
  
-  try {
-    console.log(1);
+  try { 
     const { pageNumber, pageSize } = req.body; 
     const result = await dbOperationHR.getSubmissions(pageNumber, pageSize);
     res.status(200).json({ result: result });
