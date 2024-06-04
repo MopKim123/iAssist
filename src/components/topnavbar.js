@@ -23,7 +23,7 @@ function TopNavbar() {
   // Retrieve user's role from sessionStorage
   const userRole = sessionStorage.getItem('role');
   
-  const EmpId = '10023'
+  const EmpId = sessionStorage.getItem("employeeId")
 
   const [hasNotification, setHasNotification] = useState(true);
   const [notification, setNotification] = useState([]);

@@ -34,7 +34,7 @@ import { notificationMarkAllRead, setNotificationAsRead } from "../globalFunctio
     
   const getNotifications = async (pageNumber, pageSize) => {
     
-    const EmpId = '10023' 
+    const EmpId = sessionStorage.getItem("employeeId")  
     
 
     const formData = new FormData(); 

@@ -65,7 +65,9 @@ function Profile() {
       alert('Profile photo updated successfully!');
   
       // Reload the page after showing the alert
-      window.location.reload();
+      // window.location.reload();
+    fetchPersonalDetails();
+
     } catch (err) {
       console.error(err);
       setErrorMessage('Error updating profile photo');

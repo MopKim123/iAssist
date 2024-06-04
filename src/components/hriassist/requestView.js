@@ -21,11 +21,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const data = location.state.data;
 
     // console.log(data.EmailAddress);
-    // console.log(JSON.stringify(sessionStorage));
-    Object.entries(sessionStorage).forEach(([key, value]) => {
-      console.log(`${key}: ${value}`);
-  });
-  
+    // console.log(JSON.stringify(sessionStorage)); 
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
@@ -323,7 +319,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                       <Button onClick={completeSubmission}>Complete</Button> :
                                       <label>Completion Date: {data.CompletionDate}</label>
                                   }
-                                      <Button onClick={()=>sendEmail('complete')}>Send</Button>
+                                      <Button onClick={()=>sendEmail('submit')}>Send</Button>
                                 </div>
                                 </div> 
                               </div> 

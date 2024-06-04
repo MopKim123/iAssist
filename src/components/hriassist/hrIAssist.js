@@ -196,8 +196,7 @@ const HRIAssist = () => {
 
   // get submissions based on filter
   const getFilteredSubmissions = async (pageNumber, pageSize) => {
-    
-    const EmpId = '10023'
+     
   
     const formData = new FormData(); 
     formData.append('pageNumber', pageNumber);

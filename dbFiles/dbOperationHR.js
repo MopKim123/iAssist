@@ -350,9 +350,9 @@ const getNotifications = async (id) => {
 // All - get notifications for 'view all'
 const getNotificationsForViewAll = async (id, pageNumber, pageSize) => {
     try {
-        let pool = await sql.connect(config); 
+        let pool = await sql.connect(config);  
         let result = await pool.request() 
-            .input('id', sql.Int, id)
+            .input('id', sql.VarChar, id)
             .input('PageNumber', sql.Int, pageNumber)
             .input('PageSize', sql.Int, pageSize) 
             .query(`
@@ -371,13 +371,16 @@ const getNotificationsForViewAll = async (id, pageNumber, pageSize) => {
                         Notification.*,
                         ROW_NUMBER() OVER (ORDER BY NotificationID DESC) AS RowNumber
                     FROM Notification
+                    WHERE ReceiverID = @id
                 ) AS NotifWithRowNumber
                 WHERE NotifWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize;
             `);
 
         let count = await pool.request() 
+            .input('id', sql.VarChar, id)
             .query(`
-                SELECT COUNT(*) FROM Notification;
+                SELECT COUNT(*) FROM Notification
+                WHERE ReceiverID = @id;
             `);
         if (result.recordset.length === 0) {
             return null;

@@ -1,7 +1,6 @@
 // global.js
 
-import emailjs from '@emailjs/browser';
-import { toast, ToastContainer } from 'react-toastify';
+import emailjs from '@emailjs/browser'; 
 
 // Define your functions
 export async function notification2() { 
@@ -124,6 +123,7 @@ export async function sendEmailjs (emailType, data) {
   let message = ''
   let title = ''
 
+  // message for transaction completion
   const titleComplete = `${data.transaction_type} Approval and Completion Confirmation`
   const messageComplete = `
   Dear ${data.receiver_name},
@@ -140,20 +140,22 @@ export async function sendEmailjs (emailType, data) {
   
   ${data.sender_name}`
 
+
+  // message for submitting request
   const titleSubmit = `${data.transaction_type}: ${data.receiver_name}`
   const messageSubmit = `
-  Your request for ${data.transaction_type} has been received.
+  Your request for ${data.transaction_type} has been received. 
 
   Your HR CompBen Team will review the submitted documents and will email you within three (3) working days to update you on the status of your request
    
-  If no update is received within the speciefied timeline, you may send us an email at <b><u>HRComp_Ben@innodata.com</u></b>.
+  If no update is received within the speciefied timeline, you may send us an email at HRComp_Ben@innodata.com.
 
   Thank you.
 
   HR Compensation & Benefits Team
   `
-
-  console.log(messageSubmit);
+ 
+  // message for resubmission of file
   const titleResubmit = `Action Required: Resubmission of Document for ${data.transaction_type}`
   const messageResubmit = `
   Dear ${data.receiver_name},
@@ -175,7 +177,11 @@ export async function sendEmailjs (emailType, data) {
   Best regards,
 
   ${data.sender_name} `
+  
+  // message for resubmitting of file by the employee
   const messageResubmitted = `test ${data}`
+  
+  // message for transaction expiration
   const messageExpired = `test ${data}`
 
   switch(emailType){
@@ -186,6 +192,10 @@ export async function sendEmailjs (emailType, data) {
     case 'resubmit':
       title = titleResubmit
       message = messageResubmit
+      break;      
+    case 'submit':
+      title = titleSubmit
+      message = messageSubmit
       break;      
   }
 
@@ -200,15 +210,16 @@ export async function sendEmailjs (emailType, data) {
       message: message,  
       title: title,
     };   
-    // emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
-    //   .then((result) => {
-    //     console.log('Email sent successfully:', result.text);
-    //     // alert('Updated Successfully') 
-    //     resolve(true);
-    //   }, (error) => {
-    //     console.error('Email sending failed:', error.text);
-    //     reject(error);
-    //   });
+    console.log(message);
+    emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
+      .then((result) => {
+        console.log('Email sent successfully:', result.text);
+        // alert('Updated Successfully') 
+        resolve(true);
+      }, (error) => {
+        console.error('Email sending failed:', error.text);
+        reject(error);
+      });
   });
 };
 
