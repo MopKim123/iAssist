@@ -21,7 +21,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const data = location.state.data;
 
     // console.log(data.EmailAddress);
-    // console.log(JSON.stringify(sessionStorage)); 
+    console.log(sessionStorage); 
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();
@@ -30,7 +30,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const [pdfUrl, setPdfUrl] = useState(''); 
     const [imageUrl, setImageUrl] = useState('');
 
-    const EmpId = 10024
+    const HrEmpId = sessionStorage.getItem("employeeId");
 
     const [pdf, setPdf] = useState([]); 
     
@@ -150,8 +150,9 @@ import { Document, Page,pdfjs } from 'react-pdf';
         reason += ' respectively'
       }    
       if(reasonArray.length !== 0 && documentNameArray.length !== 0) { 
-        insertNotification(data.Name, data.TransactionType, EmpId, data.EmpId, 'resubmit', data.SubmissionID) 
+        insertNotification(data.Name, data.TransactionType, HrEmpId, data.EmpId, 'resubmit', data.SubmissionID) 
         sendEmail('resubmit', reason, documentName) 
+        getSubmissionPDF() 
       }
 
     }; 
@@ -196,7 +197,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
           return;  
         }
 
-        insertNotification(data.Name, data.TransactionType, EmpId, data.EmpId, 'complete', data.SubmissionID)
+        insertNotification(data.Name, data.TransactionType, HrEmpId, data.EmpId, 'complete', data.SubmissionID)
         
         try {
           const result = await sendEmail('complete');
@@ -284,6 +285,21 @@ import { Document, Page,pdfjs } from 'react-pdf';
       // });
     };
 
+    // Checkbox 
+    const validate = () => { 
+    
+      if((data.LoanAppDate || data.TransactionNum || data.TypeOfDelivery || 
+        data.CorrectName || data.DeductionFor || data.Description || 
+        data.ErroneousName || data.OtherReq || data.ReasonType || 
+        data.RequestTitle || data.RequestType || data.PlaceOfConfinement || 
+        data.BankAccNumber || data.CompletionDate || data.DeductionFor || 
+        data.ReasonForInfoUpdate || data.CurrentFullname || data.NewFullname || 
+        data.CurrentCivilStatus || data.NewCivilStatus )){
+        return true
+      } else {
+        return false
+      } 
+    };
        
 
     return (
@@ -331,11 +347,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                 </div>
                 
                 {/* page content begin here */}
-                {(data.LoanAppDate || data.TransactionNum || data.TypeOfDelivery || 
-                  data.CorrectName || data.DeductionFor || data.Description || 
-                  data.ErroneousName || data.OtherReq || data.ReasonType || 
-                  data.RequestTitle || data.RequestType || data.PlaceOfConfinement || 
-                  data.BankAccNumber || data.CompletionDate || data.DeductionFor ) && 
+                { validate() && 
                   <div className="container-fluid">
                       <div className="row justify-content-center">
                           <div className="col-xl-8 col-lg-7">
@@ -438,6 +450,37 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                                   <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.DeductionFor}/>
                                               </div>
                                               }
+                                              
+                                              {data.ReasonForInfoUpdate && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">Reason For Information Update</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.ReasonForInfoUpdate}/>
+                                              </div>
+                                              }
+                                              {data.CurrentFullname && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">Current Full Name</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.CurrentFullname}/>
+                                              </div>
+                                              }
+                                              {data.NewFullname && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">New Full Name</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.NewFullname}/>
+                                              </div>
+                                              }
+                                              {data.CurrentCivilStatus && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">Current Civil Status</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.CurrentCivilStatus}/>
+                                              </div>
+                                              }
+                                              {data.NewCivilStatus && 
+                                              <div className="form-group">
+                                                  <label htmlFor="typeOfDelivery">New Civil Status</label>
+                                                  <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.NewCivilStatus}/>
+                                              </div>
+                                              }
                                           </div> 
                                         </div>
                                     </div>
@@ -530,35 +573,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                 </div>
                 )} 
                 {/* Page content ends here */}
-
-                
-                {/* page content begin here */}
-                {/* <div className="container-fluid">
-                    <div className="row justify-content-center">
-                        <div className="col-xl-8 col-lg-7">
-                            <div className="card shadow mb-4"> 
-                                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 className="m-0 font-weight-bold text-primary">Remark</h6>
-                                </div> 
-                                <div className="card-body">
-                                    <div className="tab-content">
-                                        <div className="card-body loan-row"> 
-                                            <div className="form-group"> <textarea 
-                                              className="form-control" 
-                                              id="remark" 
-                                              name="remark"
-                                              rows="3" 
-                                              style={{ resize: "vertical" }}
-                                            />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> */}
-                {/* Page content ends here */}
+ 
                 {data.Status !== 'Complete' &&
                   <button type="submit" className="btn btn-primary d-block mx-auto" onClick={handleFormSubmit}>Submit</button>
                 }

@@ -58,7 +58,7 @@ app.post('/hrsubmission',  upload.single(''), async (req, res) => {
     res.status(200).json({ result: result });
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    // res.status(500).json({ error: 'Internal server error' });
   }
 }); 
 // HR - get all employee submission with filter
@@ -204,9 +204,7 @@ app.post('/insertnotification',  upload.single(''), async (req, res) => {
 
   try {
 
-    const { EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID } = req.body; 
-    // console.log(EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID);
-    // const insertNotification = async ( EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID) => {
+    const { EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID } = req.body;  
     
     const result = await dbOperationHR.insertNotification(EmployeeName, TransactionType, SenderID, ReceiverID, NotificationType, SubmissionID);
     res.status(200).json({ result: result });

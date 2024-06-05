@@ -33,15 +33,14 @@ const insertPDF = async (filename) => {
 
 // Employee side - get employee's submissions
 const getUserSubmissions = async (id, pageNumber, pageSize) => {
-    try {
-        // console.log('this log');
+    try { 
       let pool = await sql.connect(config);
       let result = await pool.request()
-        .input('id', sql.Int, id)
+        .input('id', sql.VarChar, id)
         .input('PageNumber', sql.Int, pageNumber)
         .input('PageSize', sql.Int, pageSize) 
         .query(`SELECT 
-                    SubsWithRowNumber.Name,
+                    SubsWithRowNumber.EmployeeName AS Name,
                     SubsWithRowNumber.EmailAddress,
                     SubsWithRowNumber.SubmissionID,
                     SubsWithRowNumber.TransactionType,
@@ -53,19 +52,19 @@ const getUserSubmissions = async (id, pageNumber, pageSize) => {
                     SubsWithRowNumber.TypeOfDelivery
                 FROM (
                     SELECT 
-                        Employee.Name,
-                        Employee.EmailAddress,
+                        EmpPersonalDetails.EmployeeName,
+                        EmpPersonalDetails.EmailAddress,
                         Submission.*,
                         ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
                     FROM Submission
-                    LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
+                    LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId 
                     WHERE Submission.EmpId = @id
                 ) AS SubsWithRowNumber
                 WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
         `); 
         
         let count = await pool.request() 
-            .input('id', sql.Int, id)
+            .input('id', sql.VarChar, id)
             .query(`
                 SELECT COUNT(*) FROM Submission
                 WHERE EmpId = @id;
@@ -109,7 +108,7 @@ const updatePDF = async (id,reason,subId) => {
     try {
         let pool = await sql.connect(config);
 
-        console.log('this',id,reason,subId); 
+        
         let result = await pool.request()
             .input('id', sql.Int, id)
             .input('reason', sql.NVarChar(200), reason) // Assuming the reason is a string with a maximum length of 50 characters
@@ -165,12 +164,12 @@ const getSubmissions = async (pageNumber, pageSize) => {
                     SubsWithRowNumber.* 
                 FROM (
                     SELECT 
-                        Employee.Name,
-                        Employee.EmailAddress,
+                    EmpPersonalDetails.EmployeeName AS Name,
+                    EmpPersonalDetails.EmailAddress,
                         Submission.*,
                         ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
                     FROM Submission
-                    LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
+                    LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId 
                 ) AS SubsWithRowNumber
                 WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
         `); 
