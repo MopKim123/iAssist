@@ -20,8 +20,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const location = useLocation();
     const data = location.state.data;
 
-    // console.log(data.EmailAddress);
-    console.log(sessionStorage); 
+    console.log(data);
+    // console.log(sessionStorage); 
     const sampleEmail = 'joakimtrinidad234@gmail.com'
 
     const { employeeId } = useParams();

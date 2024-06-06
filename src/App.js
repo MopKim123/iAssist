@@ -14,10 +14,12 @@ import ChangePassword from './components/changePassword';
 
 import SSSLoan from './components/loans/sssLoan';
 import PagIbigLandbankCard from './components/loans/pagIbigLandbankCard';
-import PagIbigDBPCard from './components/loans/pagIbigDBPCard';
 import PagIbigVirtualAccount from './components/loans/pagIbigVirtualAccount';
 import MaternityNotification from './components/loans/MaternityNotification';
 import MaternityBenefit from './components/loans/MaternityBenefit';
+import SSSRequest from './components/request/SSSrequest';
+import PAGIBIGrequest from './components/request/PAG-IBIGrequest';
+import PHILHEALTHrequest from './components/request/PHILHEALTHrequest';
 
 import Submissions from './components/submission/submission';
 import SubmissionView from './components/submission/submissionView';
@@ -25,6 +27,13 @@ import SubmissionView from './components/submission/submissionView';
 import HRIAssist from './components/hriassist/hrIAssist';
 import RequestView from './components/hriassist/requestView';
 import ViewNotifications from './components/notification/viewNotifications';
+ 
+import SicknessNotification from './components/sickness/SicknessNotification';
+import SicknessApproval from './components/sickness/SicknessApproval';
+
+import UpdateEmployee from './components/hriassist/UpdateEmployee';
+import OtherRequest from './components/hriassist/OtherRequest';
+
 
 
 import Test from './components/test';
@@ -56,10 +65,18 @@ function App() {
           {/* iAssist Pages */} 
             <Route path="/sssloan" element={<SSSLoan />} />
             <Route path="/landbankcard" element={<PagIbigLandbankCard />} />
-            <Route path="/dbpcard" element={<PagIbigDBPCard />} />
             <Route path="/virtualaccount" element={<PagIbigVirtualAccount />} />
             <Route path="/notification" element={<MaternityNotification />} />
             <Route path="/benefit" element={<MaternityBenefit />} />
+
+            <Route path="/SSSrequest" element={<SSSRequest />} />
+            <Route path="/PIrequest" element={<PAGIBIGrequest />} />
+            <Route path="/PHILHEALTHrequest" element={<PHILHEALTHrequest />} />
+
+            <Route path="/SicknessNotification" element={<SicknessNotification />} /> 
+            <Route path="/SicknessApproval" element={<SicknessApproval />} /> 
+            <Route path="/UpdateEmployee" element={<UpdateEmployee />} />
+            <Route path="/OtherRequest" element={<OtherRequest />} />
 
           {/* HR iAssist Pages */}
           <Route path="/hriassist" element={<HRIAssist />} />

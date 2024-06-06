@@ -6,6 +6,9 @@ import Footer from '../footer';
 import '../../App.css';
 import { variables } from '../../variables';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
  function PagIbigVirtualAccount() {
    
     const { employeeId } = useParams();
@@ -28,6 +31,12 @@ import { variables } from '../../variables';
       ContactNumber: '',
       EmailAddress: ''
     });
+
+    const [thisInfo, setThisInfo] = useState({
+      Screenshot_VirtualAcc: '',
+      paySlipFiles: '',
+      GrossIncome: ''
+    });
   
     useEffect(() => {
       // Fetch employee data based on employeeId
@@ -47,26 +56,172 @@ import { variables } from '../../variables';
       fetchEmployeeData();
     }, [employeeId]);
   
-    
+    // const handleFormSubmit = async (e) => {
+    //   e.preventDefault();
+
+    //   const formData = new FormData();
+    //   formData.append('Screenshot_Virtual', thisInfo.Screenshot_VirtualAcc);
+    //   formData.append('paySlip', thisInfo.paySlip);
+    //   formData.append('GrossIncome', thisInfo.GrossIncome);
+
+    //   try {
+    //     const response = await fetch('/PagIbigVirtualAccount', {
+    //       method: 'POST',
+    //       body: formData,
+    //     });
   
+    //     if (response.ok) {
+    //       const jsonResponse = await response.json();
+          
+    //       console.log(jsonResponse.message);
+
+    //       setThisInfo({
+    //         Screenshot_VirtualAcc: '',
+    //         paySlipFiles: '',
+    //         GrossIncome: ''
+    //       });
+    
+    //       // Clear file input fields
+    //       document.getElementById('Screenshot_VirtualAcc').value = null;
+    //       document.getElementById('paySlipFiles').value = null;
+    //       document.getElementById('GrossIncome').value = null;
+
+    //        // Emit success toast
+    //       toast.success('Submitted Successfully', {
+    //         position: "bottom-right",
+    //         autoClose: 5000,
+    //         hideProgressBar: false,
+    //         closeOnClick: true,
+    //         pauseOnHover: true,
+    //         draggable: true,
+    //         progress: undefined,
+    //         theme: "light",
+    //       });
+  
+    //     } else {
+    //       console.error('Failed to upload PDF:', response.statusText);
+    //         toast.error('Failed to Submit', {
+    //           position: "bottom-right",
+    //           autoClose: 5000,
+    //           hideProgressBar: false,
+    //           closeOnClick: true,
+    //           pauseOnHover: true,
+    //           draggable: true,
+    //           progress: undefined,
+    //           theme: "light",
+    //         });
+    //     }
+    //   } catch (error) {
+    //     console.error('Error uploading PDF:', error);
+    //   }
+    // };
+
     const handleFormSubmit = async (e) => {
       e.preventDefault();
-      // try {
-      //   const response = await fetch(variables.API_URL + 'UploadEmp/' + employeeId, {
-      //     method: 'PUT',
-      //     headers: {
-      //       'Content-Type': 'application/json'
-      //     },
-      //     body: JSON.stringify(employeeData)
-      //   });
-      //   if (!response.ok) {
-      //     throw new Error('Failed to update employee');
-      //   }
-      //   // Handle successful update
-      //   console.log('Employee updated successfully');
-      // } catch (error) {
-      //   console.error('Error updating employee:', error);
-      // }
+  
+      const isValidFileType = (file) => {
+          const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
+          return allowedTypes.includes(file.type);
+      };
+  
+      const formData = new FormData();
+      formData.append('GrossIncome', thisInfo.GrossIncome);
+  
+      // Validate and append Screenshot Virtual
+      if (thisInfo.Screenshot_VirtualAcc && isValidFileType(thisInfo.Screenshot_VirtualAcc)) {
+          formData.append('Screenshot_Virtual', thisInfo.Screenshot_VirtualAcc);
+      } else {
+          toast.error('Invalid Screenshot Virtual file type. Please upload a PDF, PNG, or JPEG file.', {
+              position: "bottom-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+          });
+          return; // Stop further execution
+      }
+  
+      // Validate and append Pay Slip
+      if (thisInfo.paySlip && isValidFileType(thisInfo.paySlip)) {
+          formData.append('paySlip', thisInfo.paySlip);
+      } else {
+          toast.error('Invalid Pay Slip file type. Please upload a PDF, PNG, or JPEG file.', {
+              position: "bottom-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+          });
+          return; // Stop further execution
+      }
+  
+      try {
+          const response = await fetch('/PagIbigVirtualAccount', {
+              method: 'POST',
+              body: formData,
+          });
+  
+          if (response.ok) {
+              const jsonResponse = await response.json();
+  
+              console.log(jsonResponse.message);
+  
+              setThisInfo({
+                  Screenshot_VirtualAcc: '',
+                  paySlipFiles: '',
+                  GrossIncome: ''
+              });
+  
+              // Clear file input fields
+              document.getElementById('Screenshot_VirtualAcc').value = null;
+              document.getElementById('paySlipFiles').value = null;
+              document.getElementById('GrossIncome').value = null;
+  
+              // Emit success toast
+              toast.success('Thank you! Your request has been submitted.', {
+                  position: "bottom-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+              });
+  
+          }  else {
+            console.error('Failed to submit request:', response.statusText);
+            toast.error('Failed to Submit', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
+    } catch (error) {
+        console.error('Error uploading:', error);
+    }
+  };
+  
+
+    const handleScreenshot_Virtual = (e) => {
+      setThisInfo({ ...thisInfo, Screenshot_VirtualAcc: e.target.files[0] });
+    };
+    const handlePay_Slip = (e) => {
+      setThisInfo({ ...thisInfo, paySlip: e.target.files[0] });
+    };
+    const handleGrossIncome = (e) => {
+      setThisInfo({ ...thisInfo, GrossIncome: e.target.files[0] });
     };
   
     if (!employeeData) {
@@ -98,7 +253,7 @@ import { variables } from '../../variables';
                               <div className="tab-content">
                                 <div className="card-body">
                                   <div className="d-flex justify-content-left">
-                                    <input type="file" className="input-file" aria-describedby="fileHelp"/>
+                                    <input id='Screenshot_VirtualAcc' type="file" className="input-file" aria-describedby="fileHelp" onChange={handleScreenshot_Virtual}/>
                                     <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                   </div>
                                 </div>
@@ -124,7 +279,7 @@ import { variables } from '../../variables';
                               <div className="tab-content">
                                 <div className="card-body">
                                   <div className="d-flex justify-content-left">
-                                    <input type="file" className="input-file" aria-describedby="fileHelp"/>
+                                    <input id="paySlipFiles" type="file" className="input-file" aria-describedby="fileHelp" onChange={handlePay_Slip}/>
                                     <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                   </div>
                                 </div>
@@ -150,7 +305,7 @@ import { variables } from '../../variables';
                               <div className="tab-content">
                                 <div className="card-body">
                                   <div className="d-flex justify-content-left">
-                                    <input type="file" className="input-file" aria-describedby="fileHelp"/>
+                                    <input id="GrossIncome" type="file" className="input-file" aria-describedby="fileHelp" onChange={handleGrossIncome}/>
                                     <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                   </div>
                                 </div>
@@ -168,6 +323,18 @@ import { variables } from '../../variables';
                 </div>
               <Footer />
           </div>
+          <ToastContainer
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
       </div>
   );
 }

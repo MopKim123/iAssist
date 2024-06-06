@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 // import Navbar from "./navbar";
+import Navbar from './navbar';
 import TopNavbar from "./topnavbar";
 import Footer from "./footer";
 import axios from "axios";
@@ -121,6 +122,7 @@ const handleSubmit = async (event) => {
     <div>
       <div id="wrapper">
         {/* <Navbar /> */}
+         <Navbar />
         <div id="content-wrapper" className="d-flex flex-column">
           <div id="content">
             <TopNavbar />

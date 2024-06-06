@@ -11,10 +11,16 @@ import { useState } from "react";
   const location = useLocation();
   const data = location.state; 
   const navigate = useNavigate()  
+  const role = sessionStorage.getItem("role")  
+  console.log(role);
 
   const [showPages, setShowPages] = useState(false);
   const [showLoans, setShowLoans] = useState(false);
   const [showMaternity, setShowMaternity] = useState(false);
+  const [showCertReq, setShowCertReq] = useState(false);
+  const [showSickness, setshowSickness] = useState(false);
+  const [UpdateEmployee, setUpdateEmployee] = useState(false);
+  const [OtherRequest, setOtherRequest] = useState(false);
 
   // Function to toggle the visibility of pages list
   const togglePages = () => {
@@ -25,6 +31,18 @@ import { useState } from "react";
   };
   const toggleMaternity = () => {
         setShowMaternity(!showMaternity);
+  };
+  const toggleCertReq = () => {
+    setShowCertReq(!showCertReq);
+  };
+  const toggleSickness = () => {
+    setshowSickness(!showSickness);
+  };
+  const toggleUpdateEmployee= () => {
+    setUpdateEmployee(!UpdateEmployee);
+  };
+  const toggleOtherRequest = () => {
+    setOtherRequest(!OtherRequest);
   };
 
      return (
@@ -54,6 +72,8 @@ import { useState } from "react";
                  MAIN
              </div>
              {/* Nav Item - New Hire Upload */}
+             
+             { role === 'HRAdmin' &&  
              <li className="nav-item"> 
                  <Link className="nav-link" to={{ pathname: "/newHireUpload"}} state={data}>
                   <i className="fas fa-fw fa-upload"></i>
@@ -61,6 +81,7 @@ import { useState } from "react";
                 </Link>
                  {/* </a> */}
              </li>
+             }
              <li className="nav-item"> 
                  <Link className="nav-link" to={{ pathname: "/submissions"}} state={data}>
                   <i className="fas fa-fw fa-book"></i>
@@ -125,19 +146,60 @@ import { useState } from "react";
                                 </ul>
                             )}
                         </li> 
+
+                        <li onClick={toggleSickness}> 
+                            <Link className="dropdown-text" state={data}>SSS Sickness</Link>
+                            {showSickness && (
+                                <ul className="custom-bullet-list sub-menu">
+                                    <li>
+                                        <Link to="/SicknessNotification " className="dropdown-text" state={data}>
+                                            SSS Sickness  
+                                            <div className="list-padding">Notification</div>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/SicknessApproval" className="dropdown-text"  state= { data }>
+                                            SSS Sickness  
+                                            <div className="list-padding">Approval</div>
+                                        </Link>
+                                    </li>
+                                </ul>
+                            )}
+                        </li>
+
+                        <li onClick={toggleUpdateEmployee}>
+                            <Link to="/UpdateEmployee" className="dropdown-text" state={data}> 
+                                Employee Information 
+                                <div className="list-padding">Update</div>
+                            </Link>
+                        </li>
+                        <li onClick={toggleOtherRequest}>
+                            <Link to="/OtherRequest" className="dropdown-text" state={data}>Other Request</Link>
+                        </li>
                     </ul>
                 )}
                  {/* </a> */}
-             </li> 
-             <li className="nav-item"> 
-                 <Link className="nav-link" to={{ pathname: "/hriassist"}} state={data}>
-                  <i className="fas fa-fw fa-upload"></i>
-                  <span>HR iAssist</span>
-                </Link>
-                 {/* </a> */}
-             </li> 
+                </li> 
+                { role === 'HRAdmin' &&  
+                    <li className="nav-item"> 
+                        <Link className="nav-link" to={{ pathname: "/hriassist"}} state={data}>
+                        <i className="fas fa-fw fa-upload"></i>
+                        <span>HR iAssist</span>
+                        </Link>
+                    </li> 
+                }
+                {/* Nav Item - Reports*/}
+                { role === 'HRAdmin' &&  
+                <li className="nav-item">
+                <Link className="nav-link" to={{ pathname: "/reports"}} state={data} >
+                   <i className="fas fa-fw fa-chart-bar"></i>
+                   <span>Report</span>
+                 </Link>
+                </li>
+                }
             
              {/* Sidebar Toggler (Sidebar) */}
+             <br/>
              <div className="text-center d-none d-md-inline">
           <button className="rounded-circle border-0" id="sidebarToggle"></button>
         </div>
