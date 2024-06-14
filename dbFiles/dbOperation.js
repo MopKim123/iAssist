@@ -3,21 +3,25 @@ const sql = require("mssql");
 const xlsx = require("xlsx");
 
 //get employee id and password for login
-const getEmployees = async (EmployeeId, Password) => {
+const getEmployees = async (EmployeeId) => {
   try {
     let pool = await sql.connect(config);
     let result = await pool
       .request()
       .input("EmployeeId", sql.VarChar, EmployeeId)
-      .input("Password", sql.VarChar, Password)
-      .query("SELECT * FROM UserAccount WHERE EmployeeId = @EmployeeId");
+      .query(`
+        SELECT UA.*, EI.EmployeeStatus, EI.Facility 
+        FROM UserAccount UA
+        JOIN EmployeeInfo EI ON UA.EmployeeId = EI.EmployeeId
+        WHERE UA.EmployeeId = @EmployeeId
+      `);
 
     return result.recordset;
   } catch (error) {
     throw error;
   }
 };
-// Get user employee id for autofill function
+//to check if employee data exists
 const getUserEmpId = async (employeeId) => {
   try {
     let pool = await sql.connect(config);
@@ -33,6 +37,46 @@ const getUserEmpId = async (employeeId) => {
   } catch (error) {
     console.error("Error fetching employee id:", error);
     throw new Error("Error fetching employee id");
+  }
+};
+//check if  emp id and email address exist
+const checkEmployeeAndEmail = async (employeeId, email) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .input("EmailAddress", sql.VarChar, email)
+      .query(`
+          SELECT * FROM EmpPersonalDetails 
+          WHERE EmployeeId = @EmployeeId AND EmailAddress = @EmailAddress;
+      `);
+    
+    // Return true if employee ID and email exist, otherwise false
+    return result.recordset.length > 0;
+  } catch (error) {
+    console.error("Error checking employee ID and email:", error);
+    throw new Error("Error checking employee ID and email");
+  }
+};
+
+// Database operation to reset the user's password
+const resetPassword = async (email, newPassword) => {
+  try {
+    let pool = await sql.connect(config);
+    await pool.request()
+      .input("EmailAddress", sql.VarChar, email)
+      .input("Password", sql.VarChar, newPassword)
+      .query(`
+        UPDATE UserAccount SET Password = @Password WHERE EmailAddress = @EmailAddress;
+      `);
+    
+    // If the query was successful, return true
+    return true;
+  } catch (error) {
+    console.error("Error resetting password in the database:", error);
+    // If the query failed, return false
+    return false;
   }
 };
 // Database operation to retrieve employee by ID
@@ -219,7 +263,6 @@ await pool
     // Insert into DeliveryUnit table
     await pool
       .request()
-      // .input("DUID", newHire.DUID)
       .input("EmployeeId", newHire.EmployeeId)
       .input("DUCode", newHire.DUCode)
       .input("DUName", newHire.DUName)
@@ -370,9 +413,6 @@ await pool
   `);
 
     //insertion of user account
-    //  const uniquePassword = generateUniquePassword();
-    //  const hashedPassword = await bcrypt.hash(uniquePassword, 10);
-
     await pool
       .request()
       .input('EmployeeId', newHire.EmployeeId)
@@ -388,40 +428,6 @@ await pool
         VALUES (@EmployeeId, @LastName, @FirstName, @MiddleName, @EmailAddress, @Password, @Role)
       `);
 
-    // const emailSubject = 'Account Created';
-    // const emailText = `Your account has been created. 
-    //                     UserID: ${newHire.EmployeeId} 
-    //                     Password: ${uniquePassword} 
-    //                     Please change your password upon initial login. 
-    //                     Tool Link: [your-tool-link]`;
-
-    // await sendEmail(newHire.EmailAddress, emailSubject, emailText);
-
-    // if (newHire.Role === 'HRAdmin') {
-    //   const defaultPassword = 'Test@12345';
-    //   const hashedDefaultPassword = await bcrypt.hash(defaultPassword, 10);
-
-    //   await pool
-    //     .request()
-    //     .input('EmployeeId', newHire.EmployeeId)
-    //     .input('Role', 'HRAdmin')
-    //     .input('Password', hashedDefaultPassword)
-    //     .query(`
-    //       UPDATE UserAccount
-    //       SET Role = @Role, Password = @Password
-    //       WHERE EmployeeId = @EmployeeId
-    //     `);
-
-    //   const adminEmailSubject = 'HR Admin Role Assigned';
-    //   const adminEmailText = `You have been assigned as HR Admin. 
-    //                           UserID: ${newHire.EmployeeId} 
-    //                           Password: ${defaultPassword} 
-    //                           Please change your password upon initial login. 
-    //                           Admin Dashboard Link: [your-admin-dashboard-link]`;
-
-    //   await sendEmail(newHire.EmailAddress, adminEmailSubject, adminEmailText);
-    // }
-
     return 'Data successfully uploaded and account has been created.';
   } catch (error) {
     console.error('Error occurred while inserting new data:', error);
@@ -431,7 +437,7 @@ await pool
 //update password / changing of password
 const updateUserPassword = async (employeeId, newPassword) => {
   try {
-    const pool = await sql.connect(config); // Establish DB connection
+    const pool = await sql.connect(config); 
     const request = pool.request();
     const query = `
       UPDATE UserAccount 
@@ -547,6 +553,7 @@ const getEmployeeById = async (employeeId) => {
           A.LandMark AS EmContactLandMark,
           A.IsPermanent AS Is_Permanent,
           A.IsEmergency AS Is_Emergency,
+          UA.Role,
           UA.ProfilePhoto -- Include ProfilePhoto from UserAccount table
         FROM EmpPersonalDetails AS PD
         INNER JOIN EmployeeInfo AS EI ON PD.EmployeeId = EI.EmployeeId
@@ -576,6 +583,43 @@ const getEmployeeById = async (employeeId) => {
     throw error;
   }
 }
+// // Update password query 
+// const updateEmployeePassword = async (employeeId, hashedPassword) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar, employeeId)
+//       .input("Password", sql.VarChar, hashedPassword) // Store hashed password
+//       .query(`
+//         UPDATE UserAccount
+//         SET Password = @Password
+//         WHERE EmployeeId = @EmployeeId;
+//       `);
+//   } catch (error) {
+//     console.error("Error updating password:", error);
+//     throw error;
+//   }
+// }
+// // Update role type query 
+// const updateEmployeeRole = async (employeeId, role) => {
+//   try {
+//     let pool = await sql.connect(config);
+//     await pool
+//       .request()
+//       .input("EmployeeId", sql.VarChar, employeeId)
+//       .input("Role", sql.VarChar, role)
+//       .query(`
+//         UPDATE UserAccount
+//         SET Role = @Role
+//         WHERE EmployeeId = @EmployeeId;
+//       `);
+//   } catch (error) {
+//     console.error("Error updating role:", error);
+//     throw error;
+//   }
+// }
+
 //update employee personal details  by id
 const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -583,28 +627,28 @@ const updateEmployeeById = async (employeeId, updatedEmployeeData) => {
     let result = await pool
       .request()
       .input("EmployeeId", sql.VarChar, employeeId)
-      .input("EmployeeName", sql.VarChar(255), updatedEmployeeData.EmployeeName)
-      .input("LastName", sql.VarChar(255), updatedEmployeeData.LastName)
-      .input("FirstName", sql.VarChar(255), updatedEmployeeData.FirstName)
-      .input("MiddleName", sql.VarChar(255), updatedEmployeeData.MiddleName)
-      .input("MaidenName", sql.VarChar(255), updatedEmployeeData.MaidenName)
-      .input("Birthdate", sql.VarChar(255), updatedEmployeeData.Birthdate)
-      .input("Age", sql.VarChar(255), updatedEmployeeData.Age)
-      .input("BirthMonth", sql.VarChar(255), updatedEmployeeData.BirthMonth)
-      .input("AgeBracket", sql.VarChar(255), updatedEmployeeData.AgeBracket)
-      .input("Gender", sql.VarChar(255), updatedEmployeeData.Gender)
+      .input("EmployeeName", sql.VarChar(255), updatedEmployeeData.EmployeeName.trim())
+      .input("LastName", sql.VarChar(255), updatedEmployeeData.LastName.trim())
+      .input("FirstName", sql.VarChar(255), updatedEmployeeData.FirstName.trim())
+      .input("MiddleName", sql.VarChar(255), updatedEmployeeData.MiddleName.trim())
+      .input("MaidenName", sql.VarChar(255), updatedEmployeeData.MaidenName.trim())
+      .input("Birthdate", sql.VarChar(255), updatedEmployeeData.Birthdate.trim())
+      .input("Age", sql.VarChar(255), updatedEmployeeData.Age.trim())
+      .input("BirthMonth", sql.VarChar(255), updatedEmployeeData.BirthMonth.trim())
+      .input("AgeBracket", sql.VarChar(255), updatedEmployeeData.AgeBracket.trim())
+      .input("Gender", sql.VarChar(255), updatedEmployeeData.Gender.trim())
       .input(
         "MaritalStatus",
         sql.VarChar(255),
-        updatedEmployeeData.MaritalStatus
+        updatedEmployeeData.MaritalStatus.trim()
       )
-      .input("SSS", sql.VarChar(255), updatedEmployeeData.SSS)
-      .input("PHIC", sql.VarChar(255), updatedEmployeeData.PHIC)
-      .input("HDMF", sql.VarChar(255), updatedEmployeeData.HDMF)
-      .input("TIN", sql.VarChar(255), updatedEmployeeData.TIN)
-      .input("EmailAddress", sql.VarChar(255), updatedEmployeeData.EmailAddress)
-      .input("HmoProvider", sql.VarChar(255), updatedEmployeeData.HmoProvider)
-      .input("HmoPolicyNumber", sql.VarChar(255), updatedEmployeeData.HmoPolicyNumber)
+      .input("SSS", sql.VarChar(255), updatedEmployeeData.SSS.trim())
+      .input("PHIC", sql.VarChar(255), updatedEmployeeData.PHIC.trim())
+      .input("HDMF", sql.VarChar(255), updatedEmployeeData.HDMF.trim())
+      .input("TIN", sql.VarChar(255), updatedEmployeeData.TIN.trim())
+      .input("EmailAddress", sql.VarChar(255), updatedEmployeeData.EmailAddress.trim())
+      .input("HmoProvider", sql.VarChar(255), updatedEmployeeData.HmoProvider.trim())
+      .input("HmoPolicyNumber", sql.VarChar(255), updatedEmployeeData.HmoPolicyNumber.trim())
       .query(`
           UPDATE EmpPersonalDetails 
           SET EmployeeId = @EmployeeId,
@@ -785,10 +829,62 @@ const updateEmployeeInfoById = async (employeeId, updatedEmployeeData) => {
           Is_Active = @Is_Active
           WHERE EmployeeId = @EmployeeId
         `);
+         //update employee user account role
+         await pool
+         .request()
+         .input("EmployeeId", sql.VarChar, employeeId)
+         .input("Role", sql.VarChar(255), updatedEmployeeData.Role)
+         .query(`
+             UPDATE UserAccount 
+             SET Role = @Role
+             WHERE EmployeeId = @EmployeeId
+           `);
         
     return result;
   } catch (error) {
     console.error("Error updating employee information by ID:", error);
+    throw error;
+  }
+};
+// SQL query to insert a record into the History table
+const addToHistory = async (historyData) => {
+  try {
+      let pool = await sql.connect(config);
+      let result = await pool.request()
+          .input('EmployeeName', sql.VarChar(100), historyData.EmployeeName)
+          .input('Action', sql.VarChar(100), historyData.Action)
+          .input('FieldName', sql.VarChar(100), historyData.FieldName)
+          .input('OldValue', sql.VarChar(100), historyData.OldValue)
+          .input('NewValue', sql.VarChar(100), historyData.NewValue)
+          .input('DateCreated', sql.DateTime, historyData.DateCreated)
+          .input('UpdatedBy', sql.VarChar(100), historyData.UpdatedBy)
+          .input('EmployeeId', sql.VarChar(100), historyData.EmployeeId)
+          .query(`
+              INSERT INTO History (EmployeeName, Action, FieldName, OldValue, NewValue, DateCreated, UpdatedBy, EmployeeId)
+              VALUES (@EmployeeName, @Action, @FieldName, @OldValue, @NewValue, @DateCreated, @UpdatedBy, @EmployeeId)
+          `);
+
+      return result;
+  } catch (error) {
+      console.error('Error adding record to History:', error);
+      throw error;
+  }
+};
+//retrieve employee info and user account
+const getEmployeeInfoById = async (employeeId) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool.request()
+      .input('EmployeeId', sql.VarChar, employeeId)
+      .query(`
+        SELECT e.*, ua.Role
+        FROM EmployeeInfo e
+        JOIN UserAccount ua ON e.EmployeeId = ua.EmployeeId
+        WHERE e.EmployeeId = @EmployeeId
+      `);
+    return result.recordset[0];
+  } catch (error) {
+    console.error('Error fetching employee information by ID:', error);
     throw error;
   }
 };
@@ -1023,7 +1119,6 @@ const updateDependentById = async (dependentId, updatedDependentData) => {
     throw error;
   }
 };
-
 // Function to insert a new dependent record into the database
 const insertDependent = async (employeeId, newDependentData) => {
   try {
@@ -1049,9 +1144,14 @@ const insertDependent = async (employeeId, newDependentData) => {
       .input("CompanyPaid", sql.VarChar(255), newDependentData.CompanyPaid)
       .input("HMOProvider", sql.VarChar(255), newDependentData.HMOProvider)
       .input("HMOPolicyNumber", sql.VarChar(255), newDependentData.HMOPolicyNumber)
+      .input("CreatedAt", sql.DateTime, new Date())
       .query(`
-          INSERT INTO Dependent (EmployeeId, FullName, PhoneNum, Relationship, DateOfBirth, Occupation, Address, City, DepProvince, PostalCode, Beneficiary, BeneficiaryDate, TypeOfCoverage, Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, HMOPolicyNumber)
-          VALUES (@EmployeeId, @FullName, @PhoneNum, @Relationship, @DateOfBirth, @Occupation, @Address, @City, @DepProvince, @PostalCode, @Beneficiary, @BeneficiaryDate, @TypeOfCoverage, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, @HMOPolicyNumber)
+          INSERT INTO Dependent (EmployeeId, FullName, PhoneNum, Relationship, DateOfBirth, Occupation, Address, City, DepProvince, 
+            PostalCode, Beneficiary, BeneficiaryDate, TypeOfCoverage, Insurance, InsuranceDate, Remarks, CompanyPaid, HMOProvider, 
+            HMOPolicyNumber, CreatedAt)
+          VALUES (@EmployeeId, @FullName, @PhoneNum, @Relationship, @DateOfBirth, @Occupation, @Address, @City, @DepProvince, @PostalCode, 
+            @Beneficiary, @BeneficiaryDate, @TypeOfCoverage, @Insurance, @InsuranceDate, @Remarks, @CompanyPaid, @HMOProvider, 
+            @HMOPolicyNumber, @CreatedAt)
         `);
 
     return result;
@@ -1080,7 +1180,6 @@ const getDependentsByEmployeeId = async (employeeId) => {
     throw error;
   }
 }
-
 //update employee product details
 const updateProductById = async (employeeId, updatedEmployeeData) => {
   try {
@@ -1273,7 +1372,6 @@ const deleteEmployeeById = async (employeeId) => {
     throw error;
   }
 };
-
 //route to delete employee by ID from the database
 const deleteUsersById = async (userId) => {
   try {
@@ -1450,7 +1548,8 @@ const deleteAllEmployeeData = async () => {
     await deleteAllFromTable(transaction, "Education");
     await deleteAllFromTable(transaction, "Address");
     await deleteAllFromTable(transaction, "UserAccount");
-    // await deleteAllFromTable(transaction, "CompensationBenefits");
+    await deleteAllFromTable(transaction, "History");
+    await deleteAllFromTable(transaction, "CompensationBenefits");
     
     await deleteAllFromTable(transaction, "EmpPersonalDetails");
 
@@ -1496,11 +1595,13 @@ const insertCompBen = async (employeeId, newCompBenData) => {
       .input("LeaveDays", sql.VarChar(255), newCompBenData.LeaveDays)
       .input("LaundryAllowance", sql.VarChar(255), newCompBenData.LaundryAllowance)
       .input("CommAllowance", sql.VarChar(255), newCompBenData.CommAllowance)
+      .input("CommAllowanceType", sql.VarChar(255), newCompBenData.CommAllowanceType)
       .input("CashGift", sql.VarChar(255), newCompBenData.CashGift)
       .input("MedicalInsurance", sql.VarChar(255), newCompBenData.MedicalInsurance)
       .input("FreeHMODependent", sql.VarChar(255), newCompBenData.FreeHMODependent)
       .input("MBL", sql.VarChar(255), newCompBenData.MBL)
       .input("LifeInsurance", sql.VarChar(255), newCompBenData.LifeInsurance)
+      .input("Beneficiaries", sql.VarChar(255), newCompBenData.Beneficiaries)
       .input("PersonalAccidentInsuranceBenefit", sql.VarChar(255), newCompBenData.PersonalAccidentInsuranceBenefit)
       .input("PWDIDNumber", sql.VarChar(255), newCompBenData.PWDIDNumber)
       .input("TendopayRegistered", sql.VarChar(255), newCompBenData.TendopayRegistered)
@@ -1516,22 +1617,153 @@ const insertCompBen = async (employeeId, newCompBenData) => {
       .input("Stat_PHICNumber", sql.VarChar(255), newCompBenData.Stat_PHICNumber)
       .input("Stat_PHICMonthlyContribution", sql.VarChar(255), newCompBenData.Stat_PHICMonthlyContribution)
       .input("Stat_TINNumber", sql.VarChar(255), newCompBenData.Stat_TINNumber)
+      .input("CreatedAt", sql.DateTime, new Date())
       .query(`
           INSERT INTO CompensationBenefits (EmployeeId, Salary, DailyEquivalent, MonthlyEquivalent, AnnualEquivalent, RiceMonthly, 
-            RiceAnnual, RiceDifferentialAnnual, UniformAnnual, LeaveDays, LaundryAllowance, CommAllowance, CashGift, MedicalInsurance, FreeHMODependent, 
-            MBL, LifeInsurance, PersonalAccidentInsuranceBenefit, PWDIDNumber, TendopayRegistered, CanteenUID, CanteenCreditLimit, CanteenBarcode, 
+            RiceAnnual, RiceDifferentialAnnual, UniformAnnual, LeaveDays, LaundryAllowance, CommAllowance, CommAllowanceType, 
+            CashGift, MedicalInsurance, FreeHMODependent, MBL, LifeInsurance, Beneficiaries, PersonalAccidentInsuranceBenefit, PWDIDNumber, 
+            TendopayRegistered, CanteenUID, CanteenCreditLimit, CanteenBarcode, 
             DAPMembershipNumber, DAPDependents, Stat_SSSNumber, Stat_SSSMonthlyContribution, Stat_PagIbigNumber, 
-            Stat_PagIbigMonthlyContribution, Stat_PHICNumber, Stat_PHICMonthlyContribution, Stat_TINNumber )
+            Stat_PagIbigMonthlyContribution, Stat_PHICNumber, Stat_PHICMonthlyContribution, Stat_TINNumber, CreatedAt )
           VALUES (@EmployeeId, @Salary, @DailyEquivalent, @MonthlyEquivalent, @AnnualEquivalent, @RiceMonthly, @RiceAnnual,
-             @RiceDifferentialAnnual, @UniformAnnual, @LeaveDays, @LaundryAllowance, @CommAllowance, @CashGift, @MedicalInsurance, 
-             @FreeHMODependent, @MBL, @LifeInsurance, @PersonalAccidentInsuranceBenefit, @PWDIDNumber, @TendopayRegistered, @CanteenUID, @CanteenCreditLimit, 
-             @CanteenBarcode, @DAPMembershipNumber, @DAPDependents, @Stat_SSSNumber, @Stat_SSSMonthlyContribution, @Stat_PagIbigNumber, 
-             @Stat_PagIbigMonthlyContribution, @Stat_PHICNumber, @Stat_PHICMonthlyContribution, @Stat_TINNumber)
+             @RiceDifferentialAnnual, @UniformAnnual, @LeaveDays, @LaundryAllowance, @CommAllowance, @CommAllowanceType, @CashGift, @MedicalInsurance, 
+             @FreeHMODependent, @MBL, @LifeInsurance, @Beneficiaries, @PersonalAccidentInsuranceBenefit, @PWDIDNumber, @TendopayRegistered, @CanteenUID,  
+             @CanteenCreditLimit, @CanteenBarcode, @DAPMembershipNumber, @DAPDependents, @Stat_SSSNumber, @Stat_SSSMonthlyContribution, @Stat_PagIbigNumber, 
+             @Stat_PagIbigMonthlyContribution, @Stat_PHICNumber, @Stat_PHICMonthlyContribution, @Stat_TINNumber, @CreatedAt )
         `);
 
     return result;
   } catch (error) {
     console.error("Error inserting compensation benefit record:", error);
+    throw error;
+  }
+};
+// Retrieve compensation benefits by Employee ID from the database
+const getCompBenByEmployeeId = async (employeeId) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .query(`
+        SELECT *
+        FROM CompensationBenefits
+        WHERE EmployeeId = @EmployeeId;
+      `);
+
+      console.log(`Query result for Employee ID ${employeeId}:`, result.recordset);
+
+    return result.recordset; // Return compensation benefits found with the given EmployeeId
+
+  } catch (error) {
+    console.error("Error fetching compensation benefits by Employee ID:", error);
+    throw error;
+  }
+}
+ //update employee compensation benefits details
+ const updateCompBenById = async (compBenId, updatedcompBenData) => {
+  try {
+    let pool = await sql.connect(config);
+    let result = await pool
+      .request()
+      .input("CompBenId", sql.Int, compBenId)
+      .input("Salary", sql.VarChar(255), updatedcompBenData.Salary)
+      .input("DailyEquivalent", sql.VarChar(255), updatedcompBenData.DailyEquivalent)
+      .input("MonthlyEquivalent", sql.VarChar(255), updatedcompBenData.MonthlyEquivalent)
+      .input("AnnualEquivalent", sql.VarChar(255), updatedcompBenData.AnnualEquivalent)
+      .input("RiceMonthly", sql.VarChar(255), updatedcompBenData.RiceMonthly)
+      .input("RiceAnnual", sql.VarChar(255), updatedcompBenData.RiceAnnual)
+      .input("RiceDifferentialAnnual", sql.VarChar(255), updatedcompBenData.RiceDifferentialAnnual)
+      .input("LeaveDays", sql.VarChar(255), updatedcompBenData.LeaveDays)
+      .input("LaundryAllowance", sql.VarChar(255), updatedcompBenData.LaundryAllowance)
+      .input("CommAllowance", sql.VarChar(255), updatedcompBenData.CommAllowance)
+      .input("CommAllowanceType", sql.VarChar(255), updatedcompBenData.CommAllowanceType)
+      .input("CashGift", sql.VarChar(255), updatedcompBenData.CashGift)
+      .input("MedicalInsurance", sql.VarChar(255), updatedcompBenData.MedicalInsurance)
+      .input("FreeHMODependent", sql.VarChar(255), updatedcompBenData.FreeHMODependent)
+      .input("MBL", sql.VarChar(255), updatedcompBenData.MBL)
+      .input("LifeInsurance", sql.VarChar(255), updatedcompBenData.LifeInsurance)
+      .input("Beneficiaries", sql.VarChar(255), updatedcompBenData.Beneficiaries)
+      .input("PersonalAccidentInsuranceBenefit", sql.VarChar(255), updatedcompBenData.PersonalAccidentInsuranceBenefit)
+      .input("PWDIDNumber", sql.VarChar(255), updatedcompBenData.PWDIDNumber)
+      .input("TendopayRegistered", sql.VarChar(255), updatedcompBenData.TendopayRegistered)
+      .input("CanteenUID", sql.VarChar(255), updatedcompBenData.CanteenUID)
+      .input("CanteenCreditLimit", sql.VarChar(255), updatedcompBenData.CanteenCreditLimit)
+      .input("CanteenBarcode", sql.VarChar(255), updatedcompBenData.CanteenBarcode)
+      .input("DAPMembershipNumber", sql.VarChar(255), updatedcompBenData.DAPMembershipNumber)
+      .input("DAPDependents", sql.VarChar(255), updatedcompBenData.DAPDependents)
+      .input("Stat_SSSNumber", sql.VarChar(255), updatedcompBenData.Stat_SSSNumber)
+      .input("Stat_SSSMonthlyContribution", sql.VarChar(255), updatedcompBenData.Stat_SSSMonthlyContribution)
+      .input("Stat_PagIbigNumber", sql.VarChar(255), updatedcompBenData.PersonalAccidentInsuranceBenefit)
+      .input("Stat_PagIbigMonthlyContribution", sql.VarChar(255), updatedcompBenData.Stat_PagIbigMonthlyContribution)
+      .input("Stat_PHICNumber", sql.VarChar(255), updatedcompBenData.Stat_PHICNumber)
+      .input("Stat_PHICMonthlyContribution", sql.VarChar(255), updatedcompBenData.Stat_PHICMonthlyContribution)
+      .input("Stat_TINNumber", sql.VarChar(255), updatedcompBenData.Stat_TINNumber)
+      .query(`
+          UPDATE CompensationBenefits 
+          SET Salary = @Salary,
+              DailyEquivalent = @DailyEquivalent,
+              MonthlyEquivalent = @MonthlyEquivalent,
+              AnnualEquivalent = @AnnualEquivalent,
+              RiceMonthly = @RiceMonthly,
+              RiceAnnual = @RiceAnnual,
+              RiceDifferentialAnnual = @RiceDifferentialAnnual,
+              LeaveDays = @LeaveDays,
+              LaundryAllowance = @LaundryAllowance,
+              CommAllowance = @CommAllowance,
+              CommAllowanceType = @CommAllowanceType,
+              CashGift = @CashGift,
+              MedicalInsurance = @MedicalInsurance,
+              FreeHMODependent = @FreeHMODependent,
+              MBL = @MBL,
+              LifeInsurance = @LifeInsurance,
+              Beneficiaries = @Beneficiaries,
+              PersonalAccidentInsuranceBenefit = @PersonalAccidentInsuranceBenefit,
+              PWDIDNumber = @PWDIDNumber,
+              TendopayRegistered = @TendopayRegistered,
+              CanteenUID = @CanteenUID,
+              CanteenCreditLimit = @CanteenCreditLimit,
+              CanteenBarcode = @CanteenBarcode,
+              DAPMembershipNumber = @DAPMembershipNumber,
+              DAPDependents = @DAPDependents,
+              Stat_SSSNumber = @Stat_SSSNumber,
+              Stat_SSSMonthlyContribution = @Stat_SSSMonthlyContribution,
+              Stat_PagIbigNumber = @Stat_PagIbigNumber,
+              Stat_PagIbigMonthlyContribution = @Stat_PagIbigMonthlyContribution,
+              Stat_PHICNumber = @Stat_PHICNumber,
+              Stat_PHICMonthlyContribution = @Stat_PHICMonthlyContribution,
+              Stat_TINNumber = Stat_TINNumber
+          WHERE CompBenId = @CompBenId
+        `);
+
+    return result;
+  } catch (error) {
+    console.error("Error updating compensation benefits by ID:", error);
+    throw error;
+  }
+};
+// Retrieve history by Employee ID from the database
+const getHistoryByEmployeeId = async (employeeId) => {
+  try {
+    // Connect to the database
+    let pool = await sql.connect(config);
+    
+    // Query history data based on employeeId
+    let result = await pool
+      .request()
+      .input("EmployeeId", sql.VarChar, employeeId)
+      .query(`
+        SELECT *
+        FROM History
+        WHERE EmployeeId = @EmployeeId;
+      `);
+
+    // Log the query result
+    console.log(`Query result for Employee ID ${employeeId}:`, result.recordset);
+
+    return result.recordset; // Return history data
+  } catch (error) {
+    console.error("Error fetching history by Employee ID:", error);
     throw error;
   }
 };
@@ -1570,5 +1802,15 @@ module.exports = {
   getDependentsByEmployeeId,
   updateDependentById,
   getAddNewContactId,
-  insertCompBen
+  insertCompBen,
+  getCompBenByEmployeeId,
+  updateCompBenById,
+  // updateEmployeePassword,
+  // updateEmployeeRole,
+  addToHistory,
+  getEmployeeInfoById,
+  checkEmployeeAndEmail,
+  resetPassword,
+  getHistoryByEmployeeId
+  // getExistingEmployeeIds
 };

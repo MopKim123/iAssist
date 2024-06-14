@@ -15,7 +15,8 @@ const Submissions = () => {
   const [pageSize] = useState(10);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
-  const EmpId = 'CTU789' 
+  const EmpId = sessionStorage.getItem("employeeId");
+ 
  
   
   const viewSubmission = (data) => {

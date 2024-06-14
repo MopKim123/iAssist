@@ -11,8 +11,7 @@ import { useState } from "react";
   const location = useLocation();
   const data = location.state; 
   const navigate = useNavigate()  
-  const role = sessionStorage.getItem("role")  
-  console.log(role);
+  const role = sessionStorage.getItem("role")   
 
   const [showPages, setShowPages] = useState(false);
   const [showLoans, setShowLoans] = useState(false);

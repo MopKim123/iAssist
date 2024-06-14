@@ -15,7 +15,7 @@ function LoginPage() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  //function that handles the login
+  //function that handles the login 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,6 +54,7 @@ function LoginPage() {
       sessionStorage.setItem("middleName", data.MiddleName);
       sessionStorage.setItem("profilePhoto", data.ProfilePhoto);
       sessionStorage.setItem("role", data.Role);
+      sessionStorage.setItem("facility", data.Facility);
 
       if (data.Role === "HRAdmin") {
         if (data.ChangePasswordRequired) {
@@ -150,8 +151,8 @@ function LoginPage() {
                 </form>
                 <hr />
                 <div className="text-center">
-                  <Link className="small" to="/changePassword">
-                    Change Password!
+                  <Link className="small" to="/forgotpassword">
+                    Forgot Password?
                   </Link>
                 </div>
                 {errorMessage && (
