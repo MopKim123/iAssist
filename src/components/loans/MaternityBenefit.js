@@ -9,29 +9,13 @@ import { variables } from '../../variables';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+
  function MaternityBenefit() {
    
-    const { employeeId } = useParams();
-    const [employeeData, setEmployeeData] = useState({
-      LastName: '',
-      FirstName: '',
-      MiddleName: '',
-      MaidenName: '',
-      Birthdate: '',
-      Age: '',
-      BirthMonth: '',
-      AgeBracket: '',
-      Aender: '',
-      MaritalStatus: '',
-      SSS: '',
-      PHIC: '',
-      HDMF: '',
-      TIN: '',
-      HRANID: '',
-      ContactNumber: '',
-      EmailAddress: '',
-      deliveryType: ''
-    });
+    const EmployeeId = sessionStorage.getItem("employeeId");
+    const Role = sessionStorage.getItem("role");
     
     const [selected, setSelected] = useState("0")
     const [thisInfo, setThisInfo] = useState({
@@ -40,119 +24,58 @@ import 'react-toastify/dist/ReactToastify.css';
       SoloParent: '',
       ProofPregnancy: '',
       HospitalRec: '',
-      DeathCert: ''
+      DeathCert: '',
+      deliveryType: ''
     });
 
+    const [showModal, setShowModal] = useState(false);
+    const handleShowModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+
+    const [SelectedLink, setSelectedLink] = useState({
+      thisSelectedLink: ''
+    });
+
+    const [currentValue, setcurrentValue] = useState({
+      currentLabel: '',
+      currentLink: ''
+    });
+
+    const [MRA, setThisMRA] = useState({
+      thisLabel: '',
+      thisLink: ''
+    });
+
+
+    const selectedMRA = (e) => {
+      e.preventDefault();
+      setcurrentValue(prevState => ({
+        ...prevState,
+        currentLabel: "SSS MRA",
+        currentLink: e.target.value
+      }));
+    };
+
     useEffect(() => {
-      // Fetch employee data based on employeeId
-      const fetchEmployeeData = async () => {
-        try {
-          const response = await fetch(variables.API_URL + 'UploadEmp/' + employeeId);
-          if (!response.ok) {
-            throw new Error('Failed to fetch employee data');
-          }
-          const data = await response.json();
-          setEmployeeData(data);
-        } catch (error) {
-          console.error('Error fetching employee data:', error);
-        }
-      };
-  
-      fetchEmployeeData();
-    }, [employeeId]);
+      // [EmployeeId];
+      handleSetLinks();
+    } );
   
     const handleInputChange = (e) => {
       
       setSelected(e.target.value);
-
       const { name, value } = e.target;
-      setEmployeeData({
-        ...employeeData,
+      setThisInfo({
+        ...thisInfo,
         [name]: value
       });
     }; 
-    // const handleFormSubmit = async (e) => {
-    //   e.preventDefault();
     
-
-    //   const formData = new FormData();
-    //   formData.append("selected", selected); // Assuming selected is defined
-    //   formData.append('Application_Form', thisInfo.Application_Form); // Assuming thisInfo.Application_Form is defined
-  
-    //   // Append other files based on selected option
-    //   if(selected === '1'){
-    //       formData.append('LiveBirthCert', thisInfo.LiveBirthCert);
-    //       formData.append('SoloParent', thisInfo.SoloParent);
-    //   } else if(selected === '2'){
-    //       formData.append('ProofPregnancy', thisInfo.ProofPregnancy);
-    //       formData.append('HospitalRec', thisInfo.HospitalRec);
-    //   } else if(selected === '3'){
-    //       formData.append('DeathCert', thisInfo.DeathCert);
-    //   }
-
-    //   try {
-    //     const response = await fetch('/MaternityBenefit', {
-    //         method: 'POST',
-    //         body: formData,
-    //     });
-    
-    //     if (response.ok) {
-    //         const jsonResponse = await response.json();
-    
-    //         console.log(jsonResponse.message);
-    //          // Emit success toast
-    //          toast.success('Submitted Successfully', {
-    //           position: "bottom-right",
-    //           autoClose: 5000,
-    //           hideProgressBar: false,
-    //           closeOnClick: true,
-    //           pauseOnHover: true,
-    //           draggable: true,
-    //           progress: undefined,
-    //           theme: "light",
-    //         });
-          
-    //         setEmployeeData({
-    //           deliveryType: ''
-    //         });
-    //         setThisInfo({
-    //           Application_Form: '',
-    //           LiveBirthCert: '',
-    //           SoloParent: '',
-    //           ProofPregnancy: '',
-    //           HospitalRec: '',
-    //           DeathCert: ''
-    //         });
-
-            
-    //         // Clear file input fields
-    //         document.getElementById('deliveryType').value = null;
-    //         setSelected("0");
-    //         document.getElementById('Application_Form').value = null;
-    
-           
-    //       } else {
-    //           console.error('Failed to upload PDF:', response.statusText);
-    //           toast.error('Failed to Submit', {
-    //               position: "bottom-right",
-    //               autoClose: 5000,
-    //               hideProgressBar: false,
-    //               closeOnClick: true,
-    //               pauseOnHover: true,
-    //               draggable: true,
-    //               progress: undefined,
-    //               theme: "light",
-    //           });
-    //       }
-    //   } catch (error) {
-    //       console.error('Error uploading PDF:', error);
-    //   }
-    // };
-
     const handleFormSubmit = async (e) => {
       e.preventDefault();
   
       const formData = new FormData();
+      formData.append('currentEmployeeId', EmployeeId);
       formData.append("selected", selected); // Assuming selected is defined
       formData.append('Application_Form', thisInfo.Application_Form); // Assuming thisInfo.Application_Form is defined
   
@@ -162,6 +85,19 @@ import 'react-toastify/dist/ReactToastify.css';
           return validFileTypes.includes(file.type);
       };
   
+      if (!validateFileType(thisInfo.Application_Form)) {
+        return toast.error('Invalid file type. Only PDF, PNG, and JPEG are allowed.', {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+        });
+    }
+    
       // Append other files based on selected option
       if (selected === '1') {
           if (!validateFileType(thisInfo.LiveBirthCert) || !validateFileType(thisInfo.SoloParent)) {
@@ -230,16 +166,14 @@ import 'react-toastify/dist/ReactToastify.css';
                   theme: "light",
               });
   
-              setEmployeeData({
-                  deliveryType: ''
-              });
               setThisInfo({
                   Application_Form: '',
                   LiveBirthCert: '',
                   SoloParent: '',
                   ProofPregnancy: '',
                   HospitalRec: '',
-                  DeathCert: ''
+                  DeathCert: '',
+                  deliveryType: ''
               });
   
               // Clear file input fields
@@ -283,10 +217,103 @@ import 'react-toastify/dist/ReactToastify.css';
     const handleDeathCert = (e) => {
       setThisInfo({ ...thisInfo, DeathCert: e.target.files[0] });
     };
+
+    const handleUpdateLinks = (e) => {
+      setSelectedLink({ ...SelectedLink, thisSelectedLink: e.target.value });
+      handleShowModal();
+    };
   
-    if (!employeeData) {
-      return <div>Loading...</div>;
+    const handleLink = async (e) => {
+      try {
+        e.preventDefault();
+
+        // Check if the textarea value is empty
+       if (currentValue.currentLink.trim() === '') {
+        // Show an error message or handle the empty case as needed
+        console.error('Textarea is empty. Please enter a URL.');
+        toast.error('Please enter a URL', {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+        });
+        return; // Exit the function if the textarea is empty
     }
+  
+        const formData = new FormData();
+        formData.append("updatethisLabel", currentValue.currentLabel);
+        formData.append("updatethisLink", currentValue.currentLink);
+        
+        const response = await fetch('/UpdateLink', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (response.ok) {
+          const jsonResponse = await response.json();
+  
+          console.log(jsonResponse.message);
+  
+          toast.success('Thank you! Your request has been submitted.', {
+              position: "bottom-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+          });
+
+          handleSetLinks();
+          handleCloseModal();
+        } else {
+            console.error('Failed to submit request:', response.statusText);
+            toast.error('Failed to Submit', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
+      } catch (error) {
+          console.error('Error fetching links:', error);
+      }
+    };
+  
+    const handleSetLinks = async () => {
+      try {
+          const response = await fetch('/setLink', {
+              method: 'POST'
+          });
+  
+          if (response.ok) {
+              const jsonResponse = await response.json();
+              // console.log(jsonResponse.message);
+  
+              // Handle the received data as needed
+              const url = jsonResponse.data;
+              
+              setThisMRA({
+                thisLabel: url[5].LinkName,
+                thisLink: url[5].LinkURL
+              });
+              
+              
+          }
+        } catch (error) {
+            console.error('Error fetching links:', error);
+        }
+      };
+  
     return (
       <div id="wrapper">
           <Navbar />
@@ -316,8 +343,13 @@ import 'react-toastify/dist/ReactToastify.css';
                                       <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                   </div>
                                       <button style={{ fontSize: '12px', border: 'none', background: 'none', marginBottom: '15px' }} type="button">
-                                        <a href="https://www.sss.gov.ph/sss/DownloadContent?fileName=SIC_01242.pdf" target="_blank" rel="noopener noreferrer">Please see link for the steps/process</a>
+                                        <a href={MRA.thisLink} target="_blank" rel="noopener noreferrer">Please see link for the steps/process</a>
                                       </button>
+                                      {Role !== 'Employee' && (
+                                        <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showMaternityReimbursementApplication" onClick={handleUpdateLinks}>
+                                          Update 
+                                        </button>
+                                      )}
                                 </div>
                               </div>
                             </div>
@@ -342,7 +374,7 @@ import 'react-toastify/dist/ReactToastify.css';
                                     <div className="d-flex justify-content-left">
                                       <div className="form-group">
                                         <label htmlFor="deliveryType">Type of Delivery</label>
-                                        <select className="form-control" id="deliveryType" name="deliveryType" value={employeeData.deliveryType} onChange={handleInputChange}>
+                                        <select className="form-control" id="deliveryType" name="deliveryType" value={thisInfo.deliveryType} onChange={handleInputChange}>
                                           <option value="0" >Select Type</option>
                                           <option value="1">Live Child Birth</option>
                                           <option value="2">Miscarriage/ Emergency Termination of Pregnancy/ Ectopic Pregnancy</option>
@@ -443,9 +475,66 @@ import 'react-toastify/dist/ReactToastify.css';
                 pauseOnHover
                 theme="light"
             />
+            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header >
+              <Modal.Title>Update Link</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {SelectedLink.thisSelectedLink === "showMaternityReimbursementApplication" ? (
+                  <form onSubmit={handleLink}>
+                    {/* Page content begins here */}
+                          <div className="container-fluid">
+                            <div className="row justify-content-center">
+                                <div className="col-xl-12 col-lg-8">
+                                    {/* First Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 text-primary">SSS Maternity Reimbursement Application Form</h6>
+                                        </div>
+                                        {/* Card Body */}    
+                                    </div>
+                                    {/* Second Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 font-weight-bold text-primary">URL / Link</h6>
+                                        </div>
+                                        {/* Card Body */}
+                                        <div className="card-body">
+                                            <div className="tab-content">
+                                                <textarea
+                                                    className="form-control text-gray-700"
+                                                    style={{ height: '100px' }} // This line sets the height to 100px
+                                                    value={currentValue.currentLink}
+                                                    onChange={selectedMRA}
+                                                    placeholder={MRA.thisLink}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      {/* Page content ends here */}
+                      <button className="btn btn-primary d-block mx-auto loan-btn">Update</button>
+                  </form>
+                ) : (
+                  <div>
+                    <p>No specific link selected.</p>
+                  </div>
+                )}
+                <label style={{fontSize: '12px'}}>Note: Before you paste your link, please make sure to copy the entire URL or link.</label>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                Close
+              </Button>
+              {/* Add any additional buttons or actions here */}
+            </Modal.Footer>
+          </Modal>
       </div>
   );
 }
 
 export default MaternityBenefit;
-

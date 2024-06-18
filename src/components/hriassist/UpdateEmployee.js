@@ -11,26 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function UpdateEmployee() {
 
-    const { employeeId } = useParams();
-    const [employeeData, setEmployeeData] = useState({
-        LastName: '',
-        FirstName: '',
-        MiddleName: '',
-        MaidenName: '',
-        Birthdate: '',
-        Age: '',
-        BirthMonth: '',
-        AgeBracket: '',
-        Aender: '',
-        MaritalStatus: '',
-        SSS: '',
-        PHIC: '',
-        HDMF: '',
-        TIN: '',
-        HRANID: '',
-        ContactNumber: '',
-        EmailAddress: ''
-    });
+    const EmployeeId = sessionStorage.getItem("employeeId");
 
     const [thisInfo, setThisInfo] = useState({
         ReasonForInfoUpdate: "",
@@ -42,10 +23,15 @@ function UpdateEmployee() {
         OtherContract: ""
     });
 
+    // useEffect(() => {
+    //     [EmployeeId];
+    // });
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-
+        formData.append('currentEmployeeId', EmployeeId);
+        
         const isValidFileType = (file) => {
             const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
             return allowedTypes.includes(file.type);
@@ -204,10 +190,6 @@ function UpdateEmployee() {
         setThisInfo({ ...thisInfo, OtherContract: e.target.files[0] });
     };
     
-
-    if (!employeeData) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <div id="wrapper">

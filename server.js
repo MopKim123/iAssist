@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
+// const upload = multer();
 const upload = multer({ dest: 'uploads/' }); // Specify upload directory
 exports.upload = upload;
 // Multer storage configuration
@@ -302,6 +303,42 @@ app.get('/api/checkExistingEmployeeId/:employeeId', async (req, res) => {
   }
 });
 // Backend API endpoint to check if an employee ID exists
+app.post('/api/checkEmployeeAndEmail', async (req, res) => {
+  try {
+    const { employeeId, email } = req.body;
+    // Perform a query to check if the employeeId and email exist in the database
+    const existingEmployee = await dbOperation.checkEmployeeAndEmail(employeeId, email);
+    if (existingEmployee) {
+      res.status(200).json({ exists: true });
+    } else {
+      res.status(200).json({ exists: false });
+    }
+  } catch (error) {
+    console.error('Error checking employee ID and email:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+// Backend API endpoint to reset the password
+app.post('/api/resetPassword', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    // Update the user's password in the database
+    const result = await dbOperation.resetPassword(email, newPassword);
+
+    // Check if the password was successfully updated
+    if (result) {
+      res.status(200).json({ message: "Password reset successfully." });
+    } else {
+      res.status(400).json({ error: "Unable to reset password. Please try again." });
+    }
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Backend API endpoint to check if an employee ID exists
 app.get('/api/checkEmployeeId/:employeeId', async (req, res) => {
   try {
     const employeeId = req.params.employeeId;
@@ -336,56 +373,116 @@ app.post('/register', async (req, res) => {
 });
 
 //post endpoint for user login
-  app.post('/login', async (req, res) => {
-    const { EmployeeId, Password } = req.body;
-    console.log('Login attempt:', { EmployeeId, Password });
-  
-    try {
-      // Check for static credentials
-      if (EmployeeId === STATIC_EMPLOYEE_ID) {
-        if (Password === ADMIN_PASSWORD) {
-          res.status(200).json({
-            EmployeeId: STATIC_EMPLOYEE_ID,
-            Role: 'HRAdmin'
-          });
-          return;
-        } else if (Password === EMPLOYEE_PASSWORD) {
-          res.status(200).json({
-            EmployeeId: STATIC_EMPLOYEE_ID,
-            Role: 'Employee'
-          });
-          return;
-        } else {
-          res.status(401).json({ error: 'Incorrect employee id or password' });
-          return;
-        }
-      }
-  
-      // Retrieve user from the database based on EmployeeId
-      const users = await dbOperation.getEmployees(EmployeeId);
-      if (users.length > 0) {
-        const user = users[0];
-        console.log('User found:', user);
-  
-        // Compare provided password with the hashed password stored in the database
-        const isValidPassword = await bcrypt.compare(Password, user.Password);
-        console.log('Password valid:', isValidPassword);
-  
-        if (isValidPassword) {
-          res.status(200).json(user);
-        } else {
-          console.log('Password mismatch:', { provided: Password, stored: user.Password });
-         // alert('Password mismatch. Please check your inputted password!');
-          res.status(401).json({ error: 'Incorrect employee id or password' });
-        }
+app.post('/login', async (req, res) => {
+  const { EmployeeId, Password } = req.body;
+  console.log('Login attempt:', { EmployeeId, Password });
+
+  try {
+    // Check for static credentials
+    if (EmployeeId === STATIC_EMPLOYEE_ID) {
+      if (Password === ADMIN_PASSWORD) {
+        res.status(200).json({
+          EmployeeId: STATIC_EMPLOYEE_ID,
+          Role: 'HRAdmin'
+        });
+        return;
+      } else if (Password === EMPLOYEE_PASSWORD) {
+        res.status(200).json({
+          EmployeeId: STATIC_EMPLOYEE_ID,
+          Role: 'Employee'
+        });
+        return;
       } else {
-        res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
+        res.status(401).json({ error: 'Incorrect employee id or password' });
+        return;
       }
-    } catch (error) {
-      console.error('Login Failed:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
+
+    // Retrieve user from the database based on EmployeeId
+    const users = await dbOperation.getEmployees(EmployeeId);
+    if (users.length > 0) {
+      const user = users[0];
+      console.log('User found:', user);
+
+      // Check if the employee status is Active
+      // if (user.EmployeeStatus !== 'Active') {
+      //   res.status(401).json({ error: `Your account status is currently ${user.EmployeeStatus}. Please contact HRAdmin for assistance.` });
+      //   return;
+      // }
+      if (user.EmployeeStatus == 'Separated' || user.EmployeeStatus == 'Inactive - Absent Without Leave') {
+        res.status(401).json({ error: `Your account status is currently ${user.EmployeeStatus}. Please contact HRAdmin for assistance.` });
+        return;
+      }
+
+      // Compare provided password with the hashed password stored in the database
+      const isValidPassword = await bcrypt.compare(Password, user.Password);
+      console.log('Password valid:', isValidPassword);
+
+      if (isValidPassword) {
+        res.status(200).json(user);
+      } else {
+        console.log('Password mismatch:', { provided: Password, stored: user.Password });
+        res.status(401).json({ error: 'Incorrect employee id or password' });
+      }
+    } else {
+      res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
+    }
+  } catch (error) {
+    console.error('Login Failed:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+  // app.post('/login', async (req, res) => {
+  //   const { EmployeeId, Password } = req.body;
+  //   console.log('Login attempt:', { EmployeeId, Password });
+  
+  //   try {
+  //     // Check for static credentials
+  //     if (EmployeeId === STATIC_EMPLOYEE_ID) {
+  //       if (Password === ADMIN_PASSWORD) {
+  //         res.status(200).json({
+  //           EmployeeId: STATIC_EMPLOYEE_ID,
+  //           Role: 'HRAdmin'
+  //         });
+  //         return;
+  //       } else if (Password === EMPLOYEE_PASSWORD) {
+  //         res.status(200).json({
+  //           EmployeeId: STATIC_EMPLOYEE_ID,
+  //           Role: 'Employee'
+  //         });
+  //         return;
+  //       } else {
+  //         res.status(401).json({ error: 'Incorrect employee id or password' });
+  //         return;
+  //       }
+  //     }
+  
+  //     // Retrieve user from the database based on EmployeeId
+  //     const users = await dbOperation.getEmployees(EmployeeId);
+  //     if (users.length > 0) {
+  //       const user = users[0];
+  //       console.log('User found:', user);
+  
+  //       // Compare provided password with the hashed password stored in the database
+  //       const isValidPassword = await bcrypt.compare(Password, user.Password);
+  //       console.log('Password valid:', isValidPassword);
+  
+  //       if (isValidPassword) {
+  //         res.status(200).json(user);
+  //       } else {
+  //         console.log('Password mismatch:', { provided: Password, stored: user.Password });
+  //        // alert('Password mismatch. Please check your inputted password!');
+  //         res.status(401).json({ error: 'Incorrect employee id or password' });
+  //       }
+  //     } else {
+  //       res.status(401).json({ error: 'User not found or invalid credentials. Register your account!' });
+  //     }
+  //   } catch (error) {
+  //     console.error('Login Failed:', error);
+  //     res.status(500).json({ error: 'Internal Server Error' });
+  //   }
+  // });
   // Change password endpoint
   app.post('/changePassword', async (req, res) => {
     const { EmployeeId, CurrentPassword, NewPassword } = req.body;
@@ -418,6 +515,8 @@ app.post('/register', async (req, res) => {
     }
   });
   
+// Multer storage configuration
+// const upload = multer();
 // API endpoint to update profile photo
 app.post('/api/updatePhoto/:employeeId', upload.single('profilePhoto'), async (req, res) => {
   try {
@@ -470,27 +569,27 @@ app.get('/api/getUserData/:employeeId', async (req, res) => {
   }
 });
 
-// POST endpoint to handle Excel data upload
-app.post('/upload', async (req, res) => {
-  const excelData = req.body; // Assuming excelData is sent as JSON
+  // POST endpoint to handle Excel data upload
+  app.post('/upload', async (req, res) => {
+    const excelData = req.body; // Assuming excelData is sent as JSON
 
-  try {
-    for (const row of excelData) {
-      // Hash the password before storing it in the database
-      const hashedPassword = await bcrypt.hash(row.Password, 10);
+    try {
+      for (const row of excelData) {
+        // Hash the password before storing it in the database
+        const hashedPassword = await bcrypt.hash(row.Password, 10);
 
-      // Insert row data along with the hashed password into the database
-      await dbOperation.insertNewHire(row, hashedPassword);
-      console.log('Employee inserted:', row);
+        // Insert row data along with the hashed password into the database
+        await dbOperation.insertNewHire(row, hashedPassword);
+        console.log('Employee inserted:', row);
+      }
+
+      // Respond with success message
+      res.status(200).json({ message: 'Data uploaded successfully' });
+    } catch (error) {
+      console.error("Error occurred while inserting data:", error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-
-    // Respond with success message
-    res.status(200).json({ message: 'Data uploaded successfully' });
-  } catch (error) {
-    console.error("Error occurred while inserting data:", error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+  });
 
 // Endpoint to retrieve employee data
 app.get('/newHireEmp', async (req, res) => {
@@ -539,6 +638,42 @@ app.get('/retrieve/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// Update password endpoint
+// app.post('/update/password/:employeeId', async (req, res) => {
+//   const { employeeId } = req.params;
+//   const { Password } = req.body;
+
+//   try {
+//     // Hash the password
+//     const hashedPassword = await bcrypt.hash(Password, 10);
+
+//     // Perform the update operation in your database
+//     await dbOperation.updateEmployeePassword(employeeId, hashedPassword);
+
+//     res.json({ message: 'Password updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating password:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
+// Update role type endpoint
+// app.post('/update/role/:employeeId', async (req, res) => {
+//   const { employeeId } = req.params;
+//   const { Role } = req.body;
+//   try {
+//     // Perform the update operation in your database here
+//     await dbOperation.updateEmployeeRole(employeeId, Role);
+//     // updateEmployeeRole doesn't return the updated data, you can send a success response
+//     res.json({ message: 'Role updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating role:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
+
 // Endpoint to update employee by ID
 app.put('/updateEmployee/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -554,21 +689,76 @@ app.put('/updateEmployee/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-//api endpoint for updating employee information by id
+// API endpoint for updating employee information by id
 app.put('/updateEmployeeInfo/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const updatedEmployeeData = req.body;
+
+  // Validate HRANType is chosen
+  if (!updatedEmployeeData.HRANType) {
+      return res.status(400).json({ message: 'HRANType is required when updating the employee information.' });
+  }
+
   try {
-    const result = await dbOperation.updateEmployeeInfoById(employeeId, updatedEmployeeData);
-    if (!result) {
-      return res.status(404).json({ message: 'Employee information not found' });
-    }
-    res.json({ message: 'Employee information updated successfully' });
+      const result = await dbOperation.updateEmployeeInfoById(employeeId, updatedEmployeeData);
+      if (!result) {
+          return res.status(404).json({ message: 'Employee information not found' });
+      }
+      res.json({ message: 'Employee information updated successfully' });
   } catch (error) {
-    console.error('Error updating employee information:', error);
+      console.error('Error updating employee information:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// API endpoint for adding records to the History table
+app.post('/addToHistory', async (req, res) => {
+  const historyData = req.body;
+
+  console.log('Received historyData:', historyData); // Debugging statement
+
+  try {
+      // Insert the record into the History table
+      const result = await dbOperation.addToHistory(historyData);
+
+      // Respond with success message
+      res.status(201).json({ message: 'Record added to History successfully' });
+  } catch (error) {
+      console.error('Error adding record to History:', error);
+      res.status(500).json({ message: 'Failed to add record to History' });
+  }
+});
+// API endpoint for getting current employee information by ID
+app.get('/getEmployeeInfo/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  try {
+    const employeeData = await dbOperation.getEmployeeInfoById(employeeId);
+    if (!employeeData) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+    res.json(employeeData);
+  } catch (error) {
+    console.error('Error fetching employee information:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+// //api endpoint for updating employee information by id
+// app.put('/updateEmployeeInfo/:employeeId', async (req, res) => {
+//   const { employeeId } = req.params;
+//   const updatedEmployeeData = req.body;
+//   try {
+//     const result = await dbOperation.updateEmployeeInfoById(employeeId, updatedEmployeeData);
+//     if (!result) {
+//       return res.status(404).json({ message: 'Employee information not found' });
+//     }
+//     res.json({ message: 'Employee information updated successfully' });
+//   } catch (error) {
+//     console.error('Error updating employee information:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
 //api endpoint for updating employee address by id
 app.put('/updateEmployeeAddress/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -659,19 +849,19 @@ app.put('/updateDepartment/:employeeId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-// API endpoint for inserting a new dependent record
-app.post('/addDependent/:employeeId', async (req, res) => {
-  const { employeeId } = req.params;
-  const newDependentData = req.body;
-  try {
-    // const result = await dbOperation.insertDependent(employeeId, newDependentData);
-    await dbOperation.insertDependent(employeeId, newDependentData); // No need to assign to result if not used
-    res.json({ message: 'Dependent record added successfully' });
-  } catch (error) {
-    console.error('Error adding dependent record:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
+  // API endpoint for inserting a new dependent record
+  app.post('/addDependent/:employeeId', async (req, res) => {
+    const { employeeId } = req.params;
+    const newDependentData = req.body;
+    try {
+      // const result = await dbOperation.insertDependent(employeeId, newDependentData);
+      await dbOperation.insertDependent(employeeId, newDependentData); 
+      res.json({ message: 'Dependent record added successfully' });
+    } catch (error) {
+      console.error('Error adding dependent record:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
 // Endpoint to retrieve dependents by Employee ID
 app.get('/retrieve/dependents/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
@@ -784,18 +974,78 @@ app.delete('/deleteEmContact/:emergencyNumId', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
   }
 });
-// API endpoint for inserting a new compesation benefits record
+// API endpoint for inserting a new compensation benefits record
 app.post('/addCompBen/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   const newCompBenData = req.body;
   try {
-    await dbOperation.insertCompBen(employeeId, newCompBenData); // No need to assign to result if not used
+    await dbOperation.insertCompBen(employeeId, newCompBenData); 
     res.json({ message: 'Compensation benefit added successfully' });
   } catch (error) {
     console.error('Error adding compensation benefit record:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Endpoint to retrieve compensation benefits by Employee ID
+app.get('/retrieve/compBen/:employeeId', async (req, res) => {
+  const { employeeId } = req.params;
+  if (!employeeId) {
+    return res.status(400).json({ message: 'Employee ID is required' });
+  }
+
+  try {
+    const compBen = await dbOperation.getCompBenByEmployeeId(employeeId);
+    if (compBen.length === 0) {
+      return res.status(404).json({ message: 'No compensation benefits found for the given Employee ID' });
+    }
+    res.json(compBen);
+  } catch (error) {
+    console.error('Error fetching compensation benefits:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+// Endpoint to update compensation benefits details by CompBenId
+app.put('/updateCompBen/:compBenId', async (req, res) => {
+  const { compBenId } = req.params;
+  const updatedcompBenData = req.body;
+
+  try {
+    const result = await dbOperation.updateCompBenById(compBenId, updatedcompBenData);
+
+    if (!result) {
+      return res.status(404).json({ message: 'Compensation benefit details not found' });
+    }
+
+    res.json({ message: 'Compensation benefit details updated successfully' });
+  } catch (error) {
+    console.error('Error updating compensation benefit:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+// Endpoint to retrieve history by Employee ID
+app.get('/retrieve/history/:employeeId', async (req, res) => {
+  // Retrieve employeeId from request parameters
+  const { employeeId } = req.params;
+
+  // Check if employeeId is provided
+  if (!employeeId) {
+    return res.status(400).json({ message: 'Employee ID is required' });
+  }
+
+  try {
+    // Fetch history data from the database based on the employee ID
+    const history = await dbOperation.getHistoryByEmployeeId(employeeId);
+    if (history.length === 0) {
+      return res.status(404).json({ message: 'No history found for the given Employee ID' });
+    }
+    res.json(history);
+  } catch (error) {
+    console.error('Error fetching history:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 
 
 

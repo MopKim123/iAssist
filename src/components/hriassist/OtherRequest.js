@@ -11,26 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function OtherRequest() {
 
-    const { employeeId } = useParams();
-    const [employeeData, setEmployeeData] = useState({
-        LastName: '',
-        FirstName: '',
-        MiddleName: '',
-        MaidenName: '',
-        Birthdate: '',
-        Age: '',
-        BirthMonth: '',
-        AgeBracket: '',
-        Aender: '',
-        MaritalStatus: '',
-        SSS: '',
-        PHIC: '',
-        HDMF: '',
-        TIN: '',
-        HRANID: '',
-        ContactNumber: '',
-        EmailAddress: ''
-    });
+    const EmployeeId = sessionStorage.getItem("employeeId");
 
     const [thisInfo, setThisInfo] = useState({
         RequestTitle: "",
@@ -38,23 +19,9 @@ function OtherRequest() {
         NeccesaryFile: ""
     });
 
-    useEffect(() => {
-        // Fetch employee data based on employeeId
-        const fetchEmployeeData = async () => {
-            try {
-                const response = await fetch(variables.API_URL + 'UploadEmp/' + employeeId);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch employee data');
-                }
-                const data = await response.json();
-                setEmployeeData(data);
-            } catch (error) {
-                console.error('Error fetching employee data:', error);
-            }
-        };
-
-        fetchEmployeeData();
-    }, [employeeId]);
+    // useEffect(() => {
+    //     [EmployeeId]
+    // });
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -66,6 +33,7 @@ function OtherRequest() {
         
         // Proceed with the file upload
         const formData = new FormData();
+        formData.append('currentEmployeeId', EmployeeId);
 
         if (!thisInfo.RequestTitle) {
             toast.error('Request title is required.', {
@@ -175,10 +143,6 @@ function OtherRequest() {
     const handleNeccesaryFile = (e) => {
         setThisInfo({ ...thisInfo, NeccesaryFile: e.target.files[0] });
       };
-
-    if (!employeeData) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <div id="wrapper">

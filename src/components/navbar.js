@@ -109,13 +109,7 @@ import { useState } from "react";
                                             Pag-Ibig Loan:
                                             <div className="list-padding">Landbank Card</div>
                                         </Link>
-                                    </li>
-                                    <li>
-                                        <Link to="/dbpcard" className="dropdown-text" state={data}>
-                                            Pag-Ibig Loan:
-                                            <div className="list-padding">DBP Card</div>
-                                        </Link>
-                                    </li>
+                                    </li> 
                                     <li> 
                                         <Link to="/virtualaccount" className="dropdown-text" state={data}>
                                             Pag-Ibig Loan:
@@ -145,6 +139,30 @@ import { useState } from "react";
                                 </ul>
                             )}
                         </li> 
+
+                        <li onClick={toggleCertReq}> 
+                            <Link className="dropdown-text" state={data}>Certificate Request</Link>
+                            {showCertReq && (
+                                <ul className="custom-bullet-list sub-menu">
+                                    <li>
+                                        <Link to="/SSSrequest" className="dropdown-text" state= { data }> 
+                                            SSS   
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/PIrequest" className="dropdown-text"  state= { data }>
+                                            PAG-IBIG 
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/PHILHEALTHrequest" className="dropdown-text" state= { data }>
+                                            PHILHEALTH
+                                            <div className="list-padding" style={{ fontSize: '12px' }}>Certificate of Remittance</div>
+                                        </Link>
+                                    </li>
+                                </ul>
+                            )}
+                        </li>
 
                         <li onClick={toggleSickness}> 
                             <Link className="dropdown-text" state={data}>SSS Sickness</Link>

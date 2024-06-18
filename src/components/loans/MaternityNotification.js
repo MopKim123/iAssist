@@ -9,28 +9,65 @@ import { variables } from '../../variables';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+
  function MaternityNotification() {
    
-    const { employeeId } = useParams();
-    const [employeeData, setEmployeeData] = useState({
-      LastName: '',
-      FirstName: '',
-      MiddleName: '',
-      MaidenName: '',
-      Birthdate: '',
-      Age: '',
-      BirthMonth: '',
-      AgeBracket: '',
-      Aender: '',
-      MaritalStatus: '',
-      SSS: '',
-      PHIC: '',
-      HDMF: '',
-      TIN: '',
-      HRANID: '',
-      ContactNumber: '',
-      EmailAddress: ''
+    const EmployeeId = sessionStorage.getItem("employeeId");
+    const Role = sessionStorage.getItem("role");
+
+    const [showModal, setShowModal] = useState(false);
+    const handleShowModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+
+    const [SelectedLink, setSelectedLink] = useState({
+      thisSelectedLink: ''
     });
+
+    const [currentValue, setcurrentValue] = useState({
+      currentLabel: '',
+      currentLink: ''
+    });
+
+    const [MNF, setThisMNF] = useState({
+      thisLabel: '',
+      thisLink: ''
+    });
+    const [ME, setThisME] = useState({
+      thisLabel: '',
+      thisLink: ''
+    });
+    const [AMLC, setThisAMLC] = useState({
+      thisLabel: '',
+      thisLink: ''
+    });
+
+
+    const selectedMNF = (e) => {
+      e.preventDefault();
+      setcurrentValue(prevState => ({
+        ...prevState,
+        currentLabel: "SSS MNF",
+        currentLink: e.target.value
+      }));
+    };
+    const selectedME = (e) => {
+      e.preventDefault();
+      setcurrentValue(prevState => ({
+        ...prevState,
+        currentLabel: "SSS ME",
+        currentLink: e.target.value
+      }));
+    };
+    const selectedAMLC = (e) => {
+      e.preventDefault();
+      setcurrentValue(prevState => ({
+        ...prevState,
+        currentLabel: "SSS AMLC",
+        currentLink: e.target.value
+      }));
+    };
 
     const [thisInfo, setThisInfo] = useState({
       Notication_Form: '',
@@ -40,87 +77,10 @@ import 'react-toastify/dist/ReactToastify.css';
     });
 
     useEffect(() => {
-      // Fetch employee data based on employeeId
-      const fetchEmployeeData = async () => {
-        try {
-          const response = await fetch(variables.API_URL + 'UploadEmp/' + employeeId);
-          if (!response.ok) {
-            throw new Error('Failed to fetch employee data');
-          }
-          const data = await response.json();
-          setEmployeeData(data);
-        } catch (error) {
-          console.error('Error fetching employee data:', error);
-        }
-      };
-  
-      fetchEmployeeData();
+      // [EmployeeId]
       handleSetLinks();
-    }, [employeeId]);
-  
-  
-    // const handleFormSubmit = async (e) => {
-    //   e.preventDefault();
-      
-    //   const formData = new FormData();
-    //   formData.append('Notication_Form', thisInfo.Notication_Form);
-    //   formData.append('Maternity_Eligibility', thisInfo.Maternity_Eligibility);
-    //   formData.append('Credit_Form', thisInfo.Credit_Form);
-    //   formData.append('Medical_Reports', thisInfo.Medical_Reports);
+    });
 
-    //     try {
-    //       const response = await fetch('/MaternityNotification', {
-    //         method: 'POST',
-    //         body: formData,
-    //       });
-    
-    //       if (response.ok) {
-    //         const jsonResponse = await response.json();
-
-    //         console.log(jsonResponse.message);
-
-    //         setThisInfo({
-    //           Notication_Form: '',
-    //           Maternity_Eligibility: '',
-    //           Credit_Form: '',
-    //           Medical_Reports: ''
-    //         });
-      
-    //         // Clear file input fields
-    //         document.getElementById('Notication_Form').value = null;
-    //         document.getElementById('Maternity_Eligibility').value = null;
-    //         document.getElementById('Credit_Form').value = null;
-    //         document.getElementById('Medical_Reports').value = null;
-
-    //         // Emit success toast
-    //         toast.success('Submitted Successfully', {
-    //           position: "bottom-right",
-    //           autoClose: 5000,
-    //           hideProgressBar: false,
-    //           closeOnClick: true,
-    //           pauseOnHover: true,
-    //           draggable: true,
-    //           progress: undefined,
-    //           theme: "light",
-    //         });
-    
-    //       } else {
-    //         console.error('Failed to upload PDF:', response.statusText);
-    //           toast.error('Failed to Submit', {
-    //             position: "bottom-right",
-    //             autoClose: 5000,
-    //             hideProgressBar: false,
-    //             closeOnClick: true,
-    //             pauseOnHover: true,
-    //             draggable: true,
-    //             progress: undefined,
-    //             theme: "light",
-    //           });
-    //       }
-    //     } catch (error) {
-    //       console.error('Error uploading PDF:', error);
-    //     }
-    // };
 
     const handleFormSubmit = async (e) => {
       e.preventDefault();
@@ -154,6 +114,7 @@ import 'react-toastify/dist/ReactToastify.css';
       }
     
       const formData = new FormData();
+      formData.append('currentEmployeeId', EmployeeId);
       formData.append('Notication_Form', noticationForm);
       formData.append('Maternity_Eligibility', maternityEligibility);
       formData.append('Credit_Form', creditForm);
@@ -225,6 +186,77 @@ import 'react-toastify/dist/ReactToastify.css';
     const handleMedical_Reports = (e) => {
       setThisInfo({ ...thisInfo, Medical_Reports: e.target.files[0] });
     };
+
+    const handleUpdateLinks = (e) => {
+      setSelectedLink({ ...SelectedLink, thisSelectedLink: e.target.value });
+      handleShowModal();
+    };
+  
+    const handleLink = async (e) => {
+      try {
+        e.preventDefault();
+
+        // Check if the textarea value is empty
+       if (currentValue.currentLink.trim() === '') {
+        // Show an error message or handle the empty case as needed
+        console.error('Textarea is empty. Please enter a URL.');
+        toast.error('Please enter a URL', {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+        });
+        return; // Exit the function if the textarea is empty
+    }
+  
+        const formData = new FormData();
+        formData.append("updatethisLabel", currentValue.currentLabel);
+        formData.append("updatethisLink", currentValue.currentLink);
+        
+        const response = await fetch('/UpdateLink', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (response.ok) {
+          const jsonResponse = await response.json();
+  
+          console.log(jsonResponse.message);
+  
+          toast.success('Thank you! Your request has been submitted.', {
+              position: "bottom-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+          });
+
+          handleSetLinks();
+          handleCloseModal();
+        } else {
+            console.error('Failed to submit request:', response.statusText);
+            toast.error('Failed to Submit', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
+      } catch (error) {
+          console.error('Error fetching links:', error);
+      }
+    };
   
     const handleSetLinks = async () => {
       try {
@@ -234,22 +266,23 @@ import 'react-toastify/dist/ReactToastify.css';
   
           if (response.ok) {
               const jsonResponse = await response.json();
-
-              const url = jsonResponse.data;
+              // console.log(jsonResponse.message);
   
-            //   if(selected === '1'){
-            //       setThisSOA({
-            //         thisLabel: url[0].LinkName,
-            //         thisLink: url[0].LinkURL
-            //       });
-            //       setThisVF({
-            //         thisLabel: url[1].LinkName,
-            //         thisLink: url[1].LinkURL
-            //       });
-            //   }else if(selected === '2'){
-                
+              // Handle the received data as needed
+              const url = jsonResponse.data;
               
-            // }
+              setThisMNF({
+                thisLabel: url[2].LinkName,
+                thisLink: url[2].LinkURL
+              });
+              setThisME({
+                thisLabel: url[3].LinkName,
+                thisLink: url[3].LinkURL
+              });
+              setThisAMLC({
+                thisLabel: url[4].LinkName,
+                thisLink: url[4].LinkURL
+              });
               
           }
         } catch (error) {
@@ -257,9 +290,6 @@ import 'react-toastify/dist/ReactToastify.css';
         }
       };
 
-    if (!employeeData) {
-      return <div>Loading...</div>;
-    }
     return (
       <div id="wrapper">
           <Navbar />
@@ -290,8 +320,18 @@ import 'react-toastify/dist/ReactToastify.css';
                                     <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                   </div>
                                   <button style={{ fontSize: '12px', border: 'none', background: 'none' }} type="button">
-                                    <a href="https://www.sss.gov.ph/sss/DownloadContent?fileName=SIC_01241.pdf" target="_blank" rel="noopener noreferrer">Link to download SSS Maternity Form</a>
+                                    <a href={MNF.thisLink} target="_blank" rel="noopener noreferrer">Link to download SSS Maternity Form</a>
                                   </button>
+                                  {Role !== 'Employee' && (
+                                    <button
+                                      style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }}
+                                      type="button"
+                                      value="showMaternityForm"
+                                      onClick={handleUpdateLinks}
+                                    >
+                                      Update
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -319,8 +359,13 @@ import 'react-toastify/dist/ReactToastify.css';
                                     <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                   </div>
                                   <button style={{ fontSize: '12px', border: 'none', background: 'none' }} type="button">
-                                    <a href="https://innodata-my.sharepoint.com/:b:/p/zax/EWXR8fUdvqhBoGd00VF5dvABgcA6oPrNY-Ba1rA2AlBMTw?e=KPEBNN" target="_blank" rel="noopener noreferrer">Please see link for the steps/process</a>
+                                    <a href={ME.thisLink} target="_blank" rel="noopener noreferrer">Please see link for the steps/process</a>
                                   </button>
+                                  {Role !== 'Employee' && (
+                                    <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showMaternityEligibility" onClick={handleUpdateLinks}>
+                                      Update 
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -348,8 +393,13 @@ import 'react-toastify/dist/ReactToastify.css';
                                     <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                   </div>
                                   <button style={{ fontSize: '12px', border: 'none', background: 'none' }} type="button">
-                                    <a href="https://www.sss.gov.ph/sss/DownloadContent?fileName=smd-01409.pdf" target="_blank" rel="noopener noreferrer">Please see link for the steps/process</a>
+                                    <a href={AMLC.thisLink} target="_blank" rel="noopener noreferrer">Please see link for the steps/process</a>
                                   </button>
+                                  {Role !== 'Employee' && (
+                                    <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showAllocationOfMaternityLeaveCredit" onClick={handleUpdateLinks}>
+                                      Update 
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -401,9 +451,145 @@ import 'react-toastify/dist/ReactToastify.css';
             pauseOnHover
             theme="light"
           />
+          <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header >
+              <Modal.Title>Update Link</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {SelectedLink.thisSelectedLink === "showMaternityForm" ? (
+                  <form onSubmit={handleLink}>
+                    {/* Page content begins here */}
+                          <div className="container-fluid">
+                            <div className="row justify-content-center">
+                                <div className="col-xl-12 col-lg-8">
+                                    {/* First Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 text-primary">SSS Maternity Form</h6>
+                                        </div>
+                                        {/* Card Body */}    
+                                    </div>
+                                    {/* Second Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 font-weight-bold text-primary">URL / Link</h6>
+                                        </div>
+                                        {/* Card Body */}
+                                        <div className="card-body">
+                                            <div className="tab-content">
+                                                <textarea
+                                                    className="form-control text-gray-700"
+                                                    style={{ height: '100px' }} // This line sets the height to 100px
+                                                    value={currentValue.currentLink}
+                                                    onChange={selectedMNF}
+                                                    placeholder={MNF.thisLink}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      {/* Page content ends here */}
+                      <button className="btn btn-primary d-block mx-auto loan-btn">Update</button>
+                  </form>
+                ) : SelectedLink.thisSelectedLink === "showMaternityEligibility" ? (
+                  <form onSubmit={handleLink}>
+                    {/* Page content begins here */}
+                          <div className="container-fluid">
+                            <div className="row justify-content-center">
+                                <div className="col-xl-12 col-lg-8">
+                                    {/* First Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 text-primary"> SSS Maternity Eligibility</h6>
+                                        </div>
+                                        {/* Card Body */}    
+                                    </div>
+                                    {/* Second Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 font-weight-bold text-primary">URL / Link</h6>
+                                        </div>
+                                        {/* Card Body */}
+                                        <div className="card-body">
+                                            <div className="tab-content">
+                                                <textarea
+                                                    className="form-control text-gray-700"
+                                                    style={{ height: '100px' }} // This line sets the height to 100px
+                                                    value={currentValue.currentLink}
+                                                    onChange={selectedME}
+                                                    placeholder={ME.thisLink}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      {/* Page content ends here */}
+                      <button className="btn btn-primary d-block mx-auto loan-btn">Update</button>
+                  </form>
+                ) : SelectedLink.thisSelectedLink === "showAllocationOfMaternityLeaveCredit" ? (
+                  <form onSubmit={handleLink}>
+                    {/* Page content begins here */}
+                          <div className="container-fluid">
+                            <div className="row justify-content-center">
+                                <div className="col-xl-12 col-lg-8">
+                                    {/* First Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 text-primary"> SSS Allocation of Maternity Leave Credit Form</h6>
+                                        </div>
+                                        {/* Card Body */}    
+                                    </div>
+                                    {/* Second Card */}
+                                    <div className="card shadow mb-4">
+                                        {/* Card Header */}
+                                        <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                            <h6 className="m-0 font-weight-bold text-primary">URL / Link</h6>
+                                        </div>
+                                        {/* Card Body */}
+                                        <div className="card-body">
+                                            <div className="tab-content">
+                                                <textarea
+                                                    className="form-control text-gray-700"
+                                                    style={{ height: '100px' }} // This line sets the height to 100px
+                                                    value={currentValue.currentLink}
+                                                    onChange={selectedAMLC}
+                                                    placeholder={AMLC.thisLink}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      {/* Page content ends here */}
+                      <button className="btn btn-primary d-block mx-auto loan-btn">Update</button>
+                  </form>
+                ) : (
+                  <div>
+                    <p>No specific link selected.</p>
+                  </div>
+                )}
+                <label style={{fontSize: '12px'}}>Note: Before you paste your link, please make sure to copy the entire URL or link.</label>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                Close
+              </Button>
+              {/* Add any additional buttons or actions here */}
+            </Modal.Footer>
+          </Modal>
       </div>
+      
   );
 }
 
 export default MaternityNotification;
-

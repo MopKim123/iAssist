@@ -14,31 +14,12 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function SSSRequest() {
 
+  const EmployeeId = sessionStorage.getItem("employeeId");
+  const Role = sessionStorage.getItem("role");
+
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
-
-  const { employeeId } = useParams();
-  const [employeeData, setEmployeeData] = useState({
-    LastName: '',
-    FirstName: '',
-    MiddleName: '',
-    MaidenName: '',
-    Birthdate: '',
-    Age: '',
-    BirthMonth: '',
-    AgeBracket: '',
-    Aender: '',
-    MaritalStatus: '',
-    SSS: '',
-    PHIC: '',
-    HDMF: '',
-    TIN: '',
-    HRANID: '',
-    ContactNumber: '',
-    EmailAddress: '',
-    deliveryType: ''
-  });
 
   const [selected, setSelected] = useState("0");
   const [specifyOtherRequest, setSpecifyOtherRequest] = useState("");
@@ -46,6 +27,7 @@ function SSSRequest() {
     StatementOfAccount: '',
     VerificationRequestForm: '',
     MonthlyContributions: '',
+    deliveryType: ''
   });
 
   const [currentValue, setcurrentValue] = useState({
@@ -74,18 +56,19 @@ function SSSRequest() {
 
 
   useEffect(() => {
+    // [EmployeeId];
     handleSetLinks();
   });
 
-  const handleInputChange = async(e) => {
+  const handleInputChange = (e) => {
     setSelected(e.target.value);
-
+    
     const { name, value } = e.target;
-    setEmployeeData({
-      ...employeeData,
+    setThisInfo({
+      ...thisInfo,
       [name]: value
     });
-  };
+  }; 
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -97,6 +80,7 @@ function SSSRequest() {
   
     const formData = new FormData();
     formData.append("selected", selected);
+    formData.append('currentEmployeeId', EmployeeId);
 
     if (selected === '1') {
       if (thisInfo.StatementOfAccount && isValidFileType(thisInfo.StatementOfAccount)) {
@@ -202,7 +186,7 @@ function SSSRequest() {
           theme: "light",
         });
 
-        setEmployeeData({
+        setThisInfo({
           deliveryType: ''
         });
 
@@ -274,6 +258,23 @@ function SSSRequest() {
   const handleLink = async (e) => {
     try {
       e.preventDefault();
+
+       // Check if the textarea value is empty
+       if (currentValue.currentLink.trim() === '') {
+        // Show an error message or handle the empty case as needed
+        console.error('Textarea is empty. Please enter a URL.');
+        toast.error('Please enter a URL', {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+        });
+        return; // Exit the function if the textarea is empty
+    }
 
       const formData = new FormData();
       formData.append("updatethisLabel", currentValue.currentLabel);
@@ -347,9 +348,6 @@ function SSSRequest() {
       }
     };
 
-  if (!employeeData) {
-    return <div>Loading...</div>;
-  }
   return (
     <div id="wrapper">
       <Navbar />
@@ -373,7 +371,7 @@ function SSSRequest() {
                             <div className="d-flex justify-content-left">
                               <div className="form-group">
                                 <label htmlFor="deliveryType">SSS Request for: </label>
-                                <select className="form-control" id="deliveryType" name="deliveryType" value={employeeData.deliveryType} onChange={handleInputChange}>
+                                <select className="form-control" id="deliveryType" name="deliveryType" value={thisInfo.deliveryType} onChange={handleInputChange}>
                                   <option value="0" >Select Type</option>
                                   <option value="1">Unposted Loan Payment</option>
                                   <option value="2">Unposted Contribution</option>
@@ -402,9 +400,11 @@ function SSSRequest() {
                                     <button style={{ fontSize: '12px', border: 'none', background: 'none' }} type="button">
                                       <a href={SOA.thisLink} target="_blank" rel="noopener noreferrer">How to download SSS SOA</a>
                                     </button>
-                                    <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalSOA" onClick={handleUpdateLinks}>
-                                      Update 
-                                    </button>
+                                    {Role !== 'Employee' && (
+                                      <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalSOA" onClick={handleUpdateLinks}>
+                                        Update 
+                                      </button>
+                                    )}
                                   </div>
 
                                   <div style={{ border: '1px solid #ccc', marginTop: '5px', marginBottom: '5px' }} />
@@ -415,9 +415,11 @@ function SSSRequest() {
                                     <button style={{ fontSize: '12px', border: 'none', background: 'none' }} type="button">
                                       <a href={VF.thisLink} target="_blank" rel="noopener noreferrer">View Form</a>
                                     </button>
-                                    <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalVF" onClick={handleUpdateLinks}>
-                                        Update
-                                    </button>
+                                    {Role !== 'Employee' && (
+                                      <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalVF" onClick={handleUpdateLinks}>
+                                          Update
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               )}
@@ -440,9 +442,11 @@ function SSSRequest() {
                                     <button style={{ fontSize: '12px', border: 'none', background: 'none' }} type="button">
                                       <a href={VF.thisLink} target="_blank" rel="noopener noreferrer">View Form</a>
                                     </button>
-                                    <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalVF" onClick={handleUpdateLinks}>
-                                        Update
-                                    </button>
+                                    {Role !== 'Employee' && (
+                                      <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalVF" onClick={handleUpdateLinks}>
+                                          Update
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               )}
@@ -454,7 +458,16 @@ function SSSRequest() {
                                   </div>
                                   <div className="form-group">
                                     <label htmlFor="middleName">Specify Other Request *</label>
-                                    <input id='DeathCert' type="text" className="form-control-file" aria-describedby="fileHelp" onChange={handleOtherRequestChange} value={specifyOtherRequest} placeholder='Type here...' />
+
+                                    <textarea
+                                                            type="text"
+                                                            className="form-control text-gray-100"
+                                                            style={{ height: '40px' }}
+                                                            id=""
+                                                            value={specifyOtherRequest}
+                                                            onChange={handleOtherRequestChange}
+                                                            placeholder="Type here..."
+                                                        />
                                   </div>
 
                                   <div style={{ border: '1px solid #ccc', marginTop: '5px', marginBottom: '5px' }} />
@@ -465,9 +478,11 @@ function SSSRequest() {
                                     <button style={{ fontSize: '12px', border: 'none', background: 'none' }} type="button">
                                       <a href={VF.thisLink} target="_blank" rel="noopener noreferrer">View Form</a>
                                     </button>
-                                    <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalVF" onClick={handleUpdateLinks}>
-                                        Update
-                                    </button>
+                                    {Role !== 'Employee' && (
+                                      <button style={{ fontSize: '12px', border: '1px solid #ccc', padding: '1px 5px', cursor: 'pointer', marginLeft: '3px' }} type="button" value="showModalVF" onClick={handleUpdateLinks}>
+                                          Update
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               )}
@@ -479,7 +494,7 @@ function SSSRequest() {
                   </div>
                 </div>
                 {/* Page content ends here */}
-                <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
+                <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Update</button>
               </div>
             </form>
           </div>
@@ -540,7 +555,7 @@ function SSSRequest() {
                         </div>
                     </div>
                   {/* Page content ends here */}
-                  <button className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
+                  <button className="btn btn-primary d-block mx-auto loan-btn">Update</button>
               </form>
             ) : SelectedLink.thisSelectedLink === "showModalVF" ? (
               <form onSubmit={handleLink}>

@@ -667,3 +667,127 @@
   margin: auto;
   padding-bottom: 25px;
 }
+
+/*start*/
+.header-name {
+  padding-bottom: 20px;
+}
+.input-file{
+  /* border: 1px solid; */
+  width: 60%;
+}
+.card-tab{
+  display: grid;
+    grid-template-columns: 20vw 5px auto; 
+    grid-gap: 10px;
+}
+.vertical-line {
+  border-left: 1px solid #ccc;
+  height: 100%;
+}
+.no-selected{
+  padding: 50px;
+  margin: auto;
+}
+.content-holder{
+  display: flex;
+  flex-direction: column;
+}
+.loan-btn{
+  width: 64%;
+  margin-bottom: 30px;
+}
+
+.loan-row{
+  gap: 1rem;
+  display: grid;
+  grid-template-columns: 25vw 25vw;
+}
+
+.pagination {
+  margin-left: 15px;
+  margin-right: 15px; 
+  justify-content: center;
+}
+
+.pagination-btn {
+  margin-left: 15px;
+  margin-right: 15px; 
+  justify-content: center; 
+  width: 15vw;
+  display: flex; 
+  justify-content: space-between;
+}
+.notification-dot {
+  width: 9px;
+  height: 9px;
+  background-color: red;
+  border-radius: 50%;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  margin-top: 20%;
+  margin-right: 6%;
+}
+.notification-bell {
+  border: 1px solid #4E73DF;  
+  padding: 5px; 
+  border-radius: 50%;
+  color: #4E73DF;
+  height: 20px;
+}
+.notification {
+  border-bottom: 1px solid #d1ddff;  
+  padding: 0px;  
+  padding-left: 10px;  
+  padding-right: 10px;  
+  background-color: white;
+  color: #4E73DF; 
+}
+.notification-seen {
+  border-bottom: 1px solid #d1ddff;  
+  padding: 0px;  
+  padding-left: 10px;  
+  padding-right: 10px;  
+  /* background-color: rgb(238, 238, 238); */
+  color: #4E73DF; 
+}
+.notification-dropdown {
+  padding: 0px;  
+  padding-left: 10px;  
+  padding-right: 10px;  
+  color: #4E73DF;  
+  min-width: 25vw;
+  background-color: rgb(238, 238, 238);
+  max-width: 25vw;
+  
+}
+.notification-card {  
+  max-width: 22vw;
+  padding-top: 4px;  
+
+}
+.notification-title {
+  font-weight: 600;
+}
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+  word-wrap: break-word;
+  height: auto;
+  line-height: 1.5em; 
+  max-height: 3em;  
+}
+.notification-title-div {
+  max-width: 60%;
+  font-weight: 900;
+}
+.notificationView-card:hover {
+  background-color: #e2eefc; 
+}
+.notificationView-card-seen {
+  background-color: #d2e3f7;  
+}

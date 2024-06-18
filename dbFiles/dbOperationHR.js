@@ -31,7 +31,7 @@ const insertPDF = async (filename) => {
 }
  
 
-// Employee side - get employee's submissions
+// EmpPersonalDetails side - get employee's submissions
 const getUserSubmissions = async (id, pageNumber, pageSize) => {
     try { 
       let pool = await sql.connect(config);
@@ -194,22 +194,22 @@ const getFilteredSubmissions = async (pageNumber, pageSize, name, transactionTyp
                         SubsWithRowNumber.* 
                     FROM (
                         SELECT 
-                            Employee.Name,
-                            Employee.EmailAddress,
+                            EmpPersonalDetails.EmployeeName AS Name,
+                            EmpPersonalDetails.EmailAddress,
                             Submission.*,
                             ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
                         FROM Submission
-                        LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId
+                        LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId
                         WHERE 1 = 1 
                     `
     let endQuery =   `) AS SubsWithRowNumber
                     WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
                     `
-    let countFilter = ' LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId WHERE 1=1 '
+    let countFilter = ' LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId WHERE 1=1 '
 
     if(name){
-        query += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
-        countFilter += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        query += ` AND (EmpPersonalDetails.EmployeeName LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        countFilter += ` AND (EmpPersonalDetails.EmployeeName LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
     } 
     if(transactionType){
         query += ` AND Submission.TransactionType = '${transactionType}' `
@@ -263,20 +263,20 @@ const downloadSubmissions = async (name, transactionType, status, month, year) =
                         SubsWithRowNumber.Status
                     FROM (
                         SELECT  
-                            Employee.Name,
-                            Employee.EmailAddress,
+                            EmpPersonalDetails.EmployeeName AS Name,
+                            EmpPersonalDetails.EmailAddress,
                             Submission.*,
                             ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
                         FROM Submission
-                        LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId
+                        LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId
                         WHERE 1 = 1 
                     `
     let endQuery =   `) AS SubsWithRowNumber`
-    let countFilter = ' LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId WHERE 1=1 '
+    let countFilter = ' LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId WHERE 1=1 '
 
     if(name){
-        query += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
-        countFilter += ` AND (Employee.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        query += ` AND (EmpPersonalDetails.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        countFilter += ` AND (EmpPersonalDetails.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
     } 
     if(transactionType){
         query += ` AND Submission.TransactionType = '${transactionType}' `
@@ -442,12 +442,12 @@ const getSubmissionForNotification = async (SubmissionID) => {
         .input('id', sql.Int, SubmissionID) 
         .query(` 
             SELECT 
-                Employee.EmpId,
-                Employee.Name,
-                Employee.EmailAddress,
+                EmpPersonalDetails.EmployeeId,
+                EmpPersonalDetails.EmployeeName AS Name,
+                EmpPersonalDetails.EmailAddress,
                 Submission.* 
             FROM Submission
-            LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId  
+            LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId  
             WHERE Submission.SubmissionID = @id;
         `); 
          
@@ -516,8 +516,8 @@ const sample = async () => {
         let result = await pool.request() 
             .query(`
                 SELECT 
-                    Employee.Name,
-                    Employee.EmailAddress,
+                    EmpPersonalDetails.EmployeeName AS Name,
+                    EmpPersonalDetails.EmailAddress,
                     Submission.SubmissionID,
                     Submission.TransactionType,
                     Submission.TurnAround,
@@ -527,7 +527,7 @@ const sample = async () => {
                     Submission.TransactionNum,
                     Submission.TypeOfDelivery
                 FROM Submission
-                LEFT JOIN Employee ON Submission.EmpId = Employee.EmpId 
+                LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId 
             `);
 
     
