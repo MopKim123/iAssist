@@ -70,7 +70,7 @@ const HRIAssist = () => {
     if(!searhFilter){   
       getSubmissions(currentPage, pageSize, facility)   
     }else{  
-      getFilteredSubmissions(currentPage, pageSize)   
+      getFilteredSubmissions(currentPage, pageSize, facility)   
     }
   }, [currentPage, pageSize, facility]);
   
@@ -196,12 +196,13 @@ const HRIAssist = () => {
   };
 
   // get submissions based on filter
-  const getFilteredSubmissions = async (pageNumber, pageSize) => {
+  const getFilteredSubmissions = async (pageNumber, pageSize, facility) => {
      
   
     const formData = new FormData(); 
     formData.append('pageNumber', pageNumber);
     formData.append('pageSize', pageSize); 
+    formData.append('facility', facility); 
     formData.append('name', filter.name);
     formData.append('transactionType', filter.transactionType);
     formData.append('status', filter.status);

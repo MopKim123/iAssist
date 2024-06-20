@@ -78,8 +78,8 @@ app.post('/hrsubmission',  upload.single(''), async (req, res) => {
 app.post('/hrfiltersubmission', upload.single(''),  async (req, res) => {
  
   try {
-    const { pageNumber, pageSize, name, transactionType, status, month, year } = req.body;   
-    const result = await dbOperationHR.getFilteredSubmissions(pageNumber, pageSize, name, transactionType, status, month, year);
+    const { pageNumber, pageSize, facility, name, transactionType, status, month, year } = req.body;   
+    const result = await dbOperationHR.getFilteredSubmissions(pageNumber, pageSize, facility, name, transactionType, status, month, year);
     res.status(200).json({ result: result });
   } catch (error) {
     console.error('Error:', error);

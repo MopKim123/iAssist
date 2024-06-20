@@ -183,7 +183,7 @@ const getSubmissions = async (pageNumber, pageSize, facility) => {
     }
 }
 // HR side - get all employee submissions
-const getFilteredSubmissions = async (pageNumber, pageSize, name, transactionType, status, month, year) => {
+const getFilteredSubmissions = async (pageNumber, pageSize, facility, name, transactionType, status, month, year) => {
     let query =   `SELECT 
                         SubsWithRowNumber.* 
                     FROM (
@@ -194,12 +194,15 @@ const getFilteredSubmissions = async (pageNumber, pageSize, name, transactionTyp
                             ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
                         FROM Submission
                         LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId
-                        WHERE 1 = 1 
+                        LEFT JOIN EmployeeInfo ON Submission.EmpId = EmployeeInfo.EmployeeId 
+                        WHERE EmployeeInfo.Facility = @Facility 
                     `
     let endQuery =   `) AS SubsWithRowNumber
                     WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
                     `
-    let countFilter = ' LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId WHERE 1=1 '
+    let countFilter = ` LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId 
+                        LEFT JOIN EmployeeInfo ON Submission.EmpId = EmployeeInfo.EmployeeId 
+                        WHERE EmployeeInfo.Facility = @Facility `
 
     if(name){
         query += ` AND (EmpPersonalDetails.EmployeeName LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
@@ -223,18 +226,21 @@ const getFilteredSubmissions = async (pageNumber, pageSize, name, transactionTyp
         countFilter += `AND DateTime LIKE '${year}%' `
     }
     query += endQuery;  
+    console.log(name);
 
     try {
         let pool = await sql.connect(config);
         let result = await pool.request()
             .input('PageNumber', sql.Int, pageNumber)
             .input('PageSize', sql.Int, pageSize) 
+            .input('Facility', sql.VarChar, facility) 
             .query(query); 
         
         let count = await pool.request() 
+            .input('Facility', sql.VarChar, facility) 
             .query(`
                 SELECT COUNT(*) FROM Submission
-            `+countFilter);
+            `+ countFilter);
         if (result.recordset.length === 0) {
             return null;
         }
