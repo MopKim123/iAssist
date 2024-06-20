@@ -40,16 +40,7 @@ const getUserSubmissions = async (id, pageNumber, pageSize) => {
         .input('PageNumber', sql.Int, pageNumber)
         .input('PageSize', sql.Int, pageSize) 
         .query(`SELECT 
-                    SubsWithRowNumber.EmployeeName AS Name,
-                    SubsWithRowNumber.EmailAddress,
-                    SubsWithRowNumber.SubmissionID,
-                    SubsWithRowNumber.TransactionType,
-                    SubsWithRowNumber.TurnAround,
-                    SubsWithRowNumber.Status,
-                    SubsWithRowNumber.DateTime,
-                    SubsWithRowNumber.LoanAppDate,
-                    SubsWithRowNumber.TransactionNum,
-                    SubsWithRowNumber.TypeOfDelivery
+                    SubsWithRowNumber.* 
                 FROM (
                     SELECT 
                         EmpPersonalDetails.EmployeeName,
@@ -154,22 +145,25 @@ const updateSubmission = async (id) => {
     }
 }
 // HR side - get all employee submissions
-const getSubmissions = async (pageNumber, pageSize) => {
+const getSubmissions = async (pageNumber, pageSize, facility) => {
     try {
       let pool = await sql.connect(config);
       let result = await pool.request()
         .input('PageNumber', sql.Int, pageNumber)
         .input('PageSize', sql.Int, pageSize) 
+        .input('Facility', sql.VarChar, facility) 
         .query(`SELECT 
                     SubsWithRowNumber.* 
                 FROM (
                     SELECT 
                     EmpPersonalDetails.EmployeeName AS Name,
                     EmpPersonalDetails.EmailAddress,
-                        Submission.*,
+                    Submission.*,
                         ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
                     FROM Submission
                     LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId 
+                    LEFT JOIN EmployeeInfo ON Submission.EmpId = EmployeeInfo.EmployeeId 
+                    WHERE EmployeeInfo.Facility = @Facility
                 ) AS SubsWithRowNumber
                 WHERE SubsWithRowNumber.RowNumber BETWEEN (@PageNumber - 1) * @PageSize + 1 AND @PageNumber * @PageSize 
         `); 

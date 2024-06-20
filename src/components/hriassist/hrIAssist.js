@@ -16,8 +16,8 @@ const HRIAssist = () => {
 
   const navigate = useNavigate(); 
   const currentYear = new Date().getFullYear();  
-  
-  // sessionStorage.getItem("userId")
+  const facility = sessionStorage.getItem("facility")
+  // console.log(facility);
 
   const [submissions, setSubmissions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,20 +68,21 @@ const HRIAssist = () => {
       setSearchFilter(false)
     }
     if(!searhFilter){   
-      getSubmissions(currentPage, pageSize)   
+      getSubmissions(currentPage, pageSize, facility)   
     }else{  
       getFilteredSubmissions(currentPage, pageSize)   
     }
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, facility]);
   
   // get all the employee submissions
-  const getSubmissions = async (pageNumber, pageSize) => {
+  const getSubmissions = async (pageNumber, pageSize, facility) => {
     
     const EmpId = '10023'
 
     const formData = new FormData(); 
     formData.append('pageNumber', pageNumber);
     formData.append('pageSize', pageSize);
+    formData.append('facility', facility);
      
     try {
       const uploadResponse = await fetch('http://localhost:5000/hrsubmission', {

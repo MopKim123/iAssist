@@ -16,12 +16,8 @@ function OtherRequest() {
     const [thisInfo, setThisInfo] = useState({
         RequestTitle: "",
         Description: "",
-        NeccesaryFile: ""
+        NeccesaryFile: null
     });
-
-    // useEffect(() => {
-    //     [EmployeeId]
-    // });
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -31,11 +27,12 @@ function OtherRequest() {
             return allowedTypes.includes(file.type);
         };
         
-        // Proceed with the file upload
         const formData = new FormData();
         formData.append('currentEmployeeId', EmployeeId);
 
+        // Validation for RequestTitle
         if (!thisInfo.RequestTitle) {
+            document.getElementById('RequestInvalid').style.border = '1px solid red';
             toast.error('Request title is required.', {
                 position: "bottom-right",
                 autoClose: 5000,
@@ -47,9 +44,13 @@ function OtherRequest() {
                 theme: "light",
             });
             return; // Stop further execution
+        } else {
+            document.getElementById('RequestInvalid').style.border = 'none';
         }
         
+        // Validation for Description
         if (!thisInfo.Description) {
+            document.getElementById('DescriptionInvalid').style.border = '1px solid red';
             toast.error('Description is required.', {
                 position: "bottom-right",
                 autoClose: 5000,
@@ -61,26 +62,33 @@ function OtherRequest() {
                 theme: "light",
             });
             return; // Stop further execution
-        }
-        
-        if (thisInfo.NeccesaryFile && isValidFileType(thisInfo.NeccesaryFile)) {
-            formData.append('RequestTitle', thisInfo.RequestTitle);
-            formData.append('Description', thisInfo.Description);
-            formData.append('NeccesaryFile', thisInfo.NeccesaryFile);
         } else {
-            toast.error('Invalid file type for necessary file. Please upload a valid file.', {
-                position: "bottom-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-            });
-            return; // Stop further execution
+            document.getElementById('DescriptionInvalid').style.border = 'none';
         }
-        
+
+        formData.append('RequestTitle', thisInfo.RequestTitle);
+        formData.append('Description', thisInfo.Description);
+
+        // File validation only if file is provided
+        if (thisInfo.NeccesaryFile) {
+            if (isValidFileType(thisInfo.NeccesaryFile)) {
+                formData.append('NeccesaryFile', thisInfo.NeccesaryFile);
+                document.getElementById('NeccesaryFile').style.border = 'none';
+            } else {
+                document.getElementById('Invalid').style.border = '1px solid red';
+                toast.error('Invalid file type for necessary file. Please upload a valid file.', {
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                });
+                return; // Stop further execution
+            }
+        }
         
         try {
             const response = await fetch('/OtherRequest', {
@@ -95,15 +103,13 @@ function OtherRequest() {
                 setThisInfo({
                     RequestTitle: '',
                     Description: '',
-                    NeccesaryFile: ''
+                    NeccesaryFile: null
                 });
     
-                // Clear file input fields
-                document.getElementById('RequestTitle').value = null;
-                document.getElementById('Description').value = null;
-                document.getElementById('NeccesaryFile').value = null;
+                document.getElementById('RequestTitle').value = '';
+                document.getElementById('Description').value = '';
+                document.getElementById('NeccesaryFile').value = '';
     
-                // Emit success toast
                 toast.success('Thank you! Your request has been submitted.', {
                     position: "bottom-right",
                     autoClose: 5000,
@@ -140,9 +146,10 @@ function OtherRequest() {
     const handleDescription = (e) => {
         setThisInfo({ ...thisInfo, Description: e.target.value });
     };
+    
     const handleNeccesaryFile = (e) => {
         setThisInfo({ ...thisInfo, NeccesaryFile: e.target.files[0] });
-      };
+    };
 
     return (
         <div id="wrapper">
@@ -160,7 +167,7 @@ function OtherRequest() {
                         <div className="container-fluid">
                             <div className="row justify-content-center">
                                 <div className="col-xl-8 col-lg-7">
-                                    <div className="card shadow mb-4">
+                                    <div className="card shadow mb-4" id="RequestInvalid">
                                         {/* Card Header - New Hire Upload */}
                                         <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                             <h6 className="m-0 font-weight-bold text-primary">Request Document</h6>
@@ -194,7 +201,7 @@ function OtherRequest() {
                         <div className="container-fluid">
                             <div className="row justify-content-center">
                                 <div className="col-xl-8 col-lg-7">
-                                    <div className="card shadow mb-4">
+                                    <div className="card shadow mb-4" id="DescriptionInvalid">
                                         {/* Card Header - New Hire Upload */}
                                         <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                             <h6 className="m-0 font-weight-bold text-primary">Description</h6>
@@ -224,13 +231,13 @@ function OtherRequest() {
                         {/* Page content ends here */}
                         
                         {/* page content begin here */}
-                        <div className="container-fluid">
-                            <div className="row justify-content-center">
-                                <div className="col-xl-8 col-lg-7">
-                                    <div className="card shadow mb-4">
+                        <div className="container-fluid"  >
+                            <div className="row justify-content-center" >
+                                <div className="col-xl-8 col-lg-7" >
+                                    <div className="card shadow mb-4" id="Invalid">
                                         {/* Card Header - New Hire Upload */}
                                         <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                            <h6 className="m-0 font-weight-bold text-primary">Upload file</h6>
+                                            <h6 className="m-0 font-weight-bold text-primary" >Upload file</h6>
                                         </div>
                                         {/* Card Body - New Hire Options */}
                                         <div className="card-body">

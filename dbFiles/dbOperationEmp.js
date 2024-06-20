@@ -631,7 +631,12 @@ const OtherRequest = async (data,dataPDF) => {
         const CurrentCivilStatus = data.CurrentCivilStatus;
         const NewCivilStatus = data.NewCivilStatus;
 
-        handleDocuments(TransactionType,Status,DateTime,TurnAround,Application_Date,Transaction_Num,RequestType,TypeOfDelivery,OtherReq,EmpId,ErroneousName,CorrectName,RequestTitle, Description,CompletionDate,DeductionFor,ReasonType,PlaceOfConfinement,BankAccount,ReasonForInfoUpdate, CurrentFullname, NewFullname, CurrentCivilStatus, NewCivilStatus,dataPDF)
+        if (dataPDF !== ""){
+            handleDocuments(TransactionType,Status,DateTime,TurnAround,Application_Date,Transaction_Num,RequestType,TypeOfDelivery,OtherReq,EmpId,ErroneousName,CorrectName,RequestTitle, Description,CompletionDate,DeductionFor,ReasonType,PlaceOfConfinement,BankAccount,ReasonForInfoUpdate, CurrentFullname, NewFullname, CurrentCivilStatus, NewCivilStatus,dataPDF)
+        }else{
+            handleDocuments(TransactionType,Status,DateTime,TurnAround,Application_Date,Transaction_Num,RequestType,TypeOfDelivery,OtherReq,EmpId,ErroneousName,CorrectName,RequestTitle, Description,CompletionDate,DeductionFor,ReasonType,PlaceOfConfinement,BankAccount,ReasonForInfoUpdate, CurrentFullname, NewFullname, CurrentCivilStatus, NewCivilStatus)
+        }
+
 
     } catch (error) {
         console.error("Error inserting PDF:", error);
@@ -704,72 +709,69 @@ const handleDocuments = async (TransactionType, Status, DateTime, TurnAround, Ap
             `);
 
             const SubmissionID = file.recordset[0].SubmissionID;
-
-            if(TransactionType === "SSS Loan"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"1 Month Pay Slip");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Loan Disclosure Statement");
-            }else if(TransactionType === "Pag-Ibig Landbank Card"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
-                PdfFile(dataPDF.Doc2,SubmissionID,"1 Month Pay Slip");
-                PdfFile(dataPDF.Doc3,SubmissionID,"Valid ID");
-            }else if(TransactionType === "Pag-Ibig Virtual Account"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Screenshot of Filed Loan via Virtual Account");
-                PdfFile(dataPDF.Doc2,SubmissionID,"1 Month Pay Slip");
-                PdfFile(dataPDF.Doc3,SubmissionID,"1 Month Gross Income");
-            }else if(TransactionType === "Maternity Notication"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"SSS Maternity Notification Form");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Screenshot of SSS Maternity Eligibility");
-                PdfFile(dataPDF.Doc3,SubmissionID,"SSS Allocation of Maternity Leave Credit Form");
-                PdfFile(dataPDF.Doc4,SubmissionID,"Medical Certificate or Ultrasound Report");
-            }else if(TypeOfDelivery === "Live Child Birth"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Live Birth Certificate");
-                PdfFile(dataPDF.Doc3,SubmissionID,"Solo Parent ID");
-            }else if(TypeOfDelivery === "Miscarriage / Emergency Termination of Pregnancy / Ectopic Pregnancy"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Proof of Pregnancy");
-                PdfFile(dataPDF.Doc3,SubmissionID,"Proof of Termination of Pregnancy");
-            }else if(TypeOfDelivery === "Still Birth / Fetal Death"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Fetal Certificate of Death");
-            }else if(RequestType === "SSS Unposted Loan Payment"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Latest Statement of Account");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Request/Verification Form");
-            }else if(RequestType === "SSS Unposted Contribution"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Latest Monthly Contributions");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Request/Verification Form");
-            }else if(RequestType === "SSS Other Information Update Request"){
-                PdfFile(dataPDF.DocumentFile,SubmissionID,"Request/Verification Form");
-            }else if(RequestType === "PAG-IBIG Certificate of Remittance"){
-                PdfFile(dataPDF.DocumentFile,SubmissionID,"Latest Statement of Account");
-            }else if(RequestType === "PAG-IBIG Certificate of Oneness"){
-                PdfFile(dataPDF.DocumentFile,SubmissionID,"Form from Pag-Ibig");
-            }else if(DeductionFor === "SSS Salary Loan" || DeductionFor === "SSS Calamity Loan"){
-                PdfFile(dataPDF.DocumentFile,SubmissionID,"Email Notification from SSS");
-            }else if(DeductionFor === "PAG-IBIG Salary Loan" || DeductionFor === "PAG-IBIG Calamity Loan"){
-                if(ReasonType === "Provident Fund"){
-                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Provident Application Form received by PAG-IBIG");
-                }else if(ReasonType === "Re-Loan"){
-                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Screenshot/Image of Text Notification from PAG-IBIG");
+            if (dataPDF.DocumentFile && dataPDF.DocumentFile.length > 0){
+                if(TransactionType === "SSS Loan"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"1 Month Pay Slip");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Loan Disclosure Statement");
+                }else if(TransactionType === "Pag-Ibig Landbank Card"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"1 Month Pay Slip");
+                    PdfFile(dataPDF.Doc3,SubmissionID,"Valid ID");
+                }else if(TransactionType === "Pag-Ibig Virtual Account"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Screenshot of Filed Loan via Virtual Account");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"1 Month Pay Slip");
+                    PdfFile(dataPDF.Doc3,SubmissionID,"1 Month Gross Income");
+                }else if(TransactionType === "Maternity Notication"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"SSS Maternity Notification Form");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Screenshot of SSS Maternity Eligibility");
+                    PdfFile(dataPDF.Doc3,SubmissionID,"SSS Allocation of Maternity Leave Credit Form");
+                    PdfFile(dataPDF.Doc4,SubmissionID,"Medical Certificate or Ultrasound Report");
+                }else if(TypeOfDelivery === "Live Child Birth"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Live Birth Certificate");
+                    PdfFile(dataPDF.Doc3,SubmissionID,"Solo Parent ID");
+                }else if(TypeOfDelivery === "Miscarriage / Emergency Termination of Pregnancy / Ectopic Pregnancy"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Proof of Pregnancy");
+                    PdfFile(dataPDF.Doc3,SubmissionID,"Proof of Termination of Pregnancy");
+                }else if(TypeOfDelivery === "Still Birth / Fetal Death"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Application Form");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Fetal Certificate of Death");
+                }else if(RequestType === "SSS Unposted Loan Payment"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Latest Statement of Account");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Request/Verification Form");
+                }else if(RequestType === "SSS Unposted Contribution"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Latest Monthly Contributions");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Request/Verification Form");
+                }else if(RequestType === "SSS Other Information Update Request"){
+                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Request/Verification Form");
+                }else if(RequestType === "PAG-IBIG Certificate of Remittance"){
+                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Latest Statement of Account");
+                }else if(RequestType === "PAG-IBIG Certificate of Oneness"){
+                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Form from Pag-Ibig");
+                }else if(DeductionFor === "SSS Salary Loan" || DeductionFor === "SSS Calamity Loan"){
+                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Email Notification from SSS");
+                }else if(DeductionFor === "PAG-IBIG Salary Loan" || DeductionFor === "PAG-IBIG Calamity Loan"){
+                    if(ReasonType === "Provident Fund"){
+                        PdfFile(dataPDF.DocumentFile,SubmissionID,"Provident Application Form received by PAG-IBIG");
+                    }else if(ReasonType === "Re-Loan"){
+                        PdfFile(dataPDF.DocumentFile,SubmissionID,"Screenshot/Image of Text Notification from PAG-IBIG");
+                    }
+                }else if(TransactionType === "SSS Sickness Notification"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Sickness Notification Form");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Medical Certificate");
+                    PdfFile(dataPDF.Doc3,SubmissionID,"Supporting Documents");
+                    PdfFile(dataPDF.Doc4,SubmissionID,"EC Supporting Documents");
+                }else if(TransactionType === "SSS Sickness Approval"){
+                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Sickness Eligibility");
+                }else if(TransactionType === "Update Employee Information"){
+                    PdfFile(dataPDF.Doc1,SubmissionID,"Signed Letter of Request");
+                    PdfFile(dataPDF.Doc2,SubmissionID,"Certificate/Contract");
                 }
-            }else if(TransactionType === "SSS Sickness Notification"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Sickness Notification Form");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Medical Certificate");
-                PdfFile(dataPDF.Doc3,SubmissionID,"Supporting Documents");
-                PdfFile(dataPDF.Doc4,SubmissionID,"EC Supporting Documents");
-            }else if(TransactionType === "SSS Sickness Approval"){
-                PdfFile(dataPDF.DocumentFile,SubmissionID,"Sickness Eligibility");
-            }else if(TransactionType === "Update Employee Information"){
-                PdfFile(dataPDF.Doc1,SubmissionID,"Signed Letter of Request");
-                PdfFile(dataPDF.Doc2,SubmissionID,"Certificate/Contract");
+                else if(TransactionType === "Other Request"){
+                    PdfFile(dataPDF.DocumentFile,SubmissionID,"Other Request Uploaded File");
+                }
             }
-            else if(TransactionType === "Other Request"){
-                PdfFile(dataPDF.DocumentFile,SubmissionID,"Other Request Uploaded File");
-            }
-                
-           
-            
-
             console.log("Successfully inserted: ",file);
     } catch (error) {
         console.error("Error inserting PDF:", error);

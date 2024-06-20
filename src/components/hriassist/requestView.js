@@ -19,18 +19,18 @@ import { Document, Page,pdfjs } from 'react-pdf';
 
     const location = useLocation();
     const data = location.state.data;
-
-    console.log(data);
-    // console.log(sessionStorage); 
-    const sampleEmail = 'joakimtrinidad234@gmail.com'
+ 
+    const HrEmail = sessionStorage.getItem("email");
+    const HrEmpId = sessionStorage.getItem("employeeId");
+    // console.log(sampleEmail); 
 
     const { employeeId } = useParams();
+    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [numPages, setNumPages] = useState(); 
     const [pdfUrl, setPdfUrl] = useState(''); 
     const [imageUrl, setImageUrl] = useState('');
 
-    const HrEmpId = sessionStorage.getItem("employeeId");
 
     const [pdf, setPdf] = useState([]); 
     
@@ -84,8 +84,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
       document.body.removeChild(a);
     };
   
-    useEffect(() => {  
-      getSubmissionPDF() 
+    useEffect(() => {   
+      getSubmissionPDF()  
     },[]); 
 
     // Get all pdf of a transaction
@@ -256,7 +256,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const sendEmail = async (type, reason, documentName) => {  
       const content = {
         sender_name: `sender's name`,
-        sender_email: sampleEmail, // hr's email
+        sender_email: HrEmail, // hr's email
         receiver_name: data.Name,
         receiver_email: data.EmailAddress, // employee's email
         transaction_type: data.TransactionType,
@@ -335,7 +335,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                       <Button onClick={completeSubmission}>Complete</Button> :
                                       <label>Completion Date: {data.CompletionDate}</label>
                                   }
-                                      <Button onClick={()=>sendEmail('submit')}>Send</Button>
+                                      {/* <Button onClick={()=>sendEmail('submit')}>Send</Button> */}
                                 </div>
                                 </div> 
                               </div> 
@@ -359,7 +359,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                   {/* Card Body - New Hire Options */}
                                     <div className="card-body">
                                         <div className="tab-content">
-                                          <div className="card-body loan-row">
+                                          <div className="card-body">
                                               {data.CorrectName && 
                                               <div className="form-group">
                                                   <label htmlFor="correctName">Correct Name</label>
@@ -491,7 +491,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                 }
                 {/* Page content ends here */}
 
-                {/* page content begin here */}  
+                {/* page content begin here */}   
                 {pdf && pdf.map((pdf, index) =>
                 <div className="container-fluid">
                     <div className="row justify-content-center">
@@ -545,7 +545,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                                               id="remark" 
                                                               name="remark"
                                                               rows="3" 
-                                                              style={{ resize: "vertical" }}
+                                                              style={{ resize: "both" }}
                                                               onChange={(e)=>resubmitReason(pdf.PdfFileID,e)}
                                                               value={pdf.ResubmitReason}
                                                             /> 

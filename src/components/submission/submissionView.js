@@ -84,6 +84,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
       getSubmissionPDF()
     }, [employeeId]); 
 
+    console.log(data);
     // Get all pdf of a transaction
     const getSubmissionPDF = async () => {
 
@@ -260,6 +261,21 @@ import { Document, Page,pdfjs } from 'react-pdf';
         console.error('Error updating failed:', error);
       }
     };
+
+    const validate = () => { 
+    
+      if((data.LoanAppDate || data.TransactionNum || data.TypeOfDelivery || 
+        data.CorrectName || data.DeductionFor || data.Description || 
+        data.ErroneousName || data.OtherReq || data.ReasonType || 
+        data.RequestTitle || data.RequestType || data.PlaceOfConfinement || 
+        data.BankAccNumber || data.CompletionDate || data.DeductionFor || 
+        data.ReasonForInfoUpdate || data.CurrentFullname || data.NewFullname || 
+        data.CurrentCivilStatus || data.NewCivilStatus )){
+        return true
+      } else {
+        return false
+      } 
+    };
  
     
     return (
@@ -315,7 +331,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                 </div>
                       
                 {/* page content begin here */}
-                {(data.LoanAppDate || data.TransactionNum || data.TypeOfDelivery ) && 
+                {validate() && 
                   <div className="container-fluid">
                       <div className="row justify-content-center">
                           <div className="col-xl-8 col-lg-7">
@@ -327,7 +343,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                   {/* Card Body - New Hire Options */}
                                     <div className="card-body">
                                         <div className="tab-content">
-                                            <div className="card-body loan-row">
+                                            <div className="card-body">
                                                 {data.DateTime && 
                                                 <div className="form-group">
                                                     <label>Loan Application Date</label>
@@ -339,16 +355,119 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                                     />
                                                 </div>
                                                 }
+                                                {data.DeductionFor && 
+                                                <div className="form-group">
+                                                    <label htmlFor="deductionFor">Deduction For</label>
+                                                    <input type="text" className="form-control" id="deductionFor" name="deductionFor" disabled value={data.DeductionFor}/>
+                                                </div>
+                                                }
+                                                {data.Description && 
+                                                <div className="form-group">
+                                                    <label htmlFor="description">Description</label>
+                                                    <input type="text" className="form-control" id="description" name="description" disabled value={data.Description}/>
+                                                </div>
+                                                }
+                                                {data.ErroneousName && 
+                                                <div className="form-group">
+                                                    <label htmlFor="erroneousName">Erroneous Name</label>
+                                                    <input type="text" className="form-control" id="erroneousName" name="erroneousName" disabled value={data.ErroneousName}/>
+                                                </div>
+                                                }
+                                                {data.LoanAppDate && 
+                                                <div className="form-group">
+                                                    <label htmlFor="loanAppDate">Loan Application Date</label>
+                                                    <input type="date" className="form-control" id="loanAppDate" name="loanAppDate" disabled value={data.LoanAppDate}/>
+                                                </div>
+                                                }
+                                                {data.OtherReq && 
+                                                <div className="form-group">
+                                                    <label htmlFor="otherReq">Other Request</label>
+                                                    <input type="text" className="form-control" id="otherReq" name="otherReq" disabled value={data.OtherReq}/>
+                                                </div>
+                                                }
+                                                {data.ReasonType && 
+                                                <div className="form-group">
+                                                    <label htmlFor="reasonType">Reason Type</label>
+                                                    <input type="text" className="form-control" id="reasonType" name="reasonType" disabled value={data.ReasonType}/>
+                                                </div>
+                                                }
+                                                {data.RequestTitle && 
+                                                <div className="form-group">
+                                                    <label htmlFor="requestTitle">Request Title</label>
+                                                    <input type="text" className="form-control" id="requestTitle" name="requestTitle" disabled value={data.RequestTitle}/>
+                                                </div>
+                                                }
+                                                {data.RequestType && 
+                                                <div className="form-group">
+                                                    <label htmlFor="requestType">Request Type</label>
+                                                    <input type="text" className="form-control" id="requestType" name="requestType" disabled value={data.RequestType}/>
+                                                </div>
+                                                } 
                                                 {data.TransactionNum && 
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Transaction Number</label>
-                                                    <input type="text" className="form-control" id="name" name="name" disabled value={data.TransactionNum}/>
+                                                    <label htmlFor="transactionNum">Transaction Number</label>
+                                                    <input type="text" className="form-control" id="transactionNum" name="transactionNum" disabled value={data.TransactionNum}/>
                                                 </div>
                                                 }
                                                 {data.TypeOfDelivery && 
                                                 <div className="form-group">
-                                                    <label htmlFor="name">Type of Delivery</label>
-                                                    <input type="text" className="form-control" id="name" name="name" disabled value={data.TypeOfDelivery}/>
+                                                    <label htmlFor="typeOfDelivery">Type of Delivery</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.TypeOfDelivery}/>
+                                                </div>
+                                                }
+                                                {data.PlaceOfConfinement && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">Place of Confinement</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.PlaceOfConfinement}/>
+                                                </div>
+                                                }
+                                                {data.BankAccNumber && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">Bank Account Number</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.BankAccNumber}/>
+                                                </div>
+                                                }
+                                                {data.CompletionDate && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">Completion Date</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.CompletionDate}/>
+                                                </div>
+                                                }
+                                                {data.DeductionFor && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">Deduction For</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.DeductionFor}/>
+                                                </div>
+                                                }
+                                                
+                                                {data.ReasonForInfoUpdate && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">Reason For Information Update</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.ReasonForInfoUpdate}/>
+                                                </div>
+                                                }
+                                                {data.CurrentFullname && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">Current Full Name</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.CurrentFullname}/>
+                                                </div>
+                                                }
+                                                {data.NewFullname && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">New Full Name</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.NewFullname}/>
+                                                </div>
+                                                }
+                                                {data.CurrentCivilStatus && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">Current Civil Status</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.CurrentCivilStatus}/>
+                                                </div>
+                                                }
+                                                {data.NewCivilStatus && 
+                                                <div className="form-group">
+                                                    <label htmlFor="typeOfDelivery">New Civil Status</label>
+                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.NewCivilStatus}/>
                                                 </div>
                                                 }
                                             </div>
