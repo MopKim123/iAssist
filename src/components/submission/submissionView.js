@@ -29,6 +29,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     const [numPages, setNumPages] = useState();
     const [pageNumber, setPageNumber] = useState(1); 
     const [pdfUrl, setPdfUrl] = useState(''); 
+    const [imageUrl, setImageUrl] = useState('');
     
 
     const [pdf, setPdf] = useState([]);
@@ -49,8 +50,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     };
     
     // Converts base64 to pdf
-    const convertToPDF = (base64) => {
-      console.log("here",base64)
+    const convertToPDF = (base64) => { 
       // const binaryString = atob(base64?base64:base64pdf.blobpdf2);
       const binaryString = atob(base64?base64:base64pdf.blobpdf2);
 
@@ -64,6 +64,25 @@ import { Document, Page,pdfjs } from 'react-pdf';
       return(URL.createObjectURL(blob))
     } 
     
+    const convertToImage = (base64,type) => {
+      // Decode the base64 string to binary data
+      const binaryString = atob(base64);
+    
+      // Create a buffer and a uint8 array from the binary string
+      const arrayBuffer = new ArrayBuffer(binaryString.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < binaryString.length; i++) {
+        uint8Array[i] = binaryString.charCodeAt(i);
+      }
+    
+      // Create a blob from the uint8 array and specify the image type
+      const blob = new Blob([arrayBuffer], { type: `image/${type}` });
+    
+      // Create a URL for the blob
+      const imageUrl = URL.createObjectURL(blob);
+      return imageUrl;
+    };
+
     // Converts and download
     const convertAndDownloadPDF = (base64, fileName) => {  
       console.log(base64)
@@ -83,8 +102,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     useEffect(() => { 
       getSubmissionPDF()
     }, [employeeId]); 
-
-    console.log(data);
+ 
     // Get all pdf of a transaction
     const getSubmissionPDF = async () => {
 
@@ -104,12 +122,10 @@ import { Document, Page,pdfjs } from 'react-pdf';
 
           try {
             const responseData = await uploadResponse.json();
-            const sortedData = responseData.result.sort((a, b) => {
-                // First, sort by name
+            const sortedData = responseData.result.sort((a, b) => { 
                 if (a.RequirementName !== b.RequirementName) {
                     return a.RequirementName.localeCompare(b.RequirementName);
-                } else {
-                    // If names are the same, sort by the variable containing the number
+                } else { 
                     return b.Updated - a.Updated;
                 }
             }); 
@@ -199,10 +215,16 @@ import { Document, Page,pdfjs } from 'react-pdf';
       
   
     // Modal functions
-    const handleButtonClick = (base64, e) => { 
-      e.preventDefault();
-      console.log(e);
-      convertToPDF(base64);
+    const handleButtonClick = (data) => {
+      if(data.ContentType=='.pdf'){  
+        convertToPDF(data.PdfData);
+        setImageUrl(''); 
+      } else {  
+        const url = convertToImage(data.PdfData,data.ContentType); 
+        setImageUrl(url); 
+        setPdfUrl(''); 
+      }
+
       setShowModal(true);
     };
 
@@ -292,7 +314,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                   </div>
           <div className="row justify-content-center">
             <div className="col-xl-12 col-xl-9">
-            <form onSubmit={handleFormSubmit}>
+            {/* <form onSubmit={handleFormSubmit}> */}
               <div className="card shadow mb-4">
                 <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <ul className="nav nav-tabs nav-fill">
@@ -343,18 +365,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                   {/* Card Body - New Hire Options */}
                                     <div className="card-body">
                                         <div className="tab-content">
-                                            <div className="card-body">
-                                                {data.DateTime && 
-                                                <div className="form-group">
-                                                    <label>Loan Application Date</label>
-                                                    <input
-                                                        type="date"
-                                                        className="form-control" 
-                                                        value={data.LoanAppDate}
-                                                        disabled
-                                                    />
-                                                </div>
-                                                }
+                                            <div className="card-body"> 
                                                 {data.DeductionFor && 
                                                 <div className="form-group">
                                                     <label htmlFor="deductionFor">Deduction For</label>
@@ -498,8 +509,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                               <div className="card-body">
                                 <div className="d-flex justify-content-between align-items-center">
                                   <div>
-                                    <button onClick={(e) => handleButtonClick(pdfItem.PdfData, e)}>
-                                      View PDF
+                                    <button onClick={() => handleButtonClick(pdfItem)}>
+                                      View File
                                     </button>
                                     <button onClick={() => convertAndDownloadPDF(pdfItem.PdfData, pdfItem.FileName)} className='btnClose'>
                                       Download
@@ -528,54 +539,16 @@ import { Document, Page,pdfjs } from 'react-pdf';
                     </div>
                   </div>
                 )}
-                {/* Page content ends here */}
+                {/* Page content ends here */} 
 
-                {/* page content begin here */}
-                {/* <div className="container-fluid">
-                    <div className="row justify-content-center">
-                        <div className="col-xl-8 col-lg-7">
-                            <div className="card shadow mb-4"> 
-                                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 className="m-0 font-weight-bold text-primary">*Requirement name</h6> 
-                                    <h6 className="m-0 font-weight-bold">*Resubmit</h6> 
-                                </div> 
-                                <div className="card-body">
-                                    <div className="tab-content">
-                                        <div className="card-body">
-                                            <div className="d-flex justify-content-between mb-2">
-                                              <div> 
-                                                <button onClick={handleButtonClick}>
-                                                  View PDF
-                                                </button>
-                                                <button onClick={convertAndDownloadPDF} className='btnClose'>
-                                                  Download
-                                                </button>
-                                              </div>
-                                              <label>*File Name</label>
-                                              <label>*Upload Date</label>
-                                            </div>
- 
-                                            <div className="d-flex justify-content-between">
-                                                <div className="d-flex justify-content-left">
-                                                    <input type="file" className="input-file" aria-describedby="fileHelp"/> 
-                                                </div> 
-                                                <label>Reason: Incomplete/blurry</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> */}
                 {/* Page content ends here */} 
                 {data.Status === 'Resubmit' ? (
-                  <button type="submit" className="btn btn-primary d-block mx-auto mb-4">Submit</button>
+                  <button type="submit" onClick={handleFormSubmit} className="btn btn-primary d-block mx-auto mb-4">Submit</button>
                 ) : (
                   <span></span>
                 )}
                 
-                </form>
+                {/* </form> */}
               </div>
 
               
@@ -588,8 +561,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                       <button type="button" className="btnClose" onClick={handleCloseModal}>Close</button>
                     </div>
                   </Modal.Header>
-                  <Modal.Body style={{backgroundColor: 'lightgray'}}>  
-                    <Document
+                  <Modal.Body style={{backgroundColor: 'lightgray'}}>   
+                    {pdfUrl && <Document
                         file={pdfUrl} 
                         onLoadSuccess={({ numPages })=>setNumPages(numPages)} 
                     >
@@ -603,7 +576,8 @@ import { Document, Page,pdfjs } from 'react-pdf';
                               renderTextLayer={false}
                             />
                           </div>)}
-                    </Document>
+                    </Document>}
+                    {imageUrl && <img src={imageUrl} alt="Converted Image" />}
                   </Modal.Body>
                   <Modal.Footer> 
                     <div>

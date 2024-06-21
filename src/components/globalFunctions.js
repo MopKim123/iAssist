@@ -118,6 +118,44 @@ export async function insertNotification(Name, TransactionType, SenderID, Receiv
 }; 
 
 
+    // Function to handle form submission
+  export async function  sendEmail (type, reason, documentName, data) {  
+    
+    /*
+    3 days
+    loan application certification
+    sss sickness notification
+    sss maternity notification
+    sss maternity reimbursement
+    stop deduction
+    general
+
+    5 days
+    certification request    
+
+    */
+
+    const content = {
+      sender_name: data.HrName,
+      sender_email: data.HrEmail, // hr's email
+      receiver_name: data.Name,
+      receiver_email: data.EmailAddress, // employee's email
+      transaction_type: data.TransactionType,
+      document_name: documentName,
+      reason: reason 
+    };  
+    try {
+      const result = await sendEmailjs(type, content);
+      if (result) {
+        return Promise.resolve(true);
+      } else {
+        return Promise.reject(false);
+      }
+    } catch (error) {
+      return Promise.reject(false);
+    } 
+  };
+
 export async function sendEmailjs (emailType, data) {  
 
   let message = ''
@@ -168,7 +206,7 @@ export async function sendEmailjs (emailType, data) {
   
   Your prompt attention to this matter will greatly assist us in finalizing the transaction smoothly.
   
-  If you require any assistance or clarification regarding the resubmission process, please do not hesitate to reach out to ${data.contact_person}.
+  If you require any assistance or clarification regarding the resubmission process, please do not hesitate to reach out to HR Compensation & Benefits Team.
   
   Thank you for your cooperation and understanding.
   
@@ -179,9 +217,22 @@ export async function sendEmailjs (emailType, data) {
   ${data.sender_name} `
   
   // message for resubmitting of file by the employee
-  const messageResubmitted = `test ${data}`
+  const titleResubmitted = `Notification: ${data.employee_name} Resubmitted Document for ${data.transaction_type}`
+  const messageResubmitted = `
+  Dear ${data.hr_name},
+
+  This is to inform you that ${data.employee_name} has resubmitted the ${data.document_name} required for the ${data.transaction_type} process.
+
+  Please review the resubmitted document at your earliest convenience. If any further action is required, you will be notified promptly.
+
+  Thank you for your attention to this matter.
+
+  Best regards,
+ 
+  Automated HR Information System`
   
   // message for transaction expiration
+  const titleExpired = `test ${data}`
   const messageExpired = `test ${data}`
 
   switch(emailType){
@@ -190,6 +241,10 @@ export async function sendEmailjs (emailType, data) {
       message = messageComplete
       break;
     case 'resubmit':
+      title = titleResubmit
+      message = messageResubmit
+      break;    
+    case 'resubmitted':
       title = titleResubmit
       message = messageResubmit
       break;      

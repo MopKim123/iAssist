@@ -252,7 +252,8 @@ const getFilteredSubmissions = async (pageNumber, pageSize, facility, name, tran
     }
 }
 // HR side - download submissions
-const downloadSubmissions = async (name, transactionType, status, month, year) => {
+const downloadSubmissions = async (name, transactionType, status, month, year, facility) => {
+    console.log(facility);
     let query =   `SELECT 
                         SubsWithRowNumber.EmpId,
                         SubsWithRowNumber.Name,
@@ -269,14 +270,17 @@ const downloadSubmissions = async (name, transactionType, status, month, year) =
                             ROW_NUMBER() OVER (ORDER BY SubmissionID DESC) AS RowNumber
                         FROM Submission
                         LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId
-                        WHERE 1 = 1 
+                        LEFT JOIN EmployeeInfo ON Submission.EmpId = EmployeeInfo.EmployeeId 
+                        WHERE EmployeeInfo.Facility = @Facility 
                     `
     let endQuery =   `) AS SubsWithRowNumber`
-    let countFilter = ' LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId WHERE 1=1 '
+    let countFilter = ` LEFT JOIN EmpPersonalDetails ON Submission.EmpId = EmpPersonalDetails.EmployeeId 
+                        LEFT JOIN EmployeeInfo ON Submission.EmpId = EmployeeInfo.EmployeeId 
+                        WHERE EmployeeInfo.Facility = @Facility `
 
     if(name){
-        query += ` AND (EmpPersonalDetails.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
-        countFilter += ` AND (EmpPersonalDetails.Name LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        query += ` AND (EmpPersonalDetails.EmployeeName LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
+        countFilter += ` AND (EmpPersonalDetails.EmployeeName LIKE '%${name}%' OR Submission.EmpId LIKE '%${name}%') `
     } 
     if(transactionType){
         query += ` AND Submission.TransactionType = '${transactionType}' `
@@ -300,9 +304,11 @@ const downloadSubmissions = async (name, transactionType, status, month, year) =
     try {
         let pool = await sql.connect(config);
         let result = await pool.request() 
+            .input('Facility', sql.VarChar, facility)   
             .query(query); 
         
         let count = await pool.request() 
+            .input('Facility', sql.VarChar, facility) 
             .query(`
                 SELECT COUNT(*) FROM Submission
             `+countFilter);

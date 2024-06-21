@@ -63,7 +63,7 @@ const HRIAssist = () => {
     }
   });
   
-  useEffect(() => { 
+  useEffect(() => {   
     if(Object.values(filter).every(value => value === '')){
       setSearchFilter(false)
     }
@@ -76,9 +76,7 @@ const HRIAssist = () => {
   
   // get all the employee submissions
   const getSubmissions = async (pageNumber, pageSize, facility) => {
-    
-    const EmpId = '10023'
-
+     
     const formData = new FormData(); 
     formData.append('pageNumber', pageNumber);
     formData.append('pageSize', pageSize);
@@ -118,6 +116,7 @@ const HRIAssist = () => {
     formData.append('status', filter.status);
     formData.append('month', filter.month);
     formData.append('year', filter.year);
+    formData.append('facility', facility);
     
     try {
       const uploadResponse = await fetch('http://localhost:5000/hrdownloadsubmissions', {
@@ -221,8 +220,7 @@ const HRIAssist = () => {
       } 
 
       try {
-        const data = await uploadResponse.json();   
-        console.log(data.result);
+        const data = await uploadResponse.json();    
         setSubmissions(data.result ? data.result.submissions:[]) 
         setTotalPages(data.result ? Math.ceil(data.result.count / pageSize):1)  
       } catch (error) {
@@ -266,18 +264,17 @@ const HRIAssist = () => {
   };
 
   // filter requirements before retrieving
-  const filterSearch = () => { 
+  const filterSearch = () => {  
     const month = filter.month
     const year = filter.year
     if((month && year)||(!month && year) || (!month && !year))
-    {
-      setCurrentPage(1)
-      setSubmissions([]) 
+    { 
+      setSubmissions([])  
       if(Object.values(filter).every(value => value === '')){ 
-        setSearchFilter(false)
-        getSubmissions(currentPage, pageSize) 
-      }else{ 
-        getFilteredSubmissions(currentPage, pageSize, filter) 
+        setSearchFilter(false) 
+        getSubmissions(currentPage, pageSize, facility) 
+      }else{  
+        getFilteredSubmissions(currentPage, pageSize, facility) 
         setSearchFilter(true)
       }
     }else{

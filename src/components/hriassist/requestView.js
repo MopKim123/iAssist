@@ -22,10 +22,9 @@ import { Document, Page,pdfjs } from 'react-pdf';
  
     const HrEmail = sessionStorage.getItem("email");
     const HrEmpId = sessionStorage.getItem("employeeId");
-    // console.log(sampleEmail); 
-
-    const { employeeId } = useParams();
-    const [loading, setLoading] = useState(true);
+    const HrName = sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName") ;
+ 
+ 
     const [showModal, setShowModal] = useState(false);
     const [numPages, setNumPages] = useState(); 
     const [pdfUrl, setPdfUrl] = useState(''); 
@@ -89,7 +88,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
     },[]); 
 
     // Get all pdf of a transaction
-    const getSubmissionPDF = async () => {
+    const getSubmissionPDF = async () => { 
 
         const formData = new FormData();
         formData.append('SubmissionID', data.SubmissionID);
@@ -99,14 +98,14 @@ import { Document, Page,pdfjs } from 'react-pdf';
             method: 'POST',
             body: formData,
           });
-      
+       
           if (!uploadResponse.ok) {
             console.error('Failed to upload PDF:', uploadResponse.statusText);
             return;
           }
 
           try {
-            const responseData = await uploadResponse.json();  
+            const responseData = await uploadResponse.json();   
             if(responseData.result){
               const sortedData = responseData.result.sort((a, b) => {   
                 if (a.RequirementName !== b.RequirementName) {
@@ -255,14 +254,13 @@ import { Document, Page,pdfjs } from 'react-pdf';
     // Function to handle form submission
     const sendEmail = async (type, reason, documentName) => {  
       const content = {
-        sender_name: `sender's name`,
+        sender_name: HrName,
         sender_email: HrEmail, // hr's email
         receiver_name: data.Name,
         receiver_email: data.EmailAddress, // employee's email
         transaction_type: data.TransactionType,
         document_name: documentName,
-        reason: reason,
-        contact_person: 'Ms Cham', 
+        reason: reason 
       };  
       try {
         const result = await sendEmailjs(type, content);
@@ -274,15 +272,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
       } catch (error) {
         return Promise.reject(false);
       }
-      
-      // return new Promise((resolve, reject) => { 
-        
-      //   if(await sendEmailjs(type, content)){
-      //     resolve(true);
-      //   } else {
-      //     reject(false); 
-      //   } 
-      // });
+       
     };
 
     // Checkbox 
