@@ -119,7 +119,7 @@ export async function insertNotification(Name, TransactionType, SenderID, Receiv
 
 
     // Function to handle form submission
-  export async function  sendEmail (type, reason, documentName, data) {  
+  export async function  sendEmail (type, data) {  
     
     /*
     3 days
@@ -131,19 +131,58 @@ export async function insertNotification(Name, TransactionType, SenderID, Receiv
     general
 
     5 days
-    certification request    
-
+    certification request     
     */
+    
+    let HrName
+    let HrEmail
+    let cc
+    const TurnAround = data.TransactionType === 'Certification Request'? 'five (5)': 'three (3)';
+
+    
+    const formData = new FormData();
+    formData.append('facility', data.facility);
+    
+    try {
+      const uploadResponse = await fetch('http://localhost:5000/gethremails', {
+        method: 'POST',
+        body: formData,
+      });
+   
+      if (!uploadResponse.ok) {
+        console.error('Failed to upload PDF:', uploadResponse.statusText);
+        return;
+      }
+
+      try {
+        const pdfResponse = await uploadResponse.json(); 
+        HrName = pdfResponse.result[0].Name
+        HrEmail = pdfResponse.result[0].EmailAddress
+        
+        cc = pdfResponse.result.map(item => item.EmailAddress).join(', '); 
+        
+      } catch (error) {
+          console.error('Error parsing JSON response:', error);
+      }
+   
+    } catch (error) {
+      console.error('Error uploading PDF:', error);
+    }
 
     const content = {
-      sender_name: data.HrName,
-      sender_email: data.HrEmail, // hr's email
+      sender_name: HrName,
+      sender_email: HrEmail, // hr's email
       receiver_name: data.Name,
       receiver_email: data.EmailAddress, // employee's email
       transaction_type: data.TransactionType,
-      document_name: documentName,
-      reason: reason 
+      document_name: data.documentName,
+      reason: data.reason,
+      stopDeduction: data.reason,
+      cc: cc,
+      turnAround: TurnAround
     };  
+    // console.log(content);
+ 
     try {
       const result = await sendEmailjs(type, content);
       if (result) {
@@ -160,6 +199,13 @@ export async function sendEmailjs (emailType, data) {
 
   let message = ''
   let title = ''
+  let cc = ''
+
+  if(data.cc){
+    cc = data.cc
+  } else {
+    cc = data.receiver_email + ", "+ data.sender_email
+  }
 
   // complete - message for transaction completion
   const titleComplete = `${data.transaction_type} Approval and Completion Confirmation`
@@ -184,7 +230,7 @@ export async function sendEmailjs (emailType, data) {
   const messageSubmit = `
   Your request for ${data.transaction_type} has been received. 
 
-  Your HR CompBen Team will review the submitted documents and will email you within three (3) working days to update you on the status of your request
+  Your HR CompBen Team will review the submitted documents and will email you within ${data.turnAround} working days to update you on the status of your request
    
   If no update is received within the speciefied timeline, you may send us an email at HRComp_Ben@innodata.com.
 
@@ -248,7 +294,7 @@ export async function sendEmailjs (emailType, data) {
       title = titleResubmit
       message = messageResubmit
       break;      
-    case 'submit':
+    case 'submit': 
       title = titleSubmit
       message = messageSubmit
       break;      
@@ -260,22 +306,22 @@ export async function sendEmailjs (emailType, data) {
       sender_name: data.sender_name,
       sender_email: data.sender_email, 
       receiver_name: data.receiver_name, 
-      receiver_email: data.receiver_email,
-      // receiver_email: 'joakimtrinidad234@gmail.com', //temporary email
+      receiver_email: data.receiver_email, 
       message: message,  
       title: title,
-      cc: data.receiver_email + ", "+ data.sender_email
+      cc: cc
     };   
     console.log(formData);
-    emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
-      .then((result) => {
-        console.log('Email sent successfully:', result.text);
-        // alert('Updated Successfully') 
-        resolve(true);
-      }, (error) => {
-        console.error('Email sending failed:', error.text);
-        reject(error);
-      });
+
+    // emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
+    //   .then((result) => {
+    //     console.log('Email sent successfully:', result.text);
+    //     // alert('Updated Successfully') 
+    //     resolve(true);
+    //   }, (error) => {
+    //     console.error('Email sending failed:', error.text);
+    //     reject(error);
+    //   });
   });
 };
 

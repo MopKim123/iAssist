@@ -70,6 +70,32 @@ const getUserSubmissions = async (id, pageNumber, pageSize) => {
       throw error;
     }
 }
+// EmpPersonalDetails side - get hr emails
+const getHREmails = async (facility) => {
+    try { 
+      let pool = await sql.connect(config);
+      let result = await pool.request()
+        .input('facility', sql.VarChar, facility) 
+        .query(`
+            SELECT 
+                EmpPersonalDetails.EmployeeName AS Name,
+                EmpPersonalDetails.EmailAddress 
+            FROM EmpPersonalDetails 
+            LEFT JOIN EmployeeInfo ON EmpPersonalDetails.EmployeeId = EmployeeInfo.EmployeeId 
+            LEFT JOIN UserAccount ON EmpPersonalDetails.EmployeeId = UserAccount.EmployeeId 
+            WHERE EmployeeInfo.Facility = @facility AND UserAccount.Role = 'HRAdmin'
+        `); 
+         
+        if (result.recordset.length === 0) {
+            return null;
+        }
+        //   return result.recordset;
+        return  result.recordset ;
+    } catch (error) {
+      console.error("Error retrieving submission data:", error);
+      throw error;
+    }
+}
 
 
 // HR side - get submission pdfs
@@ -560,4 +586,5 @@ module.exports = {
     getSubmissionForNotification,
     insertNotification,
     downloadSubmissions,
+    getHREmails
 };

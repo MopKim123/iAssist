@@ -160,6 +160,20 @@ app.post('/usersubmission',  upload.single('EmpId'), async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+// Employee - get hr emails
+app.post('/gethremails',  upload.single('EmpId'), async (req, res) => {
+
+  try { 
+  
+    const { facility } = req.body; 
+    const result = await dbOperationHR.getHREmails(facility);
+    res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 // All - get notifications

@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'; 
 import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
-import '../../App.css';
-import { variables } from '../../variables';
+import '../../App.css'; 
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { insertNotification, sendEmail } from '../globalFunctions'; 
 
 function SSSLoan() {
 
@@ -24,6 +23,26 @@ function SSSLoan() {
     // useEffect(() => {
     //     [EmployeeId]
     // });
+
+    const TestEmail = () => {
+        
+        const content = {
+            HrName: '',
+            HrEmail: '', // hr's email
+            Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+            EmailAddress: sessionStorage.getItem("email"), // employee's email
+            TransactionType: 'SSS Loan',
+            documentName: '',
+            reason: '',
+            stopDeduction: false,
+            facility: sessionStorage.getItem("facility")
+        };
+
+        console.log(content); 
+        
+        sendEmail('submit',content)
+    };
+
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -188,6 +207,7 @@ function SSSLoan() {
                             <h4 className="m-0 font-weight-bold text-primary header-name">SSS Loan</h4>
                         </div>
                     </div>
+                        <button type="submit" onClick={TestEmail} className="btn btn-primary d-block mx-auto loan-btn">send</button>
                     <form onSubmit={handleFormSubmit}>
                         {/* page content begin here */}
                         <div className="container-fluid">

@@ -101,7 +101,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
   
     useEffect(() => { 
       getSubmissionPDF()
-    }, [employeeId]); 
+    }, []); 
  
     // Get all pdf of a transaction
     const getSubmissionPDF = async () => {
@@ -368,7 +368,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                             <div className="card-body"> 
                                                 {data.DeductionFor && 
                                                 <div className="form-group">
-                                                    <label htmlFor="deductionFor">Deduction For</label>
+                                                    <label htmlFor="deductionFor">Stop Deduction For</label>
                                                     <input type="text" className="form-control" id="deductionFor" name="deductionFor" disabled value={data.DeductionFor}/>
                                                 </div>
                                                 }
@@ -443,14 +443,7 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                                     <label htmlFor="typeOfDelivery">Completion Date</label>
                                                     <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.CompletionDate}/>
                                                 </div>
-                                                }
-                                                {data.DeductionFor && 
-                                                <div className="form-group">
-                                                    <label htmlFor="typeOfDelivery">Deduction For</label>
-                                                    <input type="text" className="form-control" id="typeOfDelivery" name="typeOfDelivery" disabled value={data.DeductionFor}/>
-                                                </div>
-                                                }
-                                                
+                                                } 
                                                 {data.ReasonForInfoUpdate && 
                                                 <div className="form-group">
                                                     <label htmlFor="typeOfDelivery">Reason For Information Update</label>
