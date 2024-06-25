@@ -67,8 +67,14 @@ function SicknessApproval() {
 
         if (thisInfo.SicknessEligibility && isValidFileType(thisInfo.SicknessEligibility)) {
             formData.append("SicknessEligibility", thisInfo.SicknessEligibility);
+
+            document.getElementById('SicknessEligibilityInvalid').style.border = '';
+            document.getElementById('BankAccountInvalid').style.border = '';
+
         } else {
-            toast.error('Invalid StatementOfAccount file type. Please upload a PDF, PNG, or JPEG file.', {
+            document.getElementById('SicknessEligibilityInvalid').style.border = '1px solid red';
+            document.getElementById('BankAccountInvalid').style.border = '';
+            toast.error('Invalid file type. Please check your file you uploaded.', {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -84,7 +90,13 @@ function SicknessApproval() {
         const inputValue = parseInt(thisInfo.BankAccount); 
         if (!isNaN(inputValue)) {
             formData.append("BankAccount", thisInfo.BankAccount);
+
+            document.getElementById('SicknessEligibilityInvalid').style.border = '';
+            document.getElementById('BankAccountInvalid').style.border = '';
         } else {
+
+            document.getElementById('SicknessEligibilityInvalid').style.border = '';
+            document.getElementById('BankAccountInvalid').style.border = '1px solid red';
             toast.error('Something went wrong. Please check your Bank account number inputed.', {
                 position: "bottom-right",
                 autoClose: 5000,
@@ -272,7 +284,7 @@ function SicknessApproval() {
                                             <h6 className="m-0 font-weight-bold text-primary">Sickness Eligibility (Non-anonymous question) *</h6>
                                         </div>
                                         {/* Card Body - New Hire Options */}
-                                        <div className="card-body">
+                                        <div className="card-body" id='SicknessEligibilityInvalid'>
                                             <div className="">
                                                 <div className="">
                                                     <input id='SicknessEligibility' type="file" className="form-control-file" aria-describedby="fileHelp" onChange={handleSicknessEligibility} />
@@ -303,7 +315,7 @@ function SicknessApproval() {
                                                 <h6 className="m-0 font-weight-bold text-primary">BDO BANK ACCOUNT NUMBER *</h6>
                                             </div>
                                         {/* Card Body - New Hire Options */}
-                                        <div className="card-body">
+                                        <div className="card-body" id='BankAccountInvalid'>
                                             <div className="tab-content">
                                                 <div className="card-body">
                                                     <div className="form-group">
@@ -328,7 +340,7 @@ function SicknessApproval() {
                         
                                   
                                  
-
+                        <label style={{ fontSize: '12px', marginLeft: '310px', width: '100%'}}>Note: File upload only accepts PDF, PNG, or JPEG file.</label>
                         <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
                     </form>
                 </div>

@@ -35,8 +35,15 @@ function PagIbigLandbankCard() {
     // Validate and append Application Form
     if (isValidFileType(thisInfo.Application_Form)) {
         formData.append('Application_Form', thisInfo.Application_Form);
+
+        document.getElementById('appFormInvalid').style.border = '';
+        document.getElementById('PayslipInvalid').style.border = '';
+        document.getElementById('IdInvalid').style.border = '';
     } else {
-        toast.error('Invalid Application Form file type. Please upload a PDF, PNG, or JPEG file.', {
+      document.getElementById('appFormInvalid').style.border = '1px solid red';
+      document.getElementById('PayslipInvalid').style.border = '';
+      document.getElementById('IdInvalid').style.border = '';
+      toast.error('Invalid file type. Please check your file you uploaded.', {
             position: "bottom-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -52,8 +59,15 @@ function PagIbigLandbankCard() {
     // Validate and append Pay Slip Files
     if (isValidFileType(thisInfo.paySlipFiles)) {
         formData.append('paySlipFiles', thisInfo.paySlipFiles);
+
+        document.getElementById('appFormInvalid').style.border = '';
+        document.getElementById('PayslipInvalid').style.border = '';
+        document.getElementById('IdInvalid').style.border = '';
     } else {
-        toast.error('Invalid Pay Slip file type. Please upload a PDF, PNG, or JPEG file.', {
+        document.getElementById('appFormInvalid').style.border = '';
+        document.getElementById('PayslipInvalid').style.border = '1px solid red';
+        document.getElementById('IdInvalid').style.border = '';
+        toast.error('Invalid file type. Please check your file you uploaded.', {
             position: "bottom-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -69,8 +83,15 @@ function PagIbigLandbankCard() {
     // Validate and append Valid ID
     if (isValidFileType(thisInfo.Valid_ID)) {
         formData.append('Valid_ID', thisInfo.Valid_ID);
+
+        document.getElementById('appFormInvalid').style.border = '';
+        document.getElementById('PayslipInvalid').style.border = '';
+        document.getElementById('IdInvalid').style.border = '';
     } else {
-        toast.error('Invalid Valid ID file type. Please upload a PDF, PNG, or JPEG file.', {
+      document.getElementById('appFormInvalid').style.border = '';
+      document.getElementById('PayslipInvalid').style.border = '';
+      document.getElementById('IdInvalid').style.border = '1px solid red';
+      toast.error('Invalid file type. Please check your file you uploaded.', {
             position: "bottom-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -167,7 +188,7 @@ function PagIbigLandbankCard() {
                       <h6 className="m-0 font-weight-bold text-primary">Application Form</h6>
                     </div>
                     {/* Card Body - New Hire Options */}
-                    <div className="card-body">
+                    <div className="card-body" id='appFormInvalid'>
                       <div className="tab-content">
                         <div className="card-body">
                           <div className="d-flex justify-content-left">
@@ -193,7 +214,7 @@ function PagIbigLandbankCard() {
                       <h6 className="m-0 font-weight-bold text-primary">1 Month Payslip</h6>
                     </div>
                     {/* Card Body - New Hire Options */}
-                    <div className="card-body">
+                    <div className="card-body" id='PayslipInvalid'>
                       <div className="tab-content">
                         <div className="card-body">
                           <div className="d-flex justify-content-left">
@@ -219,7 +240,7 @@ function PagIbigLandbankCard() {
                       <h6 className="m-0 font-weight-bold text-primary">One(1) Valid ID, Innodata Company ID, Cash Card, & Selfie Photo</h6>
                     </div>
                     {/* Card Body - New Hire Options */}
-                    <div className="card-body">
+                    <div className="card-body" id='IdInvalid'>
                       <div className="tab-content">
                         <div className="card-body">
                           <div className="d-flex justify-content-left">
@@ -235,7 +256,7 @@ function PagIbigLandbankCard() {
             </div>
             {/* Page content ends here */}
 
-
+            <label style={{ fontSize: '12px', marginLeft: '310px', width: '100%'}}>Note: File upload only accepts PDF, PNG, or JPEG file.</label>
             <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
           </form>
         </div>

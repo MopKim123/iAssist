@@ -31,13 +31,20 @@ import 'react-toastify/dist/ReactToastify.css';
   
       const formData = new FormData();
       formData.append('currentEmployeeId', EmployeeId);
-      formData.append('GrossIncome', thisInfo.GrossIncome);
+      
   
       // Validate and append Screenshot Virtual
       if (thisInfo.Screenshot_VirtualAcc && isValidFileType(thisInfo.Screenshot_VirtualAcc)) {
           formData.append('Screenshot_Virtual', thisInfo.Screenshot_VirtualAcc);
+
+          document.getElementById('ScreenshotVirtualInvalid').style.border = '';
+          document.getElementById('PayslipInvalid').style.border = '';
+          document.getElementById('GrossIncomeInvalid').style.border = '';
       } else {
-          toast.error('Invalid Screenshot Virtual file type. Please upload a PDF, PNG, or JPEG file.', {
+        document.getElementById('ScreenshotVirtualInvalid').style.border = '1px solid red';
+        document.getElementById('PayslipInvalid').style.border = '';
+        document.getElementById('GrossIncomeInvalid').style.border = '';
+        toast.error('Invalid file type. Please check your file you uploaded.', {
               position: "bottom-right",
               autoClose: 5000,
               hideProgressBar: false,
@@ -53,8 +60,40 @@ import 'react-toastify/dist/ReactToastify.css';
       // Validate and append Pay Slip
       if (thisInfo.paySlip && isValidFileType(thisInfo.paySlip)) {
           formData.append('paySlip', thisInfo.paySlip);
+
+          document.getElementById('ScreenshotVirtualInvalid').style.border = '';
+          document.getElementById('PayslipInvalid').style.border = '';
+          document.getElementById('GrossIncomeInvalid').style.border = '';
       } else {
-          toast.error('Invalid Pay Slip file type. Please upload a PDF, PNG, or JPEG file.', {
+        document.getElementById('ScreenshotVirtualInvalid').style.border = '';
+        document.getElementById('PayslipInvalid').style.border = '1px solid red';
+        document.getElementById('GrossIncomeInvalid').style.border = '';
+        toast.error('Invalid file type. Please check your file you uploaded.', {
+              position: "bottom-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+          });
+          return; // Stop further execution
+      }
+
+      // Validate and append GrossIncome
+      if (thisInfo.GrossIncome && isValidFileType(thisInfo.GrossIncome)) {
+          formData.append('GrossIncome', thisInfo.GrossIncome);
+          
+          document.getElementById('ScreenshotVirtualInvalid').style.border = '';
+          document.getElementById('PayslipInvalid').style.border = '';
+          document.getElementById('GrossIncomeInvalid').style.border = '';
+
+      } else {
+        document.getElementById('ScreenshotVirtualInvalid').style.border = '';
+        document.getElementById('PayslipInvalid').style.border = '';
+        document.getElementById('GrossIncomeInvalid').style.border = '1px solid red';
+        toast.error('Invalid file type. Please check your file you uploaded.', {
               position: "bottom-right",
               autoClose: 5000,
               hideProgressBar: false,
@@ -152,7 +191,7 @@ import 'react-toastify/dist/ReactToastify.css';
                               <h6 className="m-0 font-weight-bold text-primary">Screenshot of Filed Loan via Virtual Account</h6>
                             </div>
                             {/* Card Body - New Hire Options */}
-                            <div className="card-body">
+                            <div className="card-body" id='ScreenshotVirtualInvalid'>
                               <div className="tab-content">
                                 <div className="card-body">
                                   <div className="d-flex justify-content-left">
@@ -178,7 +217,7 @@ import 'react-toastify/dist/ReactToastify.css';
                               <h6 className="m-0 font-weight-bold text-primary">1 Month Payslip</h6>
                             </div>
                             {/* Card Body - New Hire Options */}
-                            <div className="card-body">
+                            <div className="card-body" id='PayslipInvalid'>
                               <div className="tab-content">
                                 <div className="card-body">
                                   <div className="d-flex justify-content-left">
@@ -204,7 +243,7 @@ import 'react-toastify/dist/ReactToastify.css';
                               <h6 className="m-0 font-weight-bold text-primary">1 Month Gross Income</h6>
                             </div>
                             {/* Card Body - New Hire Options */}
-                            <div className="card-body">
+                            <div className="card-body" id='GrossIncomeInvalid'>
                               <div className="tab-content">
                                 <div className="card-body">
                                   <div className="d-flex justify-content-left">
@@ -220,7 +259,7 @@ import 'react-toastify/dist/ReactToastify.css';
                     </div>
                     {/* Page content ends here */}
 
-                    
+                    <label style={{ fontSize: '12px', marginLeft: '310px', width: '100%'}}>Note: File upload only accepts PDF, PNG, or JPEG file.</label>
                     <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
                   </form>
                 </div>

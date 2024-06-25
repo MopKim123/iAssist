@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState } from 'react';
 import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
-import '../../App.css'; 
-
+import '../../App.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { insertNotification, sendEmail } from '../globalFunctions'; 
+import { sendEmail } from '../globalFunctions'; 
 
 function SSSLoan() {
 
@@ -14,56 +13,50 @@ function SSSLoan() {
 
     const [thisInfo, setSSSinfo] = useState({
         Application_Date: '',
-        Transaction_Number: '',
+        Transaction_Number: '', // Keep it as string for input handling
         Pay_Slip: '',
         Disclosure_Statement: '',
     });
 
-
-    // useEffect(() => {
-    //     [EmployeeId]
-    // });
-
-    const TestEmail = () => {
-        
-        const content = {
-            HrName: '',
-            HrEmail: '', // hr's email
-            Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
-            EmailAddress: sessionStorage.getItem("email"), // employee's email
-            TransactionType: 'SSS Loan',
-            documentName: '',
-            reason: '',
-            stopDeduction: false,
-            facility: sessionStorage.getItem("facility")
-        };
-
-        console.log(content); 
-        
-        sendEmail('submit',content)
-    };
-
-
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-    
-        
+
         const isValidFileType = (file) => {
             const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
             return allowedTypes.includes(file.type);
         };
-    
+
         console.log(EmployeeId);
+
+        // Check if Application_Date is empty
+        if (!thisInfo.Application_Date) {
+            document.getElementById('loanApplicationDate').style.border = '1px solid red';
+            toast.error('Loan Application Date is required.', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+            return; // Stop further execution
+        } else {
+            document.getElementById('loanApplicationDate').style.border = '';
+        }
 
         const formData = new FormData();
         formData.append('currentEmployeeId', EmployeeId);
         formData.append('Application_Date', thisInfo.Application_Date);
-       
-        const inputValue = parseInt(thisInfo.Transaction_Number); 
-        if (!isNaN(inputValue)) {
+
+        // Check if Transaction_Number is a valid integer
+        if (/^\d+$/.test(thisInfo.Transaction_Number)) {
             formData.append('Transaction_Number', thisInfo.Transaction_Number);
+            document.getElementById('TransactionNum').style.border = '';
         } else {
-            toast.error('Something went wrong. Please check your Transaction Number inputed.', {
+            document.getElementById('TransactionNum').style.border = '1px solid red';
+            toast.error('Something went wrong. Please check your Transaction Number input.', {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -79,8 +72,10 @@ function SSSLoan() {
         // Validate and append Pay Slip
         if (thisInfo.Pay_Slip && isValidFileType(thisInfo.Pay_Slip)) {
             formData.append('Pay_Slip', thisInfo.Pay_Slip);
+            document.getElementById('PaySlipInvalid').style.border = '';
         } else {
-            toast.error('Invalid Pay Slip file type. Please upload a PDF, PNG, or JPEG file.', {
+            document.getElementById('PaySlipInvalid').style.border = '1px solid red';
+            toast.error('Invalid file type. Please check your file you uploaded.', {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -92,12 +87,14 @@ function SSSLoan() {
             });
             return; // Stop further execution
         }
-    
+
         // Validate and append Disclosure Statement
         if (thisInfo.Disclosure_Statement && isValidFileType(thisInfo.Disclosure_Statement)) {
             formData.append('Disclosure_Statement', thisInfo.Disclosure_Statement);
+            document.getElementById('DisclosureStatementInvalid').style.border = '';
         } else {
-            toast.error('Invalid Disclosure Statement file type. Please upload a PDF, PNG, or JPEG file.', {
+            document.getElementById('DisclosureStatementInvalid').style.border = '1px solid red';
+            toast.error('Invalid file type. Please check your file you uploaded.', {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -109,32 +106,33 @@ function SSSLoan() {
             });
             return; // Stop further execution
         }
-    
+
         try {
             const response = await fetch('/SSSloan', {
                 method: 'POST',
                 body: formData,
             });
-    
+
             if (response.ok) {
                 const jsonResponse = await response.json();
-    
+
                 console.log(jsonResponse.message);
-                
-    
+
                 setSSSinfo({
                     Application_Date: '',
                     Transaction_Number: '',
                     Pay_Slip: '',
                     Disclosure_Statement: ''
                 });
-    
+
                 // Clear file input fields
                 document.getElementById('loanApplicationDate').value = null;
                 document.getElementById('TransactionNum').value = null;
                 document.getElementById('PaySlip').value = null;
                 document.getElementById('DisclosureStatement').value = null;
-    
+
+                SendEmailNotification()
+                
                 // Emit success toast
                 toast.success('Thank you! Your request has been submitted.', {
                     position: "bottom-right",
@@ -146,7 +144,7 @@ function SSSLoan() {
                     progress: undefined,
                     theme: "light",
                 });
-    
+
             } else {
                 console.error('Failed to submit request:', response.statusText);
                 toast.error('Failed to Submit', {
@@ -164,7 +162,6 @@ function SSSLoan() {
             console.error('Error uploading:', error);
         }
     };
-    
 
     const handlePay_Slip = (e) => {
         setSSSinfo({ ...thisInfo, Pay_Slip: e.target.files[0] });
@@ -193,9 +190,22 @@ function SSSLoan() {
 
         return `${year}-${month}-${day}`;
     };
-
-
-
+    const SendEmailNotification = () => {
+        
+        const content = {
+            HrName: '',
+            HrEmail: '', // hr's email
+            Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+            EmailAddress: sessionStorage.getItem("email"), // employee's email
+            TransactionType: 'SSS Loan',
+            documentName: '',
+            reason: '',
+            stopDeduction: false,
+            facility: sessionStorage.getItem("facility")
+        }; 
+        
+        sendEmail('submit',content)
+    };
     return (
         <div id="wrapper">
             <Navbar />
@@ -207,7 +217,6 @@ function SSSLoan() {
                             <h4 className="m-0 font-weight-bold text-primary header-name">SSS Loan</h4>
                         </div>
                     </div>
-                        <button type="submit" onClick={TestEmail} className="btn btn-primary d-block mx-auto loan-btn">send</button>
                     <form onSubmit={handleFormSubmit}>
                         {/* page content begin here */}
                         <div className="container-fluid">
@@ -236,7 +245,14 @@ function SSSLoan() {
                                                     </div>
                                                     <div className="form-group">
                                                         <label htmlFor="name">Transaction Number</label>
-                                                        <input type="text" className="form-control" id="TransactionNum" name="name" onChange={(e) => setSSSinfo({ ...thisInfo, Transaction_Number: e.target.value })} />
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="TransactionNum"
+                                                            name="name"
+                                                            value={thisInfo.Transaction_Number}
+                                                            onChange={(e) => setSSSinfo({ ...thisInfo, Transaction_Number: e.target.value })}
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -246,6 +262,7 @@ function SSSLoan() {
                             </div>
                         </div>
                         {/* Page content ends here */}
+                        
                         {/* page content begin here */}
                         <div className="container-fluid">
                             <div className="row justify-content-center">
@@ -256,7 +273,7 @@ function SSSLoan() {
                                             <h6 className="m-0 font-weight-bold text-primary">1 Month Pay Slip</h6>
                                         </div>
                                         {/* Card Body - New Hire Options */}
-                                        <div className="card-body">
+                                        <div className="card-body" id='PaySlipInvalid'>
                                             <div className="tab-content">
                                                 <div className="card-body">
                                                     <div className="d-flex justify-content-left">
@@ -287,11 +304,17 @@ function SSSLoan() {
                                             <h6 className="m-0 font-weight-bold text-primary">Loan Disclosure Statement</h6>
                                         </div>
                                         {/* Card Body - New Hire Options */}
-                                        <div className="card-body">
+                                        <div className="card-body" id='DisclosureStatementInvalid'>
                                             <div className="tab-content">
                                                 <div className="card-body">
                                                     <div className="d-flex justify-content-left">
-                                                        <input type="file" className="input-file" aria-describedby="fileHelp" onChange={handleDisclosure_Statement} id='DisclosureStatement' />
+                                                        <input
+                                                            type="file"
+                                                            className="input-file"
+                                                            aria-describedby="fileHelp"
+                                                            onChange={handleDisclosure_Statement}
+                                                            id='DisclosureStatement'
+                                                        />
                                                         <small id="fileHelp" className="form-text text-muted">Choose a file to upload.</small>
                                                     </div>
                                                 </div>
@@ -302,6 +325,8 @@ function SSSLoan() {
                             </div>
                         </div>
                         {/* Page content ends here */}
+                        <label style={{ fontSize: '12px', marginLeft: '310px', width: '100%'}}>Note: File upload only accepts PDF, PNG, or JPEG file.</label>
+
                         <button type="submit" className="btn btn-primary d-block mx-auto loan-btn">Submit</button>
                     </form>
                 </div>

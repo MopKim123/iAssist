@@ -177,7 +177,7 @@ export async function insertNotification(Name, TransactionType, SenderID, Receiv
       transaction_type: data.TransactionType,
       document_name: data.documentName,
       reason: data.reason,
-      stopDeduction: data.reason,
+      stopDeduction: data.stopDeduction,
       cc: cc,
       turnAround: TurnAround
     };  
@@ -231,6 +231,20 @@ export async function sendEmailjs (emailType, data) {
   Your request for ${data.transaction_type} has been received. 
 
   Your HR CompBen Team will review the submitted documents and will email you within ${data.turnAround} working days to update you on the status of your request
+   
+  If no update is received within the speciefied timeline, you may send us an email at HRComp_Ben@innodata.com.
+
+  Thank you.
+
+  HR Compensation & Benefits Team
+  `
+
+  // submit - message for submitting request
+  const titleStopDeduction = `Request to Stop Deduction : ${data.receiver_name}`
+  const messageStopDeduction = `
+  Your request to stop deduction for your ${data.transaction_type} due to ${data.reason} is received. 
+
+  Your HR CompBen Team will review the submitted documents and will email you within three (3) working days to update you on the status of your request
    
   If no update is received within the speciefied timeline, you may send us an email at HRComp_Ben@innodata.com.
 
@@ -295,8 +309,13 @@ export async function sendEmailjs (emailType, data) {
       message = messageResubmit
       break;      
     case 'submit': 
-      title = titleSubmit
-      message = messageSubmit
+      if(data.stopDeduction){
+        title = titleStopDeduction
+        message = messageStopDeduction
+      }else{
+        title = titleSubmit
+        message = messageSubmit
+      }
       break;      
   }
 
@@ -311,17 +330,17 @@ export async function sendEmailjs (emailType, data) {
       title: title,
       cc: cc
     };   
-    console.log(formData);
+    console.log(formData );
 
-    // emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
-    //   .then((result) => {
-    //     console.log('Email sent successfully:', result.text);
-    //     // alert('Updated Successfully') 
-    //     resolve(true);
-    //   }, (error) => {
-    //     console.error('Email sending failed:', error.text);
-    //     reject(error);
-    //   });
+    emailjs.send('service_2cen06m', 'template_complete', formData, 'hrQ_V5JOOkQWdddTK')
+      .then((result) => {
+        console.log('Email sent successfully:', result.text);
+        // alert('Updated Successfully') 
+        resolve(true);
+      }, (error) => {
+        console.error('Email sending failed:', error.text);
+        reject(error);
+      });
   });
 };
 
