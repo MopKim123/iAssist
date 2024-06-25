@@ -362,6 +362,12 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                                   <input type="text" className="form-control" id="deductionFor" name="deductionFor" disabled value={data.DeductionFor}/>
                                               </div>
                                               }
+                                              {data.RequestTitle && 
+                                              <div className="form-group">
+                                                  <label htmlFor="requestTitle">Request Title</label>
+                                                  <input type="text" className="form-control" id="requestTitle" name="requestTitle" disabled value={data.RequestTitle}/>
+                                              </div>
+                                              }
                                               {data.Description && 
                                               <div className="form-group">
                                                   <label htmlFor="description">Description</label>
@@ -390,12 +396,6 @@ import { Document, Page,pdfjs } from 'react-pdf';
                                               <div className="form-group">
                                                   <label htmlFor="reasonType">Reason Type</label>
                                                   <input type="text" className="form-control" id="reasonType" name="reasonType" disabled value={data.ReasonType}/>
-                                              </div>
-                                              }
-                                              {data.RequestTitle && 
-                                              <div className="form-group">
-                                                  <label htmlFor="requestTitle">Request Title</label>
-                                                  <input type="text" className="form-control" id="requestTitle" name="requestTitle" disabled value={data.RequestTitle}/>
                                               </div>
                                               }
                                               {data.RequestType && 

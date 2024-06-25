@@ -137,7 +137,7 @@ export async function insertNotification(Name, TransactionType, SenderID, Receiv
     let HrName
     let HrEmail
     let cc
-    const TurnAround = data.TransactionType === 'Certification Request'? 'five (5)': 'three (3)';
+    const TurnAround = /Certification Request/i.test(data.TransactionType) ? 'five (5)': 'three (3)';
 
     
     const formData = new FormData();

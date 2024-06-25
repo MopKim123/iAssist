@@ -6,6 +6,7 @@ import '../../App.css';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { sendEmail } from '../globalFunctions';
 
 function PagIbigLandbankCard() {
 
@@ -126,6 +127,8 @@ function PagIbigLandbankCard() {
             document.getElementById('paySlipInput').value = null;
             document.getElementById('validIdInput').value = null;
 
+            SendEmailNotification()
+
             // Emit success toast
             toast.success('Thank you! Your request has been submitted.', {
                 position: "bottom-right",
@@ -165,7 +168,26 @@ function PagIbigLandbankCard() {
   const handleValid_ID = (e) => {
     setThisInfo({ ...thisInfo, Valid_ID: e.target.files[0] });
   };
-  
+
+  const SendEmailNotification= () => {
+        
+    const content = {
+        HrName: '',
+        HrEmail: '', // hr's email
+        Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+        EmailAddress: sessionStorage.getItem("email"), // employee's email
+        TransactionType: 'Pag-Ibig Landbank Card',
+        documentName: '',
+        reason: '',
+        stopDeduction: false,
+        facility: sessionStorage.getItem("facility")
+    };
+
+    console.log(content); 
+    
+    sendEmail('submit',content)
+  };
+
   return (
     <div id="wrapper">
       <Navbar />

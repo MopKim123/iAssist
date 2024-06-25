@@ -4,8 +4,7 @@ import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
 import '../../App.css';
-import { variables } from '../../variables';
-
+import { sendEmail } from '../globalFunctions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -17,7 +16,7 @@ function OtherRequest() {
         RequestTitle: "",
         Description: "",
         NeccesaryFile: null
-    });
+    }); 
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -110,6 +109,8 @@ function OtherRequest() {
                 document.getElementById('Description').value = '';
                 document.getElementById('NeccesaryFile').value = '';
     
+                SendEmailNotification()
+
                 toast.success('Thank you! Your request has been submitted.', {
                     position: "bottom-right",
                     autoClose: 5000,
@@ -150,6 +151,26 @@ function OtherRequest() {
     const handleNeccesaryFile = (e) => {
         setThisInfo({ ...thisInfo, NeccesaryFile: e.target.files[0] });
     };
+
+    const SendEmailNotification= () => {
+          
+      const content = {
+          HrName: '',
+          HrEmail: '', // hr's email
+          Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+          EmailAddress: sessionStorage.getItem("email"), // employee's email
+          TransactionType: thisInfo.RequestTitle,
+          documentName: '',
+          reason: '',
+          stopDeduction: false,
+          facility: sessionStorage.getItem("facility")
+      };
+  
+      console.log(content); 
+      
+      sendEmail('submit',content)
+    };
+  
 
     return (
         <div id="wrapper">

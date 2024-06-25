@@ -3,6 +3,7 @@ import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
 import '../../App.css';
+import { sendEmail } from '../globalFunctions';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -128,6 +129,8 @@ import 'react-toastify/dist/ReactToastify.css';
               document.getElementById('paySlipFiles').value = null;
               document.getElementById('GrossIncome').value = null;
   
+              SendEmailNotification()
+
               // Emit success toast
               toast.success('Thank you! Your request has been submitted.', {
                   position: "bottom-right",
@@ -168,6 +171,26 @@ import 'react-toastify/dist/ReactToastify.css';
     const handleGrossIncome = (e) => {
       setThisInfo({ ...thisInfo, GrossIncome: e.target.files[0] });
     };
+
+    const SendEmailNotification= () => {
+          
+      const content = {
+          HrName: '',
+          HrEmail: '', // hr's email
+          Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+          EmailAddress: sessionStorage.getItem("email"), // employee's email
+          TransactionType: 'Pag-Ibig Virtual Account',
+          documentName: '',
+          reason: '',
+          stopDeduction: false,
+          facility: sessionStorage.getItem("facility")
+      };
+  
+      console.log(content); 
+      
+      sendEmail('submit',content)
+    };
+  
   
     return (
       <div id="wrapper">

@@ -4,8 +4,7 @@ import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
 import '../../App.css';
-import { variables } from '../../variables';
-
+import { sendEmail } from '../globalFunctions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -15,12 +14,12 @@ function SSSRequest() {
 
   const [selected, setSelected] = useState("0");
   const [selectedReason, setSelectedReason] = useState("0");
+  const [reason, setReason] = useState("0");
 
   const [thisInfo, setThisInfo] = useState({
     EmailNotification: '',
     ProvidentApplicationForm: ''
-  });
-
+  }); 
   // useEffect(() => {
   //   [EmployeeId];
   // });
@@ -31,6 +30,9 @@ function SSSRequest() {
   }; 
 
   const handleReasonChange = (e) => {
+    const selectedIndex = e.target.selectedIndex;
+    const selectedText = e.target.options[selectedIndex].text;
+    setReason(selectedText);
     setSelectedReason(e.target.value);
   };
 
@@ -128,6 +130,8 @@ function SSSRequest() {
       if (response.ok) {
           const jsonResponse = await response.json();
   
+          SendEmailNotification()
+
           console.log(jsonResponse.message);
            // Emit success toast
            toast.success('Thank you! Your request has been submitted.', {
@@ -180,6 +184,26 @@ function SSSRequest() {
     setThisInfo({ ...thisInfo, ProvidentApplicationForm: e.target.files[0] });
   };
   
+
+  const SendEmailNotification= () => {
+        
+    const content = {
+        HrName: '',
+        HrEmail: '', // hr's email
+        Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+        EmailAddress: sessionStorage.getItem("email"), // employee's email
+        TransactionType: 'SSS Loan',
+        documentName: '',
+        reason: reason,
+        stopDeduction: true,
+        facility: sessionStorage.getItem("facility")
+    };
+
+    console.log(content); 
+    
+    sendEmail('submit',content)
+  };
+
 
     return (
       <div id="wrapper">

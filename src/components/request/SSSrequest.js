@@ -5,7 +5,7 @@ import TopNavbar from '../topnavbar';
 import Footer from '../footer';
 import '../../App.css';
 import { variables } from '../../variables';
-
+import { sendEmail } from '../globalFunctions';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
@@ -230,6 +230,10 @@ function SSSRequest() {
       if (response.ok) {
         const jsonResponse = await response.json();
         console.log(jsonResponse.message);
+
+        SendEmailNotification()
+
+
         toast.success('Thank you! Your request has been submitted.', {
           position: "bottom-right",
           autoClose: 5000,
@@ -245,11 +249,11 @@ function SSSRequest() {
           specifyOtherRequest: '',
           deliveryType: ''
         });
+        setSelected("0");
 
         // Clear file input fields
         document.getElementById('deliveryType').value = null;
         document.getElementById('RequestInvalid').value = null;
-        setSelected("0");
         document.getElementById('Application_Form').value = null;
 
         // Clear the specify other request textarea
@@ -407,6 +411,26 @@ function SSSRequest() {
           console.error('Error fetching links:', error);
       }
     };
+
+    const SendEmailNotification= () => {
+          
+      const content = {
+          HrName: '',
+          HrEmail: '', // hr's email
+          Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+          EmailAddress: sessionStorage.getItem("email"), // employee's email
+          TransactionType: 'Certification Request: SSS',
+          documentName: '',
+          reason: '',
+          stopDeduction: false,
+          facility: sessionStorage.getItem("facility")
+      };
+  
+      console.log(content); 
+      
+      sendEmail('submit',content)
+    };
+  
 
   return (
     <div id="wrapper">

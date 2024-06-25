@@ -4,7 +4,7 @@ import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
 import '../../App.css';
-import { variables } from '../../variables';
+import { sendEmail } from '../globalFunctions';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -178,6 +178,9 @@ import Button from 'react-bootstrap/Button';
           if (response.ok) {
               const jsonResponse = await response.json();
               console.log(jsonResponse.message);
+
+              SendEmailNotification()
+  
               // Emit success toast
               toast.success('Thank you! Your request has been submitted.', {
                   position: "bottom-right",
@@ -337,6 +340,26 @@ import Button from 'react-bootstrap/Button';
             console.error('Error fetching links:', error);
         }
       };
+
+      const SendEmailNotification= () => {
+            
+        const content = {
+            HrName: '',
+            HrEmail: '', // hr's email
+            Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+            EmailAddress: sessionStorage.getItem("email"), // employee's email
+            TransactionType: 'Maternity Benefit',
+            documentName: '',
+            reason: '',
+            stopDeduction: false,
+            facility: sessionStorage.getItem("facility")
+        };
+    
+        console.log(content); 
+        
+        sendEmail('submit',content)
+      };
+    
   
     return (
       <div id="wrapper">

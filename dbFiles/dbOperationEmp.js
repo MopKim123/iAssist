@@ -709,7 +709,7 @@ const handleDocuments = async (TransactionType, Status, DateTime, TurnAround, Ap
             `);
 
             const SubmissionID = file.recordset[0].SubmissionID;
-            if (dataPDF.DocumentFile && dataPDF.DocumentFile.length > 0){
+            if (dataPDF.DocumentFile && dataPDF.DocumentFile.length > 0 || dataPDF.Doc1 && dataPDF.Doc1.length > 0 || dataPDF.Doc2 && dataPDF.Doc2.length > 0 || dataPDF.Doc3 && dataPDF.Doc3.length > 0 || dataPDF.Doc4 && dataPDF.Doc4.length > 0 ){
                 if(TransactionType === "SSS Loan"){
                     PdfFile(dataPDF.Doc1,SubmissionID,"1 Month Pay Slip");
                     PdfFile(dataPDF.Doc2,SubmissionID,"Loan Disclosure Statement");

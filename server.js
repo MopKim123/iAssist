@@ -1190,7 +1190,7 @@ app.post('/SSSloan', upload.fields([{ name: 'currentEmployeeId' }, { name: 'Pay_
       const TransactionType = "SSS Loan";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5"
+      const TurnAround = "3"
 
       const { Application_Date, Transaction_Number,currentEmployeeId } = req.body;
       const TypeOfDelivery = "";
@@ -1239,7 +1239,7 @@ app.post('/PagIbigLandbankCard', upload.fields([{ name: 'currentEmployeeId' }, {
       const TransactionType = "Pag-Ibig Landbank Card";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5"
+      const TurnAround = "3"
       const Application_Date = "";
       const Transaction_Number = "";
       const TypeOfDelivery = "";
@@ -1289,7 +1289,7 @@ app.post('/PagIbigVirtualAccount', upload.fields([{ name: 'currentEmployeeId' },
       const TransactionType = "Pag-Ibig Virtual Account";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5"
+      const TurnAround = "3"
       const Application_Date = "";
       const Transaction_Number = "";
       const TypeOfDelivery = "";
@@ -1338,7 +1338,7 @@ app.post('/MaternityNotification', upload.fields([{ name: 'currentEmployeeId' },
     const TransactionType = "Maternity Notication";
     const Status = "Pending";
     const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-    const TurnAround = "5"
+    const TurnAround = "3"
     const Application_Date = "";
     const Transaction_Number = "";
     const TypeOfDelivery = "";
@@ -1405,7 +1405,7 @@ app.post('/MaternityBenefit', upload.fields([
       const TransactionType = "Maternity Benefit";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5"
+      const TurnAround = "3"
       const Application_Date = "";
       const Transaction_Number = "";
       const RequestType = "";
@@ -1476,7 +1476,7 @@ app.post('/CertificationRequestSSS', upload.fields([
       const MonthlyContributions = req.files['MonthlyContributions'];
       const SpecifyOtherRequest = req.body.SpecifyOtherRequest;
 
-      const TransactionType = "Certification Request";
+      const TransactionType = "Certification Request SSS";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
       const TurnAround = "5"
@@ -1550,7 +1550,7 @@ app.post('/PagIbigRequest', upload.fields([
       const StatementOfAccount = req.files['StatementOfAccount'];
       const FormFromPagIbig = req.files['FormFromPagIbig'];
       
-      const TransactionType = "Certification Request";
+      const TransactionType = "Certification Request: PAG-IBIG";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
       const TurnAround = "5"
@@ -1617,7 +1617,7 @@ app.post('/PHILHEALTHrequest', upload.fields([
       const EmailNotification = req.files['EmailNotification'];
       const ProvidentApplicationForm = req.files['ProvidentApplicationForm'];
       
-      const TransactionType = "Certification Request";
+      const TransactionType = "Certification Request: PHILHEALTH";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
       const TurnAround = "5"
@@ -1740,7 +1740,7 @@ app.post('/SicknessNotification', upload.fields([
       const TransactionType = "SSS Sickness Notification";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5";
+      const TurnAround = "3";
       const Application_Date = "";
       const Transaction_Number = "";
       const RequestType = "";
@@ -1785,7 +1785,7 @@ app.post('/SicknessApproval', upload.fields([
       const TransactionType = "SSS Sickness Approval";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5";
+      const TurnAround = "3";
       const Application_Date = "";
       const Transaction_Number = "";
       const RequestType = "";
@@ -1839,7 +1839,7 @@ app.post('/UpdateEmployeeInformation', upload.fields([
       const TransactionType = "Update Employee Information";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5";
+      const TurnAround = "3";
       const Application_Date = "";
       const Transaction_Number = "";
       const RequestType = "";
@@ -1880,7 +1880,7 @@ app.post('/OtherRequest', upload.fields([
       const TransactionType = "Other Request";
       const Status = "Pending";
       const currentDate = new Date().toISOString().slice(0, 10); // Format: YYYY-MM-DD
-      const TurnAround = "5";
+      const TurnAround = "3";
       const Application_Date = "";
       const Transaction_Number = "";
       const RequestType = "Other Request";

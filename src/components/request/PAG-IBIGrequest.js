@@ -4,8 +4,7 @@ import Navbar from '../navbar';
 import TopNavbar from '../topnavbar';
 import Footer from '../footer';
 import '../../App.css';
-import { variables } from '../../variables';
-
+import { sendEmail } from '../globalFunctions';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -120,6 +119,8 @@ import 'react-toastify/dist/ReactToastify.css';
         if (response.ok) {
             const jsonResponse = await response.json();
     
+            SendEmailNotification()
+
             console.log(jsonResponse.message);
              // Emit success toast
              toast.success('Thank you! Your request has been submitted.', {
@@ -184,6 +185,26 @@ import 'react-toastify/dist/ReactToastify.css';
       setCorrectName(event.target.value);
     };
     
+
+  const SendEmailNotification= () => {
+        
+    const content = {
+        HrName: '',
+        HrEmail: '', // hr's email
+        Name: sessionStorage.getItem("firstName") + " " + sessionStorage.getItem("lastName"),
+        EmailAddress: sessionStorage.getItem("email"), // employee's email
+        TransactionType: 'Certification Request: PAG-IBIG',
+        documentName: '',
+        reason: '',
+        stopDeduction: false,
+        facility: sessionStorage.getItem("facility")
+    };
+
+    console.log(content); 
+    
+    sendEmail('submit',content)
+  };
+
   
     if (!thisInfo) {
       return <div>Loading...</div>;
